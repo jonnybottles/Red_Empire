@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <errno.h>
-#include<sys/utsname.h>
+#include <sys/utsname.h>
 #include "initiate.h"
 #include "utils.h"
 
