@@ -64,17 +64,34 @@ int reg(void)
         perror("curl_mime_addpart error\n");
       }
 
-      char *os_info = NULL;
-      os_info = get_os_info();
-
-      if (curl_mime_name(field, "os") != CURLE_OK) {
+      struct utsname buf1;
+      errno =0;
+      if(uname(&buf1)!=0)
+      {
+          perror("uname error\n");
+      }
+      if (curl_mime_name(field, "os type") != CURLE_OK) {
         perror("Error curl_mime_name OS\n");
       }
 
-      if (curl_mime_data(field, os_info, CURL_ZERO_TERMINATED) != CURLE_OK) {
+      if (curl_mime_data(field, buf1.nodename, CURL_ZERO_TERMINATED) != CURLE_OK) {
         perror("Error curl_mime_data OS\n");
       }
+
   
+      field = curl_mime_addpart(form);
+      if (!field) {
+        perror("curl_mime_addpart error\n");
+      }
+
+      if (curl_mime_name(field, "os version") != CURLE_OK) {
+        perror("Error curl_mime_name OS\n");
+      }
+
+      if (curl_mime_data(field, buf1.version, CURL_ZERO_TERMINATED) != CURLE_OK) {
+        perror("Error curl_mime_data OS\n");
+      }
+
       // Fill in submit field options.
       field = curl_mime_addpart(form);
       if (!field) {
@@ -121,37 +138,24 @@ int reg(void)
   return 0;
 }
 
-char *get_os_info()
-{
-   struct utsname buf1;
-   errno =0;
-   if(uname(&buf1)!=0)
-   {
-      perror("uname error\n");
-   }
-   printf("Node Name = %s\n", buf1.nodename);
-   printf("Version = %s\n", buf1.version);
-   
-   strncat(buf1.nodename,buf1.version, 12);
-   printf("%s", buf1.nodename);
-
-   char *os_info = NULL;
-   os_info = strdup(buf1.nodename);
-   if (!os_info) {
-     perror("strdup failure\n");
-   }
-   return os_info;
-}
-// char *get_host_name(void)
+// char *get_os_info()
 // {
-//   char *hostname = malloc(sizeof(*hostname));
-//   int ret;
-//   ret = gethostname(hostname, sizeof(hostname));
-//   if (ret == -1)
-//   {
-//     perror("Error getting hostname");
-//   }
-//   // printf("Host name is %s\n", hostname);
-//   return hostname;
+//    struct utsname buf1;
+//    errno =0;
+//    if(uname(&buf1)!=0)
+//    {
+//       perror("uname error\n");
+//    }
+//    printf("Node Name = %s\n", buf1.nodename);
+//    printf("Version = %s\n", buf1.version);
+   
+//    strncat(buf1.nodename,buf1.version, 12);
+//    printf("%s", buf1.nodename);
 
+//    char *os_info = NULL;
+//    os_info = strdup(buf1.nodename);
+//    if (!os_info) {
+//      perror("strdup failure\n");
+//    }
+//    return os_info;
 // }

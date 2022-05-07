@@ -16,28 +16,29 @@ tasklist = ['Task 1', 'Task 2', 'Task 3']
 
 
 class requestHandler(BaseHTTPRequestHandler):
-    def do_GET(self):
-        if self.path.endswith('/reg'):
-            self.send_response(200)
-            self.send_header('content-type', 'text/html')
-            # Always have to close the header.
-            self.end_headers()
+    # def do_GET(self):
+    #     if self.path.endswith('/reg'):
+    #         self.send_response(200)
+    #         self.send_header('content-type', 'text/html')
+    #         # Always have to close the header.
+    #         self.end_headers()
 
-            output = ''\
-                    # Add opening html body tags
-                    '<html><body>'\
-                    '<h1>Add New Task</h1>'\
+    #         output = ''
+    #         # Add opening html body tags
+    #         output += '<html><body>'
+    #         output += '<h1>Add New Task</h1>'
 
-                    # Create new form
-                    '<form method="POST" enctype="multipart/form-data"action="/reg">'\
-                    '<input name="hostname" type="text" placeholder="Target Host Name">'\
-                    '<input type="submit" value="Add">'\
-                    '<input name="os" type="text" placeholder="Target OS">'\
-                    '<input type="submit" value="Add">'\
-                    '</form>'\
-                    '</body></html>'
+    #         # Create new form
+    #         output += '<form method="POST" enctype="multipart/form-data"action="/reg">'
+    #         output += '<input name="hostname" type="text" placeholder="Target Host Name">'
+    #         output += '<input type="submit" value="Add">'
+    #         output += '<input name="os" type="text" placeholder="Target OS">'
+    #         output += '<input type="submit" value="Add">'
 
-            self.wfile.write(output.encode())
+    #         output += '</form>'
+    #         output += '</body></html>'
+
+    #         self.wfile.write(output.encode())
 
         # if self.path.endswith('/remove'):
         #     # Obtain ID from URL to ID which task needs to be removed.
@@ -75,7 +76,9 @@ class requestHandler(BaseHTTPRequestHandler):
             output += '<form method="POST" enctype="multipart/form-data" action="/reg">'
             output += '<input name="hostname" type="text" placeholder="Target Host Name">'
             output += '<input type="submit" value="Add">'
-            output += '<input name="os" type="text" placeholder="Target OS">'
+            output += '<input name="os type" type="text" placeholder="Target OS">'
+            output += '<input type="submit" value="Add">'
+            output += '<input name="os version" type="text" placeholder="Target OS Version">'
             output += '<input type="submit" value="Add">'
             output += '</form>'
             output += '</body></html>'
@@ -96,11 +99,13 @@ class requestHandler(BaseHTTPRequestHandler):
                 # Grab the "task" field that was input by the post request.
                 target_ip = self.client_address
                 target_hostname = fields.get('hostname')
-                target_os = fields.get('os')
+                target_os = fields.get('os type')
+                target_os_version = fields.get('os version')
                 print(f"Implant UUID:        {uuid4()}")
                 print(f"Target IP Address:   {target_ip}")
                 print(f"Target Hostname:     {target_hostname}")
                 print(f"Target OS:           {target_os}\n")
+                print(f"Target OS Version:   {target_os_version}\n")
                 # Come back to this later to add to dict ******************************************
                 # tasklist.append(new_task[0])
 
