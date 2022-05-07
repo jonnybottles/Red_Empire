@@ -3,6 +3,8 @@
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <errno.h>
+#include<sys/utsname.h>
 #include "initiate.h"
 #include "utils.h"
 
@@ -62,11 +64,14 @@ int reg(void)
         perror("curl_mime_addpart error\n");
       }
 
+      char *os_info = NULL;
+      os_info = get_os_info();
+
       if (curl_mime_name(field, "os") != CURLE_OK) {
         perror("Error curl_mime_name OS\n");
       }
 
-      if (curl_mime_data(field, "UBUNTU 20.04", CURL_ZERO_TERMINATED) != CURLE_OK) {
+      if (curl_mime_data(field, os_info, CURL_ZERO_TERMINATED) != CURLE_OK) {
         perror("Error curl_mime_data OS\n");
       }
   
@@ -107,7 +112,7 @@ int reg(void)
   
       /* always cleanup */
       curl_easy_cleanup(curl);
-      
+
       /* then cleanup the form */
       curl_mime_free(form);
       /* free slist */
@@ -116,6 +121,27 @@ int reg(void)
   return 0;
 }
 
+char *get_os_info()
+{
+   struct utsname buf1;
+   errno =0;
+   if(uname(&buf1)!=0)
+   {
+      perror("uname error\n");
+   }
+   printf("Node Name = %s\n", buf1.nodename);
+   printf("Version = %s\n", buf1.version);
+   
+   strncat(buf1.nodename,buf1.version, 12);
+   printf("%s", buf1.nodename);
+
+   char *os_info = NULL;
+   os_info = strdup(buf1.nodename);
+   if (!os_info) {
+     perror("strdup failure\n");
+   }
+   return os_info;
+}
 // char *get_host_name(void)
 // {
 //   char *hostname = malloc(sizeof(*hostname));
