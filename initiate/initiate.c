@@ -18,8 +18,9 @@ int reg(void)
   struct curl_slist *headerlist = NULL;
   static const char buf[] = "Expect:";
  
-  // first one is only on that i cna check int on
-  check(curl_global_init(CURL_GLOBAL_ALL), "Curl global init error\n");
+  if (curl_global_init(CURL_GLOBAL_ALL)!= 0) {
+    perror("curl_global_init error\n");
+  }
  
   curl = curl_easy_init();
   if(!curl) {
@@ -34,37 +35,65 @@ int reg(void)
         perror("curl_mime_init error\n");
       }
   
-      /* Fill in the file upload field */
+      // Begin code to set options for posting hostname / os to /reg.
       field = curl_mime_addpart(form);
       if (!field) {
         perror("curl_mime_addpart error\n");
       }
 
+      // Get target hostname.
+      // TO DO figure out how to import HOST_NAME_MAX
       char hostbuf[256];
       if (gethostname(hostbuf, sizeof(hostbuf)) == -1) {
-        perror("Error getting host name.\n");
+        perror("Error acquiring host name.\n");
       }
 
-      printf("Host name is %s\n", hostbuf);
-      curl_mime_name(field, "hostname");
-      curl_mime_data(field, hostbuf, CURL_ZERO_TERMINATED);
+      if (curl_mime_name(field, "hostname") != CURLE_OK) {
+        perror("Error curl_mime_name hostname\n");
+      }
+    
+      if (curl_mime_data(field, hostbuf, CURL_ZERO_TERMINATED) != CURLE_OK) {
+        perror("Error curl_mime_data hostname\n");
+      }
   
-      /* Fill in the filename field */
-      // This may be where I add another field......***
+
       field = curl_mime_addpart(form);
-      curl_mime_name(field, "os");
-      curl_mime_data(field, "UBUNTU 20.04", CURL_ZERO_TERMINATED);
+      if (!field) {
+        perror("curl_mime_addpart error\n");
+      }
+
+      if (curl_mime_name(field, "os") != CURLE_OK) {
+        perror("Error curl_mime_name OS\n");
+      }
+
+      if (curl_mime_data(field, "UBUNTU 20.04", CURL_ZERO_TERMINATED) != CURLE_OK) {
+        perror("Error curl_mime_data OS\n");
+      }
   
-      /* Fill in the submit field too, even if this is rarely needed */
+      // Fill in submit field options.
       field = curl_mime_addpart(form);
-      curl_mime_name(field, "submit");
-      curl_mime_data(field, "send", CURL_ZERO_TERMINATED);
+      if (!field) {
+        perror("curl_mime_addpart error\n");
+      }
+
+      if (curl_mime_name(field, "submit") != CURLE_OK) {
+        perror("Error curl_mime_name submit");
+      }
+
+      if (curl_mime_data(field, "send", CURL_ZERO_TERMINATED) != CURLE_OK) {
+        perror("Error curl_mime_data send");
+      }
   
       /* initialize custom header list (stating that Expect: 100-continue is not
         wanted */
       headerlist = curl_slist_append(headerlist, buf);
+      if (!headerlist) {
+        perror("curl_slist_append error\n");
+      }
+
+      const char regurl[19] = "127.0.0.1:9000/reg";
       /* what URL that receives this POST */
-      curl_easy_setopt(curl, CURLOPT_URL, "127.0.0.1:9000/reg");
+      curl_easy_setopt(curl, CURLOPT_URL, regurl);
 
       curl_easy_setopt(curl, CURLOPT_MIMEPOST, form);
   
@@ -78,7 +107,7 @@ int reg(void)
   
       /* always cleanup */
       curl_easy_cleanup(curl);
-  
+      
       /* then cleanup the form */
       curl_mime_free(form);
       /* free slist */
