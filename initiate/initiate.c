@@ -1,6 +1,6 @@
-#include <curl/curl.h>
 #include <stdio.h>
 #include <string.h>
+#include <stddef.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <errno.h>
@@ -12,6 +12,8 @@
 
 int reg(void)
 {
+
+ 
   CURL *curl;
   CURLcode res;
  
@@ -30,18 +32,23 @@ int reg(void)
 
 
   } else {
+
+      form = malloc(sizeof(curl_mime));
+      field = malloc(sizeof(*field));
       /* Create the form */
       // returns null if failure.
       form = curl_mime_init(curl);
       if (!form) {
         perror("curl_mime_init error\n");
       }
+
+
   
-      // Begin code to set options for posting hostname / os to /reg.
-      field = curl_mime_addpart(form);
-      if (!field) {
-        perror("curl_mime_addpart error\n");
-      }
+      // // Begin code to set options for posting hostname / os to /reg.
+      // field = curl_mime_addpart(form);
+      // if (!field) {
+      //   perror("curl_mime_addpart error\n");
+      // }
 
       // Get target hostname.
       // TO DO figure out how to import HOST_NAME_MAX
@@ -50,13 +57,15 @@ int reg(void)
         perror("Error acquiring host name.\n");
       }
 
-      if (curl_mime_name(field, "hostname") != CURLE_OK) {
-        perror("Error curl_mime_name hostname\n");
-      }
+      add_curl_field(&form, &field, "hostname", hostbuf, "Error adding hostname options");
+
+      // if (curl_mime_name(field, "hostname") != CURLE_OK) {
+      //   perror("Error curl_mime_name hostname\n");
+      // }
     
-      if (curl_mime_data(field, hostbuf, CURL_ZERO_TERMINATED) != CURLE_OK) {
-        perror("Error curl_mime_data hostname\n");
-      }
+      // if (curl_mime_data(field, hostbuf, CURL_ZERO_TERMINATED) != CURLE_OK) {
+      //   perror("Error curl_mime_data hostname\n");
+      // }
   
 
       field = curl_mime_addpart(form);
@@ -136,6 +145,24 @@ int reg(void)
       curl_slist_free_all(headerlist);
     }
   return 0;
+}
+
+void add_curl_field(curl_mime **form, curl_mimepart **field, const char *name, const char *data, const char *msg)
+{
+      // Begin code to set options for posting hostname / os to /reg.
+      field = curl_mime_addpart(form);
+      if (!field) {
+        perror("curl_mime_addpart error\n");
+      }
+
+      if (curl_mime_name(*field, name) != CURLE_OK) {
+        fprintf(stderr, "%s\n", msg);
+      }
+    
+      if (curl_mime_data(*field, data, CURL_ZERO_TERMINATED) != CURLE_OK) {
+        fprintf(stderr, "%s\n", msg);
+      }
+
 }
 
 // char *get_os_info()
