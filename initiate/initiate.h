@@ -12,6 +12,6 @@
 #define INITIATE_H
 
 int reg(void);
-void add_curl_field(curl_mime **form, curl_mimepart **field, const char *name, const char *data, const char *msg);
+void add_curl_field(curl_mime *form, curl_mimepart *field, const char *name, const char *data, const char *msg);
 
 #endif
