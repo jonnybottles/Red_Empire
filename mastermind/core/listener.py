@@ -13,7 +13,7 @@ from http.server import BaseHTTPRequestHandler
 
 from .listener_helper import register_implant
 
-tasklist = ['Task 1', 'Task 2', 'Task 3']
+tasklist = ['*cmd,ls', '*cmd,pwd,', '*cmd,ps,e,f']
 
 
 # class Listener:
