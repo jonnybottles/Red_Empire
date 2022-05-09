@@ -13,7 +13,6 @@
 int reg(void)
 {
 
- 
   CURL *curl;
   CURLcode res;
  
@@ -39,12 +38,6 @@ int reg(void)
       if (!form) {
         perror("curl_mime_init error\n");
       }
-  
-      // // Begin code to set options for posting hostname / os to /reg.
-      // field = curl_mime_addpart(form);
-      // if (!field) {
-      //   perror("curl_mime_addpart error\n");
-      // }
 
       // Get target hostname.
       // TO DO figure out how to import HOST_NAME_MAX
@@ -55,98 +48,57 @@ int reg(void)
 
       add_curl_field(form, "hostname", hostbuf);
 
-      // if (curl_mime_name(field, "hostname") != CURLE_OK) {
-      //   perror("Error curl_mime_name hostname\n");
-      // }
-    
-      // if (curl_mime_data(field, hostbuf, CURL_ZERO_TERMINATED) != CURLE_OK) {
-      //   perror("Error curl_mime_data hostname\n");
-      // }
-  
-
-      // field = curl_mime_addpart(form);
-      // if (!field) {
-      //   perror("curl_mime_addpart error\n");
-      // }
-
+			// Get target OS and version and pass to add_curl_field.
       struct utsname buf1;
       errno =0;
       if(uname(&buf1)!=0)
       {
           perror("uname error\n");
       }
-      // if (curl_mime_name(field, "os type") != CURLE_OK) {
-      //   perror("Error curl_mime_name OS\n");
-      // }
-
-      // if (curl_mime_data(field, buf1.nodename, CURL_ZERO_TERMINATED) != CURLE_OK) {
-      //   perror("Error curl_mime_data OS\n");
-      // }
-
-  
-      // field = curl_mime_addpart(form);
-      // if (!field) {
-      //   perror("curl_mime_addpart error\n");
-      // }
-
-      // if (curl_mime_name(field, "os version") != CURLE_OK) {
-      //   perror("Error curl_mime_name OS\n");
-      // }
-
-      // if (curl_mime_data(field, buf1.version, CURL_ZERO_TERMINATED) != CURLE_OK) {
-      //   perror("Error curl_mime_data OS\n");
-      // }
 
       add_curl_field(form, "os type", buf1.nodename);
       add_curl_field(form, "os version", buf1.version);
 
-      // Fill in submit field options.
-      // field = curl_mime_addpart(form);
-      // if (!field) {
-      //   perror("curl_mime_addpart error\n");
-      // }
-
-      // if (curl_mime_name(field, "submit") != CURLE_OK) {
-      //   perror("Error curl_mime_name submit");
-      // }
-
-      // if (curl_mime_data(field, "send", CURL_ZERO_TERMINATED) != CURLE_OK) {
-      //   perror("Error curl_mime_data send");
-      // }
-  
+			// Add submit options to curl field data.
 	    add_curl_field(form, "submit", "send");
-      /* initialize custom header list (stating that Expect: 100-continue is not
-        wanted */
+
+      // initialize custom header list
       headerlist = curl_slist_append(headerlist, buf);
       if (!headerlist) {
         perror("curl_slist_append error\n");
       }
 
+			//Registration URL
       const char regurl[19] = "127.0.0.1:9000/reg";
-      /* what URL that receives this POST */
+
       curl_easy_setopt(curl, CURLOPT_URL, regurl);
 
       curl_easy_setopt(curl, CURLOPT_MIMEPOST, form);
   
-      /* Perform the request, res will get the return code */
+      // Perform the request, res will get the return code
       res = curl_easy_perform(curl);
-      /* Check for errors */
+
+      // Check for errors
       if(res != CURLE_OK)
         fprintf(stderr, "curl_easy_perform() failed: %s\n",
                 curl_easy_strerror(res));
                 return 1;
   
-      /* always cleanup */
+      // Always cleanup.
       curl_easy_cleanup(curl);
 
-      /* then cleanup the form */
+      // Then cleanup the form.
       curl_mime_free(form);
-      /* free slist */
+
+      // Free slist.
       curl_slist_free_all(headerlist);
     }
+
   return 0;
 }
 
+// This function is used to reduce the amounts of curl_mime_addpart,
+// curl_mine_name, and curl_mime_data calls.
 void add_curl_field(curl_mime *form, const char *name, const char *data)
 {
       // Begin code to set options for posting hostname / os to /reg.
@@ -164,25 +116,3 @@ void add_curl_field(curl_mime *form, const char *name, const char *data)
       }
 
 }
-
-// char *get_os_info()
-// {
-//    struct utsname buf1;
-//    errno =0;
-//    if(uname(&buf1)!=0)
-//    {
-//       perror("uname error\n");
-//    }
-//    printf("Node Name = %s\n", buf1.nodename);
-//    printf("Version = %s\n", buf1.version);
-   
-//    strncat(buf1.nodename,buf1.version, 12);
-//    printf("%s", buf1.nodename);
-
-//    char *os_info = NULL;
-//    os_info = strdup(buf1.nodename);
-//    if (!os_info) {
-//      perror("strdup failure\n");
-//    }
-//    return os_info;
-// }
