@@ -156,31 +156,31 @@ bool check_tasks(void)
 	return 0;
 }
 
-// The base of this code is in the "got_data" function in js_libcurl.c
-size_t is_registered(char *buffer, size_t itemsize, size_t nitems,
-		     void *ignorethis)
-{
-	// This computes the number of bytes that was received in the response body.
-	size_t bytes = itemsize * nitems;
-	int linenumber = 1;
-	const char *resp_code = "201";
-	strstr(buffer, resp_code);
+// // The base of this code is in the "got_data" function in js_libcurl.c
+// size_t is_registered(char *buffer, size_t itemsize, size_t nitems,
+// 		     void *ignorethis)
+// {
+// 	// This computes the number of bytes that was received in the response body.
+// 	size_t bytes = itemsize * nitems;
+// 	int linenumber = 1;
+// 	const char *resp_code = "201";
+// 	strstr(buffer, resp_code);
 
-	printf("New chunk(%zu)\n", bytes);
-	printf("%d:\t", linenumber);
-	printf("%s\n", buffer);
-	// for (int i = 0; i < bytes; i++) {
-	//     printf("%c", buffer[i]);
-	//     if (buffer[i] == '\n') {
-	//         linenumber++;
-	//         // int this case each line number resets after each chunk of data.
-	//         printf("%d:\t", linenumber);
-	//     }
-	// }
-	// This adds some separation between each chunk of data.
-	printf("\n\n");
-	return bytes;
-}
+// 	printf("New chunk(%zu)\n", bytes);
+// 	printf("%d:\t", linenumber);
+// 	printf("%s\n", buffer);
+// 	// for (int i = 0; i < bytes; i++) {
+// 	//     printf("%c", buffer[i]);
+// 	//     if (buffer[i] == '\n') {
+// 	//         linenumber++;
+// 	//         // int this case each line number resets after each chunk of data.
+// 	//         printf("%d:\t", linenumber);
+// 	//     }
+// 	// }
+// 	// This adds some separation between each chunk of data.
+// 	printf("\n\n");
+// 	return bytes;
+// }
 
 // The base of this code is in the "got_data" function in js_libcurl.c
 char *get_tasks(char *buffer, size_t itemsize, size_t nitems, void *ignorethis)
