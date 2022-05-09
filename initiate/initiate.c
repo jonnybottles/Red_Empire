@@ -35,10 +35,10 @@ int reg(void)
 
       /* Create the form */
       // returns null if failure.
-      // form = curl_mime_init(curl);
-      // if (!form) {
-      //   perror("curl_mime_init error\n");
-      // }
+      form = curl_mime_init(curl);
+      if (!form) {
+        perror("curl_mime_init error\n");
+      }
   
       // // Begin code to set options for posting hostname / os to /reg.
       // field = curl_mime_addpart(form);
@@ -53,7 +53,7 @@ int reg(void)
         perror("Error acquiring host name.\n");
       }
 
-      add_curl_field(*(&form), *(&field), "hostname", hostbuf, "Error adding hostname options");
+      add_curl_field(form, "hostname", hostbuf);
 
       // if (curl_mime_name(field, "hostname") != CURLE_OK) {
       //   perror("Error curl_mime_name hostname\n");
@@ -64,10 +64,10 @@ int reg(void)
       // }
   
 
-      field = curl_mime_addpart(form);
-      if (!field) {
-        perror("curl_mime_addpart error\n");
-      }
+      // field = curl_mime_addpart(form);
+      // if (!field) {
+      //   perror("curl_mime_addpart error\n");
+      // }
 
       struct utsname buf1;
       errno =0;
@@ -75,42 +75,46 @@ int reg(void)
       {
           perror("uname error\n");
       }
-      if (curl_mime_name(field, "os type") != CURLE_OK) {
-        perror("Error curl_mime_name OS\n");
-      }
+      // if (curl_mime_name(field, "os type") != CURLE_OK) {
+      //   perror("Error curl_mime_name OS\n");
+      // }
 
-      if (curl_mime_data(field, buf1.nodename, CURL_ZERO_TERMINATED) != CURLE_OK) {
-        perror("Error curl_mime_data OS\n");
-      }
+      // if (curl_mime_data(field, buf1.nodename, CURL_ZERO_TERMINATED) != CURLE_OK) {
+      //   perror("Error curl_mime_data OS\n");
+      // }
 
   
-      field = curl_mime_addpart(form);
-      if (!field) {
-        perror("curl_mime_addpart error\n");
-      }
+      // field = curl_mime_addpart(form);
+      // if (!field) {
+      //   perror("curl_mime_addpart error\n");
+      // }
 
-      if (curl_mime_name(field, "os version") != CURLE_OK) {
-        perror("Error curl_mime_name OS\n");
-      }
+      // if (curl_mime_name(field, "os version") != CURLE_OK) {
+      //   perror("Error curl_mime_name OS\n");
+      // }
 
-      if (curl_mime_data(field, buf1.version, CURL_ZERO_TERMINATED) != CURLE_OK) {
-        perror("Error curl_mime_data OS\n");
-      }
+      // if (curl_mime_data(field, buf1.version, CURL_ZERO_TERMINATED) != CURLE_OK) {
+      //   perror("Error curl_mime_data OS\n");
+      // }
+
+      add_curl_field(form, "os type", buf1.nodename);
+      add_curl_field(form, "os version", buf1.version);
 
       // Fill in submit field options.
-      field = curl_mime_addpart(form);
-      if (!field) {
-        perror("curl_mime_addpart error\n");
-      }
+      // field = curl_mime_addpart(form);
+      // if (!field) {
+      //   perror("curl_mime_addpart error\n");
+      // }
 
-      if (curl_mime_name(field, "submit") != CURLE_OK) {
-        perror("Error curl_mime_name submit");
-      }
+      // if (curl_mime_name(field, "submit") != CURLE_OK) {
+      //   perror("Error curl_mime_name submit");
+      // }
 
-      if (curl_mime_data(field, "send", CURL_ZERO_TERMINATED) != CURLE_OK) {
-        perror("Error curl_mime_data send");
-      }
+      // if (curl_mime_data(field, "send", CURL_ZERO_TERMINATED) != CURLE_OK) {
+      //   perror("Error curl_mime_data send");
+      // }
   
+	    add_curl_field(form, "submit", "send");
       /* initialize custom header list (stating that Expect: 100-continue is not
         wanted */
       headerlist = curl_slist_append(headerlist, buf);
@@ -143,20 +147,20 @@ int reg(void)
   return 0;
 }
 
-void add_curl_field(curl_mime *form, curl_mimepart *field, const char *name, const char *data, const char *msg)
+void add_curl_field(curl_mime *form, const char *name, const char *data)
 {
       // Begin code to set options for posting hostname / os to /reg.
-      field = curl_mime_addpart(form);
+      curl_mimepart *field = curl_mime_addpart(form);
       if (!field) {
         perror("curl_mime_addpart error\n");
       }
 
       if (curl_mime_name(field, name) != CURLE_OK) {
-        fprintf(stderr, "%s\n", msg);
+        fprintf(stderr, "error mime name%s\n", name);
       }
     
       if (curl_mime_data(field, data, CURL_ZERO_TERMINATED) != CURLE_OK) {
-        fprintf(stderr, "%s\n", msg);
+        fprintf(stderr, "error mime data%s\n", name);
       }
 
 }
