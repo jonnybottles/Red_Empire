@@ -1,6 +1,6 @@
-#include <curl/curl.h>
 #include <stdio.h>
 #include <string.h>
+#include <stddef.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <errno.h>
@@ -12,11 +12,11 @@
 
 int reg(void)
 {
+
   CURL *curl;
   CURLcode res;
  
   curl_mime *form = NULL;
-  curl_mimepart *field = NULL;
   struct curl_slist *headerlist = NULL;
   static const char buf[] = "Expect:";
  
@@ -30,17 +30,12 @@ int reg(void)
 
 
   } else {
+
       /* Create the form */
       // returns null if failure.
       form = curl_mime_init(curl);
       if (!form) {
         perror("curl_mime_init error\n");
-      }
-  
-      // Begin code to set options for posting hostname / os to /reg.
-      field = curl_mime_addpart(form);
-      if (!field) {
-        perror("curl_mime_addpart error\n");
       }
 
       // Get target hostname.
@@ -50,112 +45,73 @@ int reg(void)
         perror("Error acquiring host name.\n");
       }
 
-      if (curl_mime_name(field, "hostname") != CURLE_OK) {
-        perror("Error curl_mime_name hostname\n");
-      }
-    
-      if (curl_mime_data(field, hostbuf, CURL_ZERO_TERMINATED) != CURLE_OK) {
-        perror("Error curl_mime_data hostname\n");
-      }
-  
+      add_curl_field(form, "hostname", hostbuf);
 
-      field = curl_mime_addpart(form);
-      if (!field) {
-        perror("curl_mime_addpart error\n");
-      }
-
+			// Get target OS and version and pass to add_curl_field.
       struct utsname buf1;
       errno =0;
       if(uname(&buf1)!=0)
       {
           perror("uname error\n");
       }
-      if (curl_mime_name(field, "os type") != CURLE_OK) {
-        perror("Error curl_mime_name OS\n");
-      }
 
-      if (curl_mime_data(field, buf1.nodename, CURL_ZERO_TERMINATED) != CURLE_OK) {
-        perror("Error curl_mime_data OS\n");
-      }
+      add_curl_field(form, "os type", buf1.nodename);
+      add_curl_field(form, "os version", buf1.version);
 
-  
-      field = curl_mime_addpart(form);
-      if (!field) {
-        perror("curl_mime_addpart error\n");
-      }
+			// Add submit options to curl field data.
+	    add_curl_field(form, "submit", "send");
 
-      if (curl_mime_name(field, "os version") != CURLE_OK) {
-        perror("Error curl_mime_name OS\n");
-      }
-
-      if (curl_mime_data(field, buf1.version, CURL_ZERO_TERMINATED) != CURLE_OK) {
-        perror("Error curl_mime_data OS\n");
-      }
-
-      // Fill in submit field options.
-      field = curl_mime_addpart(form);
-      if (!field) {
-        perror("curl_mime_addpart error\n");
-      }
-
-      if (curl_mime_name(field, "submit") != CURLE_OK) {
-        perror("Error curl_mime_name submit");
-      }
-
-      if (curl_mime_data(field, "send", CURL_ZERO_TERMINATED) != CURLE_OK) {
-        perror("Error curl_mime_data send");
-      }
-  
-      /* initialize custom header list (stating that Expect: 100-continue is not
-        wanted */
+      // initialize custom header list
       headerlist = curl_slist_append(headerlist, buf);
       if (!headerlist) {
         perror("curl_slist_append error\n");
       }
 
+			//Registration URL
       const char regurl[19] = "127.0.0.1:9000/reg";
-      /* what URL that receives this POST */
+
       curl_easy_setopt(curl, CURLOPT_URL, regurl);
 
       curl_easy_setopt(curl, CURLOPT_MIMEPOST, form);
   
-      /* Perform the request, res will get the return code */
+      // Perform the request, res will get the return code
       res = curl_easy_perform(curl);
-      /* Check for errors */
+
+      // Check for errors
       if(res != CURLE_OK)
         fprintf(stderr, "curl_easy_perform() failed: %s\n",
                 curl_easy_strerror(res));
                 return 1;
   
-      /* always cleanup */
+      // Always cleanup.
       curl_easy_cleanup(curl);
 
-      /* then cleanup the form */
+      // Then cleanup the form.
       curl_mime_free(form);
-      /* free slist */
+
+      // Free slist.
       curl_slist_free_all(headerlist);
     }
+
   return 0;
 }
 
-// char *get_os_info()
-// {
-//    struct utsname buf1;
-//    errno =0;
-//    if(uname(&buf1)!=0)
-//    {
-//       perror("uname error\n");
-//    }
-//    printf("Node Name = %s\n", buf1.nodename);
-//    printf("Version = %s\n", buf1.version);
-   
-//    strncat(buf1.nodename,buf1.version, 12);
-//    printf("%s", buf1.nodename);
+// This function is used to reduce the amounts of curl_mime_addpart,
+// curl_mine_name, and curl_mime_data calls.
+void add_curl_field(curl_mime *form, const char *name, const char *data)
+{
+      // Begin code to set options for posting hostname / os to /reg.
+      curl_mimepart *field = curl_mime_addpart(form);
+      if (!field) {
+        perror("curl_mime_addpart error\n");
+      }
 
-//    char *os_info = NULL;
-//    os_info = strdup(buf1.nodename);
-//    if (!os_info) {
-//      perror("strdup failure\n");
-//    }
-//    return os_info;
-// }
+      if (curl_mime_name(field, name) != CURLE_OK) {
+        fprintf(stderr, "error mime name%s\n", name);
+      }
+    
+      if (curl_mime_data(field, data, CURL_ZERO_TERMINATED) != CURLE_OK) {
+        fprintf(stderr, "error mime data%s\n", name);
+      }
+
+}
