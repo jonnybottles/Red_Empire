@@ -17,7 +17,6 @@ int reg(void)
   CURLcode res;
  
   curl_mime *form = NULL;
-  curl_mimepart *field = NULL;
   struct curl_slist *headerlist = NULL;
   static const char buf[] = "Expect:";
  
