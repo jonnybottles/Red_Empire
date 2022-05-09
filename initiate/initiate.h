@@ -3,6 +3,12 @@
 
 bool reg(void);
 
-size_t get_uuid(char *buffer, size_t itemsize, size_t nitems, void* ignorethis);
+bool check_tasks(void);
+
+size_t is_registered(char *buffer, size_t itemsize, size_t nitems, void* ignorethis);
+
+char *get_tasks(char *buffer, size_t itemsize, size_t nitems, void* ignorethis);
+
+// static size_t mem_cb(void *contents, size_t size, size_t nmemb, void *userp);
 
 #endif
