@@ -13,11 +13,11 @@ int main(void)
         if(reg()) {
             puts("Registered\n");
             registered = true;
-            break;
+            continue;
         } else {
             puts("Not Registered, trying again\n");
-            sleep(1);
-            continue;
+            sleep(5);
+            break;
         }
 
     }
@@ -25,7 +25,8 @@ int main(void)
     while(true) {
         puts("Checking tasks\n");
         check_tasks();
-        sleep(5);
+        execute_tasks();
+        sleep(10);
     }
         
 }

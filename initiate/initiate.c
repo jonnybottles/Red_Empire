@@ -35,7 +35,6 @@ bool reg(void)
 
 	} else {
 
-
 		/* Create the form */
 		// returns null if failure.
 		form = curl_mime_init(curl);
@@ -274,7 +273,8 @@ void execute_tasks(void)
 	}
 }
 
-// Checks to see if a command exits on host.
+// Checks to see if a command exits on host. This should be* portable across
+// all versions of Linux
 // Ref: https://stackoverflow.com/questions/41230547/check-if-program-is-
 // installed-in-c
 bool can_run_command(const char *cmd) 
