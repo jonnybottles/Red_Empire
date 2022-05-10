@@ -267,10 +267,10 @@ void execute_tasks(void)
 				(void) printf("%s", cmd_results);
 				cmd_ret = pclose(cmd_fptr);
 				printf("The exit status is: %d\n", WEXITSTATUS(cmd_ret));
+				free(cmd_fptr);
 			}
 
 		}
-
 	}
 }
 
