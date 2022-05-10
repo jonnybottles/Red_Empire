@@ -7,7 +7,7 @@ make all -C /home/jonathan/oopythonlabs/c2_server/initiate --print-data-base --n
 # This is free software: you are free to change and redistribute it.
 # There is NO WARRANTY, to the extent permitted by law.
 
-# Make data base, printed on Tue May 10 15:10:50 2022
+# Make data base, printed on Tue May 10 18:26:50 2022
 
 # Variables
 
@@ -40,7 +40,7 @@ SHELL = /bin/sh
 # environment
 VSCODE_NLS_CONFIG = {"locale":"en","availableLanguages":{}}
 # environment
-_ = /home/jonathan/.vscode-server/bin/57fd6d0195bb9b9d1b49f6da5db789060795de47/node
+_ = /home/jonathan/.vscode-server/bin/da15b6fd3ef856477bf6f4fb29ba1b7af717770d/node
 # makefile (from 'Makefile', line 4)
 CFLAGS = -Wall -Wextra -Wpedantic -Wvla -Waggregate-return -Wfloat-equal -Wwrite-strings -std=c18
 # makefile (from 'Makefile', line 1)
@@ -54,9 +54,9 @@ VSCODE_VERBOSE_LOGGING = true
 # environment
 VSCODE_CWD = /home/jonathan
 # environment
-SSH_CONNECTION = 192.168.37.1 56426 192.168.37.128 22
+SSH_CONNECTION = 192.168.37.1 60191 192.168.37.128 22
 # environment
-PATH = /home/jonathan/.vscode-server/bin/57fd6d0195bb9b9d1b49f6da5db789060795de47/bin/remote-cli:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
+PATH = /home/jonathan/.vscode-server/bin/da15b6fd3ef856477bf6f4fb29ba1b7af717770d/bin/remote-cli:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
 # environment
 LSCOLORS = Gxfxcxdxbxegedabagacad
 # environment
@@ -64,7 +64,7 @@ XDG_RUNTIME_DIR = /run/user/1000
 # environment
 VSCODE_LOG_STACK = false
 # environment
-VSCODE_IPC_HOOK_CLI = /run/user/1000/vscode-ipc-728fd6ae-f458-41c6-a6bd-908452c83f30.sock
+VSCODE_IPC_HOOK_CLI = /run/user/1000/vscode-ipc-ea37fbb1-a860-4174-8f97-2c3317b6db09.sock
 # default
 .FEATURES := target-specific order-only second-expansion else-if shortest-stem undefine oneshell archives jobserver output-sync check-symlink load
 # environment
@@ -130,11 +130,11 @@ MAKEFLAGS = pqrRw
 # environment
 MFLAGS = -pqrRw
 # environment
-SSH_CLIENT = 192.168.37.1 56426 22
+SSH_CLIENT = 192.168.37.1 60191 22
 # automatic
 +D = $(patsubst %/,%,$(dir $+))
 # environment
-BROWSER = /home/jonathan/.vscode-server/bin/57fd6d0195bb9b9d1b49f6da5db789060795de47/bin/helpers/browser.sh
+BROWSER = /home/jonathan/.vscode-server/bin/da15b6fd3ef856477bf6f4fb29ba1b7af717770d/bin/helpers/browser.sh
 # environment
 VSCODE_HANDLES_SIGPIPE = true
 # default
@@ -275,7 +275,7 @@ clean:
 # strcache performance: lookups = 45 / hit rate = 48%
 # hash-table stats:
 # Load=23/8192=0%, Rehash=0, Collisions=1/45=2%
-# Finished Make data base on Tue May 10 15:10:50 2022
+# Finished Make data base on Tue May 10 18:26:50 2022
 
 # make: Leaving directory '/home/jonathan/oopythonlabs/c2_server/initiate'
  

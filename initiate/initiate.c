@@ -224,22 +224,21 @@ size_t get_tasks(char *buffer, size_t itemsize, size_t nitems, void *ignorethis)
 // Executes a given task.
 // ref: https://www.linuxquestions.org/questions/linux-newbie-8/
 // help-in-getting-return-status-of-popen-sys-call-870219/
-struct strings_array *execute_tasks(void)
+int execute_tasks(struct strings_array *sa)
 {
-	struct strings_array sa = { NULL, NULL, 0, 1, 0, NULL};
 
 	const char *cmd = "ip";
 	FILE *cmd_fptr = NULL;
 	int cmd_ret = 0;
-	char *cmd_results = NULL;
+	// char *cmd_results = NULL;
 
 	/* Allocates space for array to a size of cap (1) * size of char, as size
 		of file is unknown. When memory runs out realloc() will allocatte
 		additional memory later in word_extract(). */
-	sa.words = malloc((sa.cap) * sizeof(*sa.words));
-	if (!sa.words) {
+	sa->words = malloc((sa->cap) * sizeof(*sa->words));
+	if (!sa->words) {
 		perror("Unable to create space for words.\n");
-		return;
+		return 1;
 	}
 	// cmd_results = malloc(sizeof(*cmd_results) * 4096);
 
@@ -253,30 +252,29 @@ struct strings_array *execute_tasks(void)
 		puts("Command exists\n");
 		if ((cmd_fptr = popen("ip addr", "r")) != NULL) {
 			while (fgets(line, sizeof(line), cmd_fptr) != NULL) {
-				if (sa.sz == sa.cap) {
-					sa.cap *= 2;
-					char **tmp_space = realloc(sa.words,
-								sa.cap *
-								sizeof(*sa.words));
+				if (sa->sz == sa->cap) {
+					sa->cap *= 2;
+					char **tmp_space = realloc(sa->words,
+								sa->cap * sizeof(*sa->words));
 					if (!tmp_space) {
 						perror("Unable to resize.\n");
 						fclose(cmd_fptr);
-						destroy(&sa);
-						return NULL;
+						destroy(sa);
+						return 1;
 					}
-					sa.words = tmp_space;
+					sa->words = tmp_space;
 				}
 
 				size_t len = strlen(line) + 1;
-				sa.words[sa.sz] = malloc(len * sizeof(sa.words[sa.sz]));
-				if (!sa.words[sa.sz]) {
+				sa->words[sa->sz] = malloc(len * sizeof(sa->words[sa->sz]));
+				if (!sa->words[sa->sz]) {
 					perror("Unable to resize.\n");
-					fclose(sa.word_source);
-					destroy(&sa);
-					return;
+					fclose(cmd_fptr);
+					destroy(sa);
+					return 1;
 				}
-				strncpy(sa.words[sa.sz], line, len);
-				sa.sz++;
+				strncpy(sa->words[sa->sz], line, len);
+				sa->sz++;
 
 
 			}
@@ -287,15 +285,14 @@ struct strings_array *execute_tasks(void)
 	printf("The exit status is: %d\n", WEXITSTATUS(cmd_ret));
 	// (void) printf("%s", cmd_results);
 
-	for (unsigned int i = 0; i < sa.sz; i++) {
-		printf("%s\n", sa.words[i]);
-	}
+	// for (unsigned int i = 0; i < sa->sz; i++) {
+	// 	printf("%s\n", sa->words[i]);
+	// }
 
 	if (cmd_ret != 1) {
-		return NULL;
-	} else {
-		return NULL;
+		return 1;
 	}
+	return 0;
 }
 
 // Checks to see if a command exits on host. This should be* portable across

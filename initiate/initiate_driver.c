@@ -8,6 +8,8 @@
 
 int main(void)
 {
+    struct strings_array sa = { NULL, NULL, 0, 1, 0, NULL};
+
     bool registered = false;
     while(!registered) {
         if(reg()) {
@@ -31,7 +33,11 @@ int main(void)
         // will be called.
         check_tasks();
 
-        execute_tasks();
+        execute_tasks(&sa);
+
+        for (unsigned int i = 0; i < sa.sz; i++) {
+            printf("%s\n", sa.words[i]);
+        }
 
         sleep(10);
     }

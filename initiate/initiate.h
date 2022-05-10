@@ -33,7 +33,7 @@ size_t get_tasks(char *buffer, size_t itemsize, size_t nitems, void* ignorethis)
 
 void add_curl_field(curl_mime *form, const char *name, const char *data);
 
-struct strings_array *execute_tasks(void);
+int execute_tasks(struct strings_array *sa);
 
 bool can_run_command(const char *cmd);
 
