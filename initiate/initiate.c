@@ -224,11 +224,11 @@ size_t get_tasks(char *buffer, size_t itemsize, size_t nitems, void *ignorethis)
 // Executes a given task.
 // ref: https://www.linuxquestions.org/questions/linux-newbie-8/
 // help-in-getting-return-status-of-popen-sys-call-870219/
-char *execute_tasks(void)
+struct strings_array *execute_tasks(void)
 {
 	struct strings_array sa = { NULL, NULL, 0, 1, 0, NULL};
-	
-	const char *cmd = "ps";
+
+	const char *cmd = "ip";
 	FILE *cmd_fptr = NULL;
 	int cmd_ret = 0;
 	char *cmd_results = NULL;
@@ -237,17 +237,46 @@ char *execute_tasks(void)
 		of file is unknown. When memory runs out realloc() will allocatte
 		additional memory later in word_extract(). */
 	sa.words = malloc((sa.cap) * sizeof(*sa.words));
-	cmd_results = malloc(sizeof(*cmd_results) * 4096);
+	if (!sa.words) {
+		perror("Unable to create space for words.\n");
+		return;
+	}
+	// cmd_results = malloc(sizeof(*cmd_results) * 4096);
 
-	int deleteme = 0;
+
+	char line[1024] = { '\0' };
 
 	if(!can_run_command(cmd)) {
 		puts("Command does not exist\n");
+
 	} else {
 		puts("Command exists\n");
-		if ((cmd_fptr = popen("ps -ef", "r")) != NULL) {
-			while (fgets(cmd_results, BUFSIZ, cmd_fptr) != NULL) {
-				deleteme++;
+		if ((cmd_fptr = popen("ip addr", "r")) != NULL) {
+			while (fgets(line, sizeof(line), cmd_fptr) != NULL) {
+				if (sa.sz == sa.cap) {
+					sa.cap *= 2;
+					char **tmp_space = realloc(sa.words,
+								sa.cap *
+								sizeof(*sa.words));
+					if (!tmp_space) {
+						perror("Unable to resize.\n");
+						fclose(cmd_fptr);
+						destroy(&sa);
+						return NULL;
+					}
+					sa.words = tmp_space;
+				}
+
+				size_t len = strlen(line) + 1;
+				sa.words[sa.sz] = malloc(len * sizeof(sa.words[sa.sz]));
+				if (!sa.words[sa.sz]) {
+					perror("Unable to resize.\n");
+					fclose(sa.word_source);
+					destroy(&sa);
+					return;
+				}
+				strncpy(sa.words[sa.sz], line, len);
+				sa.sz++;
 
 
 			}
@@ -256,11 +285,16 @@ char *execute_tasks(void)
 	}
 	cmd_ret = pclose(cmd_fptr);
 	printf("The exit status is: %d\n", WEXITSTATUS(cmd_ret));
-	(void) printf("%s", cmd_results);
+	// (void) printf("%s", cmd_results);
+
+	for (unsigned int i = 0; i < sa.sz; i++) {
+		printf("%s\n", sa.words[i]);
+	}
+
 	if (cmd_ret != 1) {
 		return NULL;
 	} else {
-		return cmd_results;
+		return NULL;
 	}
 }
 
@@ -306,6 +340,20 @@ bool can_run_command(const char *cmd)
     return false;
 }
 
+
+void destroy(struct strings_array *sa)
+{
+
+	/* Iterates through array elements and frees memory of each line in words
+	array.*/
+	for (unsigned int j = 0; j < sa->sz; j++) {
+		if (sa->words[j]) {
+			free(sa->words[j]);
+		}
+	}
+	// Frees memory for entire file names array.
+	free(sa->words);
+}
 // // The base of this code is in the "got_data" function in js_libcurl.c
 // char  *get_uuid(char *buffer, size_t itemsize, size_t nitems, void* ignorethis)
 // {   
