@@ -194,31 +194,6 @@ bool check_tasks(void)
 	return 0;
 }
 
-// // The base of this code is in the "got_data" function in js_libcurl.c
-// size_t is_registered(char *buffer, size_t itemsize, size_t nitems,
-// 		     void *ignorethis)
-// {
-// 	// This computes the number of bytes that was received in the response body.
-// 	size_t bytes = itemsize * nitems;
-// 	int linenumber = 1;
-// 	const char *resp_code = "201";
-// 	strstr(buffer, resp_code);
-
-// 	printf("New chunk(%zu)\n", bytes);
-// 	printf("%d:\t", linenumber);
-// 	printf("%s\n", buffer);
-// 	// for (int i = 0; i < bytes; i++) {
-// 	//     printf("%c", buffer[i]);
-// 	//     if (buffer[i] == '\n') {
-// 	//         linenumber++;
-// 	//         // int this case each line number resets after each chunk of data.
-// 	//         printf("%d:\t", linenumber);
-// 	//     }
-// 	// }
-// 	// This adds some separation between each chunk of data.
-// 	printf("\n\n");
-// 	return bytes;
-// }
 
 // The base of this code is in the "got_data" function in js_libcurl.c
 size_t get_tasks(char *buffer, size_t itemsize, size_t nitems, void *ignorethis)
@@ -249,27 +224,43 @@ size_t get_tasks(char *buffer, size_t itemsize, size_t nitems, void *ignorethis)
 // Executes a given task.
 // ref: https://www.linuxquestions.org/questions/linux-newbie-8/
 // help-in-getting-return-status-of-popen-sys-call-870219/
-void execute_tasks(void)
+char *execute_tasks(void)
 {
-	const char *cmd = "pwd";
+	struct strings_array sa = { NULL, NULL, 0, 1, 0, NULL};
+	
+	const char *cmd = "ps";
 	FILE *cmd_fptr = NULL;
 	int cmd_ret = 0;
 	char *cmd_results = NULL;
-	cmd_results = malloc(sizeof(*cmd_results) * 1024);
+
+	/* Allocates space for array to a size of cap (1) * size of char, as size
+		of file is unknown. When memory runs out realloc() will allocatte
+		additional memory later in word_extract(). */
+	sa.words = malloc((sa.cap) * sizeof(*sa.words));
+	cmd_results = malloc(sizeof(*cmd_results) * 4096);
+
+	int deleteme = 0;
 
 	if(!can_run_command(cmd)) {
 		puts("Command does not exist\n");
 	} else {
 		puts("Command exists\n");
-		if ((cmd_fptr = popen(cmd, "r")) != NULL) {
+		if ((cmd_fptr = popen("ps -ef", "r")) != NULL) {
 			while (fgets(cmd_results, BUFSIZ, cmd_fptr) != NULL) {
-				(void) printf("%s", cmd_results);
-				cmd_ret = pclose(cmd_fptr);
-				printf("The exit status is: %d\n", WEXITSTATUS(cmd_ret));
-				free(cmd_fptr);
+				deleteme++;
+
+
 			}
 
 		}
+	}
+	cmd_ret = pclose(cmd_fptr);
+	printf("The exit status is: %d\n", WEXITSTATUS(cmd_ret));
+	(void) printf("%s", cmd_results);
+	if (cmd_ret != 1) {
+		return NULL;
+	} else {
+		return cmd_results;
 	}
 }
 
@@ -336,4 +327,30 @@ bool can_run_command(const char *cmd)
 //     // This adds some separation between each chunk of data.
 //     printf("\n\n");
 //     return bytes;
+// }
+
+// // The base of this code is in the "got_data" function in js_libcurl.c
+// size_t is_registered(char *buffer, size_t itemsize, size_t nitems,
+// 		     void *ignorethis)
+// {
+// 	// This computes the number of bytes that was received in the response body.
+// 	size_t bytes = itemsize * nitems;
+// 	int linenumber = 1;
+// 	const char *resp_code = "201";
+// 	strstr(buffer, resp_code);
+
+// 	printf("New chunk(%zu)\n", bytes);
+// 	printf("%d:\t", linenumber);
+// 	printf("%s\n", buffer);
+// 	// for (int i = 0; i < bytes; i++) {
+// 	//     printf("%c", buffer[i]);
+// 	//     if (buffer[i] == '\n') {
+// 	//         linenumber++;
+// 	//         // int this case each line number resets after each chunk of data.
+// 	//         printf("%d:\t", linenumber);
+// 	//     }
+// 	// }
+// 	// This adds some separation between each chunk of data.
+// 	printf("\n\n");
+// 	return bytes;
 // }
