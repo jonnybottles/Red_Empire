@@ -1,0 +1,36 @@
+{
+    "cSpell.ignoreWords": [
+        "INET",
+        "Iwakuni",
+        "Kameryn",
+        "MCAS",
+        "Popen",
+        "Smedley",
+        "alot",
+        "celcius",
+        "chdir",
+        "farenheit",
+        "gethostbyname",
+        "inplace",
+        "mylistener",
+        "mywork",
+        "wfile"
+    ],
+    "cSpell.words": [
+        "MCCOG",
+        "Quantico",
+        "succ"
+    ],
+    "makefile.launchConfigurations": [
+        {
+            "cwd": "/home/jonathan/oopythonlabs/c2_server/imp",
+            "binaryPath": "/home/jonathan/oopythonlabs/c2_server/imp/imp",
+            "binaryArgs": []
+        },
+        {
+            "cwd": "/home/jonathan/oopythonlabs/c2_server/initiate",
+            "binaryPath": "/home/jonathan/oopythonlabs/c2_server/initiate/initiate",
+            "binaryArgs": []
+        }
+    ]
+}

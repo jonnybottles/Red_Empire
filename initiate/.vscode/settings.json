@@ -1,0 +1,72 @@
+{
+    "cSpell.words": [
+        "srcid",
+        "zcmd",
+        "zhdr"
+    ],
+    "files.associations": {
+        "in.h": "c",
+        "stdbool.h": "c",
+        "stdint.h": "c"
+    },
+    "cSpell.ignoreWords": [
+        "ZERGLING",
+        "ZERGMAP",
+        "djikstra",
+        "pqueue",
+        "tcase"
+    ],
+    "makefile.launchConfigurations": [
+        {
+            "cwd": "/home/jonathan/oopythonlabs/c2_server/imp",
+            "binaryPath": "/home/jonathan/oopythonlabs/c2_server/imp/imp",
+            "binaryArgs": ["127.0.0.1"], 
+            // "binaryArgs": ["test/samp/easy_5nxx/packet02.pcap",
+            //     "test/samp/easy_5nxx/packet03.pcap",
+            //     "test/samp/easy_5nxx/packet01.pcap",
+            //     "test/samp/easy_5nxx/packet04.pcap",
+            //     "test/samp/easy_5nxx/packet00.pcap",
+            //     "test/samp/C_getstatus.pcap",
+            //     "test/samp/easy_v6_2n0r/packet01.pcap",
+            //     "test/samp/easy_v6_2n0r/packet00.pcap",
+            //     "test/samp/S_802.1q.pcap",
+            //     "test/samp/M_empty.pcap",
+            //     "test/samp/easy_3n0r/packet02.pcap",
+            //     "test/samp/easy_3n0r/packet01.pcap",
+            //     "test/samp/easy_3n0r/packet00.pcap",
+            //     "test/samp/2n0r_6in4.pcap",
+            //     "test/samp/easy_3n1r/packet02.pcap",
+            //     "test/samp/easy_3n1r/packet01.pcap",
+            //     "test/samp/easy_3n1r/packet00.pcap",
+            //     "test/samp/S_normal.pcap",
+            //     "test/samp/med_4n1r/packet02.pcap",
+            //     "test/samp/med_4n1r/packet03.pcap",
+            //     "test/samp/med_4n1r/packet01.pcap",
+            //     "test/samp/med_4n1r/packet00.pcap",
+            //     "test/samp/G_test_1.pcap",
+            //     "test/samp/M_ipv6.pcap",
+            //     "test/samp/bad_multi_command.pcap",
+            //     "test/samp/G_normal.pcap",
+            //     "test/samp/M_hello.pcap",
+            //     "test/samp/gmailconvert.pcap",
+            //     "test/samp/M_bigendian.pcap",
+            //     "test/samp/nonzerg.pcap",
+            //     "test/samp/G_test_2.pcap",
+            //     "test/samp/multimerge.pcap",
+            //     "test/samp/C_getstatus_S_normal.pcap",
+            //     "test/samp/hard_6n0r/packet02.pcap",
+            //     "test/samp/hard_6n0r/packet05.pcap",
+            //     "test/samp/hard_6n0r/packet03.pcap",
+            //     "test/samp/hard_6n0r/packet01.pcap",
+            //     "test/samp/hard_6n0r/packet04.pcap",
+            //     "test/samp/hard_6n0r/packet00.pcap"], 
+        }
+    ],
+    "C_Cpp.default.configurationProvider": "ms-vscode.makefile-tools",
+    "makefile.configurations": [
+        {
+            "name": "My Makefile Config",
+            "makeArgs": ["-B"],
+        }
+    ]
+}
