@@ -1,10 +1,11 @@
+#include <errno.h>
 #include <stdio.h>
 #include <stdbool.h>
 #include <string.h>
 #include <stddef.h>
 #include <stdlib.h>
+#include <sys/types.h>
 #include <unistd.h>
-#include <errno.h>
 #include<sys/utsname.h>
 #include "initiate.h"
 
@@ -246,21 +247,26 @@ size_t get_tasks(char *buffer, size_t itemsize, size_t nitems, void *ignorethis)
 	return bytes;
 }
 
+// Executes a given task.
+// ref: https://www.linuxquestions.org/questions/linux-newbie-8/
+// help-in-getting-return-status-of-popen-sys-call-870219/
 void execute_tasks(void)
 {
 	const char *cmd = "pwd";
-	FILE *cmd_results = NULL;
+	FILE *cmd_fptr = NULL;
 	int cmd_ret = 0;
+	char *cmd_results = NULL;
+	cmd_results = malloc(sizeof(*cmd_results) * 1024);
 
 	if(!can_run_command(cmd)) {
 		puts("Command does not exist\n");
 	} else {
 		puts("Command exists\n");
-		if ((cmd_results = popen(cmd, "r")) != NULL) {
-			while (fgets(buf, BUFSIZ, cmd_results) != NULL) {
-				(void) printf("%s", buf);
-				cmd_ret = pclose(cmd_results);
-				printf("The exit status is: %d\n", WEXITSTATUS(cmd_results));
+		if ((cmd_fptr = popen(cmd, "r")) != NULL) {
+			while (fgets(cmd_results, BUFSIZ, cmd_fptr) != NULL) {
+				(void) printf("%s", cmd_results);
+				cmd_ret = pclose(cmd_fptr);
+				printf("The exit status is: %d\n", WEXITSTATUS(cmd_ret));
 			}
 
 		}
