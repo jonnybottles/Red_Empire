@@ -14,14 +14,14 @@ struct response {
   size_t size;
 };
 
-// struct strings_array {
-// 	char **task; // was file names
-// 	char **results; // was words
-// 	size_t sz;
-// 	size_t cap;
-// 	size_t file_num;
-// 	FILE *word_source; //was word source
-// };
+struct strings_array {
+	char **task; // was file names
+	char **words; // was words
+	size_t sz;
+	size_t cap;
+	size_t file_num;
+	FILE *word_source; //was word source
+};
 
 bool reg(void);
 
@@ -33,9 +33,11 @@ size_t get_tasks(char *buffer, size_t itemsize, size_t nitems, void* ignorethis)
 
 void add_curl_field(curl_mime *form, const char *name, const char *data);
 
-void execute_tasks(void);
+struct strings_array *execute_tasks(void);
 
 bool can_run_command(const char *cmd);
+
+void destroy(struct strings_array *sa);
 
 
 
