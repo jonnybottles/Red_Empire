@@ -24,6 +24,7 @@ class http_server:
     def __init__(self, listener):
         Handler.listener = listener
         server = HTTPServer(('', 9000), Handler)
+        print(f"Listener running on port 9000\n")
         server.serve_forever()
 
 
