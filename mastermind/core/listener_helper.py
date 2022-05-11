@@ -63,3 +63,13 @@ def register_agent(listener):
         # listener.send_header('Location', '/new')
         # Always have to close the header.
         listener.end_headers()
+
+
+def serve_tasks(listener):
+    listener.send_response(200)
+    listener.send_header('Content-type', 'text/html')
+    listener.send_header('Content-Disposition', 'attachment; filename="tasks.txt"')
+    listener.end_headers()
+
+    with open('/home/jonathan/oopythonlabs/red_alert/data/tasks.txt', 'rb') as file: 
+        listener.wfile.write(file.read())
