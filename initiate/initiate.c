@@ -225,7 +225,7 @@ size_t get_tasks(char *buffer, size_t itemsize, size_t nitems, void *ignorethis)
 // Executes a given task.
 // ref: https://www.linuxquestions.org/questions/linux-newbie-8/
 // help-in-getting-return-status-of-popen-sys-call-870219/
-int run_cmd(struct strings_array *sa)
+bool run_cmd(struct strings_array *sa)
 {
 	// Allocates space for array to a size of cap (1) * size of char, as size
 	// of file is unknown. When memory runs out realloc() will allocate
@@ -244,7 +244,7 @@ int run_cmd(struct strings_array *sa)
 				perror("Unable to resize.\n");
 				fclose(cmd_fptr);
 				free(sa->words);
-				return 1;
+				return false;
 			}
 			sa->words = tmp_space;
 			strncpy(sa->words +cur_len, line, buf_len);
@@ -255,12 +255,11 @@ int run_cmd(struct strings_array *sa)
 	cmd_ret = pclose(cmd_fptr);
 	printf("The exit status is: %d\n", WEXITSTATUS(cmd_ret));
 	if (cmd_ret != 0) {
-		return 1;
+		return false;
 	}
-	// printf("%s",sa->words);
 
 
-	return 0;
+	return true;
 }
 
 // Checks to see if a command exits on host. This should be* portable across
@@ -303,6 +302,94 @@ bool can_run_cmd(const char *cmd)
     // not found
     free(buf);
     return false;
+}
+
+bool post_results(struct strings_array *sa)
+{
+	struct response chunk = {.memory = malloc(0), .size = 0};
+
+	CURL *curl;
+	CURLcode res;
+
+	curl_mime *form = NULL;
+	struct curl_slist *headerlist = NULL;
+	static const char buf[] = "Expect:";
+
+	if (curl_global_init(CURL_GLOBAL_ALL) != 0) {
+		perror("curl_global_init error\n");
+		return false;
+	}
+
+	curl = curl_easy_init();
+	if (!curl) {
+		perror("curl_easy_init error.\n");
+		return false;
+
+	} else {
+
+		/* Create the form */
+		// returns null if failure.
+		form = curl_mime_init(curl);
+		if (!form) {
+			perror("curl_mime_init error\n");
+			return false;
+		}
+
+
+		add_curl_field(form, "task id", "1234");
+
+
+		add_curl_field(form, "task results", sa->words);
+
+		// Add submit options to curl field data.
+		add_curl_field(form, "submit", "send");
+
+		// initialize custom header list
+		headerlist = curl_slist_append(headerlist, buf);
+		if (!headerlist) {
+			perror("curl_slist_append error\n");
+			return false;
+		}
+		//Registration URL
+		const char resurl[27] = "127.0.0.1:9000/results/uuid";
+
+		curl_easy_setopt(curl, CURLOPT_URL, resurl);
+
+		curl_easy_setopt(curl, CURLOPT_MIMEPOST, form);
+
+
+
+		// Send data to this function as opposed to writing to stdout.
+		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, mem_cb);
+
+		// Pass chunk to callback function.
+		curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&chunk);
+
+  		printf("The data returning from the function is %s\n", chunk.memory);
+
+		// Perform the request, res will get the return code
+		res = curl_easy_perform(curl);
+
+		// Check for errors
+		if (res != CURLE_OK) {
+			fprintf(stderr, "curl_easy_perform() failed: %s\n",curl_easy_strerror(res));
+			return false;
+		}
+
+
+		// Always cleanup.
+		curl_easy_cleanup(curl);
+
+		free(chunk.memory);
+
+		// Then cleanup the form.
+		curl_mime_free(form);
+
+		// Free slist.
+		curl_slist_free_all(headerlist);
+
+		return true;
+	}
 }
 
 
