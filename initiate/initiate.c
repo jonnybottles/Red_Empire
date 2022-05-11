@@ -16,7 +16,7 @@ static size_t mem_cb(void *contents, size_t size, size_t nmemb, void *userp);
 bool reg(void)
 {
 
-	struct response chunk = {.memory = malloc(0), .size = 0};
+	struct response chunk = {.memory = NULL, .size = 0};
 
 	CURL *curl;
 	CURLcode res;
@@ -89,10 +89,12 @@ bool reg(void)
 		// Pass chunk to callback function.
 		curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&chunk);
 
-  		printf("The data returning from the function is %s\n", chunk.memory);
+
 
 		// Perform the request, res will get the return code
 		res = curl_easy_perform(curl);
+
+  		printf("The data returning from agent registration is %s\n\n", chunk.memory);
 
 		// Check for errors
 		if (res != CURLE_OK) {
@@ -135,7 +137,7 @@ static size_t mem_cb(void *contents, size_t size, size_t nmemb, void *userp)
   mem->size += realsize;
   mem->memory[mem->size] = 0;
 
-  printf("The data in the function is %s\n\n", mem->memory);
+//   printf("The data in the function is %s\n\n", mem->memory);
 
   return realsize;
 }
@@ -162,6 +164,8 @@ void add_curl_field(curl_mime * form, const char *name, const char *data)
 
 bool check_tasks(void)
 {
+	struct response chunk = {.memory = malloc(0), .size = 0};
+
 	CURL *curl = curl_easy_init();
 
 	if (!curl) {
@@ -177,7 +181,11 @@ bool check_tasks(void)
 	// This line below specifies what to do with the data when we receive it,
 	// as opposed to printing it to stdout. We will pass in a ptr to our own function
 	// called got_data in this example. This is known as a call back function.
-	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, get_tasks);
+		// Send data to this function as opposed to writing to stdout.
+	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, mem_cb);
+
+		// Pass chunk to callback function.
+	curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&chunk);
 
 	// set options
 	// perform our action
@@ -185,6 +193,8 @@ bool check_tasks(void)
 	// download the content from the URL.
 	// CURLcode resul saves the return code from curl_easy_perform.
 	CURLcode result = curl_easy_perform(curl);
+
+  	printf("The data returning from check tasks is %s\n\n", chunk.memory);
 
 	if (result != CURLE_OK) {
 		fprintf(stderr, "download problem: %s\n",
@@ -196,31 +206,31 @@ bool check_tasks(void)
 }
 
 
-// The base of this code is in the "got_data" function in js_libcurl.c
-size_t get_tasks(char *buffer, size_t itemsize, size_t nitems, void *ignorethis)
-{
-	// Cast to void to get rid of compiler warnings.
-	(void)ignorethis;
+// // The base of this code is in the "got_data" function in js_libcurl.c
+// size_t get_tasks(char *buffer, size_t itemsize, size_t nitems, void *ignorethis)
+// {
+// 	// Cast to void to get rid of compiler warnings.
+// 	(void)ignorethis;
 
-	// This computes the number of bytes that was received in the response body.
-	size_t bytes = itemsize * nitems;
-	int linenumber = 1;
+// 	// This computes the number of bytes that was received in the response body.
+// 	size_t bytes = itemsize * nitems;
+// 	int linenumber = 1;
 
-	printf("New chunk(%zu)\n", bytes);
-	printf("%d:\t", linenumber);
+// 	printf("New chunk(%zu)\n", bytes);
+// 	printf("%d:\t", linenumber);
 
-	for (size_t i = 0; i < bytes; i++) {
-		printf("%c", buffer[i]);
-		if (buffer[i] == '\n') {
-			linenumber++;
-			// int this case each line number resets after each chunk of data.
-			printf("%d:\t", linenumber);
-		}
-	}
-	// This adds some separation between each chunk of data.
-	printf("\n\n");
-	return bytes;
-}
+// 	for (size_t i = 0; i < bytes; i++) {
+// 		printf("%c", buffer[i]);
+// 		if (buffer[i] == '\n') {
+// 			linenumber++;
+// 			// int this case each line number resets after each chunk of data.
+// 			printf("%d:\t", linenumber);
+// 		}
+// 	}
+// 	// This adds some separation between each chunk of data.
+// 	printf("\n\n");
+// 	return bytes;
+// }
 
 // Executes a given task.
 // ref: https://www.linuxquestions.org/questions/linux-newbie-8/
@@ -357,18 +367,18 @@ bool post_results(struct strings_array *sa)
 
 		curl_easy_setopt(curl, CURLOPT_MIMEPOST, form);
 
-
-
 		// Send data to this function as opposed to writing to stdout.
 		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, mem_cb);
 
 		// Pass chunk to callback function.
 		curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&chunk);
 
-  		printf("The data returning from the function is %s\n", chunk.memory);
+
 
 		// Perform the request, res will get the return code
 		res = curl_easy_perform(curl);
+
+  		printf("The data returning from post results is %s\n\n", chunk.memory);
 
 		// Check for errors
 		if (res != CURLE_OK) {
