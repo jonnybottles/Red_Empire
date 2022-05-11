@@ -24,7 +24,6 @@ int main(void)
 
     }
 
-    // char *task_results;
     while(true) {
         puts("Checking tasks\n");
         // Check tasks will eventually return an array of strings.
@@ -33,12 +32,24 @@ int main(void)
         // will be called.
         check_tasks();
 
-        execute_tasks(&sa);
+        // Eventually check_tasks will return the task type and
+        // specific task. An if block will be added here to
+        // check if task type is cmd, if so, run the cmd commands.
+        if(can_run_cmd("ip")) {
+            puts("Command exists\n");
+            if(run_cmd(&sa)) {
+                // printf("%s", sa.words);
+                post_results(&sa);
+            }
 
-        for (unsigned int i = 0; i < sa.sz; i++) {
-            printf("%s\n", sa.words[i]);
+        } else {
+            puts("Command does not exist\n");
+            continue;
+
+
         }
 
+        // remember to destroy sa.words at some point.
         sleep(10);
     }
         
