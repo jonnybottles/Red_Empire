@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-from core.listener import Listener
+from core.listener import Handler, Listener, http_server
 from http.server import HTTPServer
 
 
@@ -11,9 +11,11 @@ def main():
     # Param 2: Port Number
     # Param 3: IP Address/ Port (blank uses local host.)
 
-    listener_one = HTTPServer(('', 9000), Listener)
-    print(f"Listener One running on port 9000\n")
+    mylistener = Listener("Listener_4802")
 
+    listener_one = http_server(mylistener)
+    print(f"Listener One running on port 9000\n")
+    # listener_one.serve_forever()
     # listener_two = HTTPServer(('', 9001), Listener)
     # print(f"Listener Two running on port 9001\n")
 
@@ -21,7 +23,7 @@ def main():
     # print(f"Listener Two running on port 9002\n")
 
     # Runs until terminated.
-    listener_one.serve_forever()
+
     # listener_two.serve_forever()
     # listener_two.webapp.serve_forever()
 

