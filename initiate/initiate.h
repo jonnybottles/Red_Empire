@@ -27,9 +27,9 @@ bool reg(void);
 
 bool check_tasks(void);
 
-size_t is_registered(char *buffer, size_t itemsize, size_t nitems, void* ignorethis);
+// size_t is_registered(char *buffer, size_t itemsize, size_t nitems, void* ignorethis);
 
-size_t get_tasks(char *buffer, size_t itemsize, size_t nitems, void* ignorethis);
+// size_t get_tasks(char *buffer, size_t itemsize, size_t nitems, void* ignorethis);
 
 void add_curl_field(curl_mime *form, const char *name, const char *data);
 
