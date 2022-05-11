@@ -52,7 +52,9 @@ def register_agent(listener):
         print(f"Target Hostname:     {tgt_hostname}")
         print(f"Target OS:           {tgt_os}")
         print(f"Target OS Version:   {tgt_os_version}\n")
-        Agent(uuid, tgt_ip, tgt_hostname, tgt_os, tgt_os_version)
+        new_agent = Agent(listener.listener.name, uuid, tgt_ip, tgt_hostname, tgt_os, tgt_os_version)
+
+        print(f" Agent listener name: {new_agent.listener}")
         # Come back to this later to add to dict ******************************************
         # tasklist.append(new_task[0])
 
