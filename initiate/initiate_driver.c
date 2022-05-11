@@ -35,17 +35,14 @@ int main(void)
         // Eventually check_tasks will return the task type and
         // specific task. An if block will be added here to
         // check if task type is cmd, if so, run the cmd commands.
-        // if(!can_run_cmd("ip")) {
-        //     puts("Command does not exist\n");
-        //     return 1;
-        // } else {
-        //     puts("Command exists\n");
-        //     run_cmd(&sa);
-
-        //     for (unsigned int i = 0; i < sa.sz; i++) {
-        //         printf("%s\n", sa.words[i]);
-        //     }
-        // }
+        if(!can_run_cmd("ip")) {
+            puts("Command does not exist\n");
+            return 1;
+        } else {
+            puts("Command exists\n");
+            run_cmd(&sa);
+            printf("%s", sa.words);
+        }
 
         // remember to destroy sa.words at some point.
         sleep(10);

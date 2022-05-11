@@ -15,8 +15,8 @@ struct response {
 };
 
 struct strings_array {
-	char **task; // was file names
-	char **words; // was words
+	char *tasks; // was file names
+	char *words; // was words
 	size_t sz;
 	size_t cap;
 	size_t file_num;
@@ -36,8 +36,6 @@ void add_curl_field(curl_mime *form, const char *name, const char *data);
 int run_cmd(struct strings_array *sa);
 
 bool can_run_cmd(const char *cmd);
-
-void destroy(struct strings_array *sa);
 
 
 

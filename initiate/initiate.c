@@ -230,50 +230,36 @@ int run_cmd(struct strings_array *sa)
 	// Allocates space for array to a size of cap (1) * size of char, as size
 	// of file is unknown. When memory runs out realloc() will allocate
 	// additional memory later in word_extract(). */
-	sa->words = malloc((sa->cap) * sizeof(*sa->words));
-	if (!sa->words) {
-		perror("Unable to create space for words.\n");
-		return 1;
-	}
 
 	FILE *cmd_fptr = NULL;
 	char line[1024] = { '\0' };
 	int cmd_ret = 0;
+	size_t cur_len = 0;
 
 	if ((cmd_fptr = popen("ip addr", "r")) != NULL) {
 		while (fgets(line, sizeof(line), cmd_fptr) != NULL) {
-			if (sa->sz == sa->cap) {
-				sa->cap *= 2;
-				char **tmp_space = realloc(sa->words,
-							sa->cap * sizeof(*sa->words));
-				if (!tmp_space) {
-					perror("Unable to resize.\n");
-					fclose(cmd_fptr);
-					destroy(sa);
-					return 1;
-				}
-				sa->words = tmp_space;
-			}
-
-			size_t len = strlen(line) + 1;
-			sa->words[sa->sz] = malloc(len * sizeof(sa->words[sa->sz]));
-			if (!sa->words[sa->sz]) {
+			size_t buf_len = strlen(line);
+			char *tmp_space = realloc(sa->words,buf_len + cur_len +1);
+			if (!tmp_space) {
 				perror("Unable to resize.\n");
 				fclose(cmd_fptr);
-				destroy(sa);
+				free(sa->words);
 				return 1;
 			}
-			strncpy(sa->words[sa->sz], line, len);
-			sa->sz++;
+			sa->words = tmp_space;
+			strncpy(sa->words +cur_len, line, buf_len);
+			cur_len += buf_len;
 		}
 
 	}
 	cmd_ret = pclose(cmd_fptr);
 	printf("The exit status is: %d\n", WEXITSTATUS(cmd_ret));
-
-	if (cmd_ret != 1) {
+	if (cmd_ret != 0) {
 		return 1;
 	}
+	// printf("%s",sa->words);
+
+
 	return 0;
 }
 
@@ -320,19 +306,6 @@ bool can_run_cmd(const char *cmd)
 }
 
 
-void destroy(struct strings_array *sa)
-{
-
-	/* Iterates through array elements and frees memory of each line in words
-	array.*/
-	for (unsigned int j = 0; j < sa->sz; j++) {
-		if (sa->words[j]) {
-			free(sa->words[j]);
-		}
-	}
-	// Frees memory for entire file names array.
-	free(sa->words);
-}
 // // The base of this code is in the "got_data" function in js_libcurl.c
 // char  *get_uuid(char *buffer, size_t itemsize, size_t nitems, void* ignorethis)
 // {   
