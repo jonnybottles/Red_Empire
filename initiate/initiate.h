@@ -14,6 +14,13 @@ struct response {
   size_t size;
 };
 
+struct web_comms {
+	CURL *curl;
+	CURLcode res;
+	curl_mime *form;
+
+};
+
 struct strings_array {
 	char *tasks; // was file names
 	char *words; // was words
@@ -23,7 +30,7 @@ struct strings_array {
 	FILE *word_source; //was word source
 };
 
-bool reg(void);
+bool reg(struct web_comms *web);
 
 bool check_tasks(void);
 

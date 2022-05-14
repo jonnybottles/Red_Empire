@@ -8,12 +8,13 @@
 #include <unistd.h>
 #include<sys/utsname.h>
 #include "initiate.h"
+#include "curl_utils.h"
 
 //ref https://curl.se/libcurl/c/postit2.html
 
 static size_t mem_cb(void *contents, size_t size, size_t nmemb, void *userp);
 
-bool reg(void)
+bool reg(struct web_comms *web)
 {
 	struct response chunk = {.memory = NULL, .size = 0};
 
@@ -21,8 +22,6 @@ bool reg(void)
 	CURLcode res;
 
 	curl_mime *form = NULL;
-	struct curl_slist *headerlist = NULL;
-	static const char buf[] = "Expect:";
 
 	if (curl_global_init(CURL_GLOBAL_ALL) != 0) {
 		perror("curl_global_init error\n");
@@ -67,12 +66,6 @@ bool reg(void)
 		// Add submit options to curl field data.
 		add_curl_field(form, "submit", "send");
 
-		// initialize custom header list
-		headerlist = curl_slist_append(headerlist, buf);
-		if (!headerlist) {
-			perror("curl_slist_append error\n");
-			return false;
-		}
 		//Registration URL
 		const char regurl[19] = "127.0.0.1:9000/reg";
 
@@ -105,9 +98,6 @@ bool reg(void)
 		// Then cleanup the form.
 		curl_mime_free(form);
 
-		// Free slist.
-		curl_slist_free_all(headerlist);
-
 		return true;
 	}
 }
@@ -134,26 +124,6 @@ static size_t mem_cb(void *contents, size_t size, size_t nmemb, void *userp)
 //   printf("The data in the function is %s\n\n", mem->memory);
 
   return realsize;
-}
-
-// This function is used to reduce the amounts of curl_mime_addpart,
-// curl_mine_name, and curl_mime_data calls.
-void add_curl_field(curl_mime * form, const char *name, const char *data)
-{
-	// Begin code to set options for posting hostname / os to /reg.
-	curl_mimepart *field = curl_mime_addpart(form);
-	if (!field) {
-		perror("curl_mime_addpart error\n");
-	}
-
-	if (curl_mime_name(field, name) != CURLE_OK) {
-		fprintf(stderr, "error mime name%s\n", name);
-	}
-
-	if (curl_mime_data(field, data, CURL_ZERO_TERMINATED) != CURLE_OK) {
-		fprintf(stderr, "error mime data%s\n", name);
-	}
-
 }
 
 bool check_tasks(void)
@@ -288,13 +258,6 @@ bool post_results(struct strings_array *sa)
 	CURLcode res;
 
 	curl_mime *form = NULL;
-	struct curl_slist *headerlist = NULL;
-	static const char buf[] = "Expect:";
-
-	if (curl_global_init(CURL_GLOBAL_ALL) != 0) {
-		perror("curl_global_init error\n");
-		return false;
-	}
 
 	curl = curl_easy_init();
 	if (!curl) {
@@ -318,12 +281,6 @@ bool post_results(struct strings_array *sa)
 		// Add submit options to curl field data.
 		add_curl_field(form, "submit", "send");
 
-		// initialize custom header list
-		headerlist = curl_slist_append(headerlist, buf);
-		if (!headerlist) {
-			perror("curl_slist_append error\n");
-			return false;
-		}
 		//Registration URL
 		const char resurl[27] = "127.0.0.1:9000/results/uuid";
 
@@ -355,9 +312,6 @@ bool post_results(struct strings_array *sa)
 
 		// Then cleanup the form.
 		curl_mime_free(form);
-
-		// Free slist.
-		curl_slist_free_all(headerlist);
 
 		return true;
 	}
