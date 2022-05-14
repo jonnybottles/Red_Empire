@@ -10,7 +10,6 @@ def register_agent(listener):
     listener.send_header('content-type', 'text/html')
     # Always have to close the header.
     listener.end_headers()
-
     output = ''
     # Add opening html body tags
     output += '<html><body>'
@@ -123,6 +122,7 @@ def serve_tasks(listener):
     listener.send_header('Content-Disposition', 'attachment; filename="tasks.txt"')
     listener.end_headers()
 
+    # Make this a relative path.
     with open('/home/jonathan/oopythonlabs/red_alert/data/tasks.txt', 'rb') as file: 
         listener.wfile.write(file.read())
 
