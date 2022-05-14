@@ -9,11 +9,10 @@
 int main(void)
 {
     struct strings_array sa = { NULL, NULL, 0, 1, 0, NULL};
-
-    struct web_comms web = {NULL, 0, NULL};
+ 
     bool registered = false;
     while(!registered) {
-        if(reg(&web)) {
+        if(reg()) {
             puts("Registered\n");
             registered = true;
             continue;
