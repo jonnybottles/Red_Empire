@@ -7,7 +7,7 @@ make all -C /home/jonathan/oopythonlabs/c2_server/initiate --print-data-base --n
 # This is free software: you are free to change and redistribute it.
 # There is NO WARRANTY, to the extent permitted by law.
 
-# Make data base, printed on Wed May 11 07:10:23 2022
+# Make data base, printed on Sat May 14 17:51:33 2022
 
 # Variables
 
@@ -54,7 +54,7 @@ VSCODE_VERBOSE_LOGGING = true
 # environment
 VSCODE_CWD = /home/jonathan
 # environment
-SSH_CONNECTION = 192.168.37.1 61870 192.168.37.128 22
+SSH_CONNECTION = 192.168.37.1 63624 192.168.37.128 22
 # environment
 PATH = /home/jonathan/.vscode-server/bin/da15b6fd3ef856477bf6f4fb29ba1b7af717770d/bin/remote-cli:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
 # environment
@@ -64,7 +64,7 @@ XDG_RUNTIME_DIR = /run/user/1000
 # environment
 VSCODE_LOG_STACK = false
 # environment
-VSCODE_IPC_HOOK_CLI = /run/user/1000/vscode-ipc-a3317114-ee80-434f-b56e-0629f13b9526.sock
+VSCODE_IPC_HOOK_CLI = /run/user/1000/vscode-ipc-4dc7dd12-7880-43fd-85e1-082eae96431d.sock
 # default
 .FEATURES := target-specific order-only second-expansion else-if shortest-stem undefine oneshell archives jobserver output-sync check-symlink load
 # environment
@@ -130,7 +130,7 @@ MAKEFLAGS = pqrRw
 # environment
 MFLAGS = -pqrRw
 # environment
-SSH_CLIENT = 192.168.37.1 61870 22
+SSH_CLIENT = 192.168.37.1 63624 22
 # automatic
 +D = $(patsubst %/,%,$(dir $+))
 # environment
@@ -275,7 +275,7 @@ clean:
 # strcache performance: lookups = 45 / hit rate = 48%
 # hash-table stats:
 # Load=23/8192=0%, Rehash=0, Collisions=1/45=2%
-# Finished Make data base on Wed May 11 07:10:23 2022
+# Finished Make data base on Sat May 14 17:51:33 2022
 
 # make: Leaving directory '/home/jonathan/oopythonlabs/c2_server/initiate'
  
