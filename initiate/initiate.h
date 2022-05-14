@@ -1,4 +1,4 @@
-#include <curl/curl.h>
+// #include <curl/curl.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -23,15 +23,13 @@ struct strings_array {
 	FILE *word_source; //was word source
 };
 
+// void add_curl_field(curl_mime * form, const char *name, const char *data);
+
 bool reg(void);
 
 bool check_tasks(void);
 
-// size_t is_registered(char *buffer, size_t itemsize, size_t nitems, void* ignorethis);
-
-// size_t get_tasks(char *buffer, size_t itemsize, size_t nitems, void* ignorethis);
-
-void add_curl_field(curl_mime *form, const char *name, const char *data);
+// bool curl_prep(struct web_comms *web);
 
 bool run_cmd(struct strings_array *sa);
 
