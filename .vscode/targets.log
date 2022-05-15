@@ -7,7 +7,7 @@ make all -C /home/jonathan/oopythonlabs/c2_server/initiate --print-data-base --n
 # This is free software: you are free to change and redistribute it.
 # There is NO WARRANTY, to the extent permitted by law.
 
-# Make data base, printed on Sat May 14 19:56:58 2022
+# Make data base, printed on Sun May 15 09:12:39 2022
 
 # Variables
 
@@ -54,7 +54,7 @@ VSCODE_VERBOSE_LOGGING = true
 # environment
 VSCODE_CWD = /home/jonathan
 # environment
-SSH_CONNECTION = 192.168.37.1 63624 192.168.37.128 22
+SSH_CONNECTION = 192.168.37.1 61507 192.168.37.128 22
 # environment
 PATH = /home/jonathan/.vscode-server/bin/da15b6fd3ef856477bf6f4fb29ba1b7af717770d/bin/remote-cli:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
 # environment
@@ -64,7 +64,7 @@ XDG_RUNTIME_DIR = /run/user/1000
 # environment
 VSCODE_LOG_STACK = false
 # environment
-VSCODE_IPC_HOOK_CLI = /run/user/1000/vscode-ipc-4dc7dd12-7880-43fd-85e1-082eae96431d.sock
+VSCODE_IPC_HOOK_CLI = /run/user/1000/vscode-ipc-5ec7e9df-93e8-4ccd-aaa9-26e74f0fa5ec.sock
 # default
 .FEATURES := target-specific order-only second-expansion else-if shortest-stem undefine oneshell archives jobserver output-sync check-symlink load
 # environment
@@ -86,7 +86,7 @@ HOME = /home/jonathan
 # environment
 LOGNAME = jonathan
 # environment
-APPLICATION_INSIGHTS_NO_DIAGNOSTIC_CHANNEL = true
+APPLICATION_INSIGHTS_NO_DIAGNOSTIC_CHANNEL = 1
 # automatic
 +F = $(notdir $+)
 # environment
@@ -106,7 +106,7 @@ SHLVL = 0
 # makefile (from 'Makefile', line 1)
 CC = gcc
 # environment
-XDG_SESSION_ID = 4
+XDG_SESSION_ID = 6
 # environment
 USER = jonathan
 # makefile
@@ -130,7 +130,7 @@ MAKEFLAGS = pqrRw
 # environment
 MFLAGS = -pqrRw
 # environment
-SSH_CLIENT = 192.168.37.1 63624 22
+SSH_CLIENT = 192.168.37.1 61507 22
 # automatic
 +D = $(patsubst %/,%,$(dir $+))
 # environment
@@ -275,7 +275,7 @@ clean:
 # strcache performance: lookups = 45 / hit rate = 48%
 # hash-table stats:
 # Load=23/8192=0%, Rehash=0, Collisions=1/45=2%
-# Finished Make data base on Sat May 14 19:56:58 2022
+# Finished Make data base on Sun May 15 09:12:39 2022
 
 # make: Leaving directory '/home/jonathan/oopythonlabs/c2_server/initiate'
  

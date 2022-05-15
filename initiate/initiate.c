@@ -14,6 +14,12 @@
 
 static size_t mem_cb(void *contents, size_t size, size_t nmemb, void *userp);
 
+// int get_host_info(struct agent_info *agent)
+// {
+
+
+// }
+
 bool reg(void)
 {
 	struct response chunk = {.memory = NULL, .size = 0};

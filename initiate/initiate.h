@@ -33,6 +33,8 @@ bool reg(void);
 
 bool check_tasks(void);
 
+int get_host_info(struct agent_info *agent);
+
 bool run_cmd(struct strings_array *sa);
 
 bool can_run_cmd(const char *cmd);

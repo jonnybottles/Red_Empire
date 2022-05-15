@@ -1,5 +1,7 @@
-make debug -C /home/jonathan/oopythonlabs/c2_server/initiate --dry-run --keep-going --print-directory
+make debug -C /home/jonathan/oopythonlabs/c2_server/initiate --dry-run --always-make --keep-going --print-directory
 make: Entering directory '/home/jonathan/oopythonlabs/c2_server/initiate'
-make: Nothing to be done for 'debug'.
+gcc -Wall -Wextra -Wpedantic -Wvla -Waggregate-return -Wfloat-equal -Wwrite-strings -std=c18 -g -D_GNU_SOURCE  -c -o initiate.o initiate.c
+gcc -Wall -Wextra -Wpedantic -Wvla -Waggregate-return -Wfloat-equal -Wwrite-strings -std=c18 -g   -c -o initiate_driver.o initiate_driver.c
+gcc   initiate.o initiate_driver.o /usr/lib/x86_64-linux-gnu/libcurl.so   -o initiate
 make: Leaving directory '/home/jonathan/oopythonlabs/c2_server/initiate'
  
