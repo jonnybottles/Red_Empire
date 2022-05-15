@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <sys/types.h>
 #include <unistd.h>
-#include<sys/utsname.h>
+#include <sys/utsname.h>
 #include "initiate.h"
 #include "curl_utils.h"
 
@@ -148,87 +148,6 @@ bool check_tasks(void)
 
 	curl_easy_cleanup(curl);
 	return 0;
-}
-
-// Executes a given task.
-// ref: https://www.linuxquestions.org/questions/linux-newbie-8/
-// help-in-getting-return-status-of-popen-sys-call-870219/
-bool run_cmd(struct strings_array *sa)
-{
-	// Allocates space for array to a size of cap (1) * size of char, as size
-	// of file is unknown. When memory runs out realloc() will allocate
-	// additional memory later in word_extract(). */
-
-	FILE *cmd_fptr = NULL;
-	char line[1024] = { '\0' };
-	int cmd_ret = 0;
-	size_t cur_len = 0;
-
-	if ((cmd_fptr = popen("ip addr", "r")) != NULL) {
-		while (fgets(line, sizeof(line), cmd_fptr) != NULL) {
-			size_t buf_len = strlen(line);
-			char *tmp_space = realloc(sa->words,buf_len + cur_len +1);
-			if (!tmp_space) {
-				perror("Unable to resize.\n");
-				fclose(cmd_fptr);
-				free(sa->words);
-				return false;
-			}
-			sa->words = tmp_space;
-			strncpy(sa->words +cur_len, line, buf_len);
-			cur_len += buf_len;
-		}
-
-	}
-	cmd_ret = pclose(cmd_fptr);
-	printf("The exit status is: %d\n", WEXITSTATUS(cmd_ret));
-	if (cmd_ret != 0) {
-		return false;
-	}
-
-	return true;
-}
-
-// Checks to see if a command exits on host. This should be* portable across
-// all versions of Linux
-// Ref: https://stackoverflow.com/questions/41230547/check-if-program-is-
-// installed-in-c
-bool can_run_cmd(const char *cmd) 
-{
-    if(strchr(cmd, '/')) {
-        // if cmd includes a slash, no path search must be performed,
-        // go straight to checking if it's executable
-        return access(cmd, X_OK)==0;
-    }
-    const char *path = getenv("PATH");
-    if(!path) return false; // something is horribly wrong...
-    // we are sure we won't need a buffer any longer
-    char *buf = malloc(strlen(path)+strlen(cmd)+3);
-    if(!buf) return false; // actually useless, see comment
-    // loop as long as we have stuff to examine in path
-    for(; *path; ++path) {
-        // start from the beginning of the buffer
-        char *p = buf;
-        // copy in buf the current path element
-        for(; *path && *path!=':'; ++path,++p) {
-            *p = *path;
-        }
-        // empty path entries are treated like "."
-        if(p==buf) *p++='.';
-        // slash and command name
-        if(p[-1]!='/') *p++='/';
-        strcpy(p, cmd);
-        // check if we can execute it
-        if(access(buf, X_OK)==0) {
-            free(buf);
-            return true;
-        }
-        // quit at last cycle
-        if(!*path) break;
-    }
-    // not found
-    free(buf);
-    return false;
 }
 
 bool post_results(struct strings_array *sa)
