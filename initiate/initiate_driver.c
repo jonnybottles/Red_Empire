@@ -9,6 +9,7 @@
 int main(void)
 {
     struct strings_array sa = { NULL, NULL, 0, 1, 0, NULL};
+    struct agent_info agent = {NULL, NULL, NULL, NULL};
  
     bool registered = false;
     while(!registered) {
