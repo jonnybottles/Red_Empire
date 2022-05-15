@@ -5,11 +5,11 @@ import cgi
 from uuid import uuid4
 
 
-def register_agent(listener):
-    listener.send_response(200)
-    listener.send_header('content-type', 'text/html')
+def register_agent(self):
+    self.send_response(200)
+    self.send_header('content-type', 'text/html')
     # Always have to close the header.
-    listener.end_headers()
+    self.end_headers()
     output = ''
     # Add opening html body tags
     output += '<html><body>'
@@ -26,23 +26,23 @@ def register_agent(listener):
     output += '</form>'
     output += '</body></html>'
 
-    listener.wfile.write(output.encode())
+    self.wfile.write(output.encode())
     # ctype = content type, pdict = parameter dictionary
     # ctype will scan the above code within /new if block, it will see
     # enctype="multipar/form-data" and add that to the value of ctype
     # the input data is then added to the pdict.
-    ctype, pdict = cgi.parse_header(listener.headers.get('content-type'))
+    ctype, pdict = cgi.parse_header(self.headers.get('content-type'))
     pdict['boundary'] = bytes(pdict['boundary'], "utf-8")
     # Obtain content length of post that is being submitted.
-    content_len = int(listener.headers.get('Content-length'))
+    content_len = int(self.headers.get('Content-length'))
     pdict['CONTENT_LENGTH'] = content_len
     if ctype == 'multipart/form-data':
         # This reads each part of the form
-        fields = cgi.parse_multipart(listener.rfile, pdict)
+        fields = cgi.parse_multipart(self.rfile, pdict)
         # Grab the "task" field that was input by the post request.
         uuid = uuid4()
         # uuid = "uuid"
-        tgt_ip = listener.client_address
+        tgt_ip = self.client_address
         tgt_hostname = fields.get('hostname')
         tgt_os = fields.get('os type')
         tgt_os_version = fields.get('os version')
@@ -51,26 +51,33 @@ def register_agent(listener):
         print(f"Target Hostname:     {tgt_hostname}")
         print(f"Target OS:           {tgt_os}")
         print(f"Target OS Version:   {tgt_os_version}\n")
-        new_agent = Agent(listener.listener.name, uuid, tgt_ip, tgt_hostname, tgt_os, tgt_os_version)
+        new_agent = Agent(self.listener.name, uuid, tgt_ip, tgt_hostname, tgt_os, tgt_os_version)
 
-        print(f" Agent listener name: {new_agent.listener}")
+        self.listener.agents[uuid] = new_agent
+
+        for key, value in self.listener.agents.items():
+            print(
+                f"UUID: {key}\n Listener name: {value.listener_name}\n")
+
+        print(f" Agent listener name: {new_agent.listener_name}")
+        
         # Come back to this later to add to dict ******************************************
         # tasklist.append(new_task[0])
 
         # 301 is a redirect status response. This case, we want the user
         # to be redirected to the tasklist/new page after submitting a task.
-        listener.send_response(201, f"@{uuid}")
+        self.send_response(201, f"@{uuid}")
         # listener.send_header('content-type', 'text/html')
         # listener.send_header('Location', '/new')
         # Always have to close the header.
-        listener.end_headers()
+        self.end_headers()
 
 
-def collect_results(listener):
-    listener.send_response(200)
-    listener.send_header('content-type', 'text/html')
+def collect_results(self):
+    self.send_response(200)
+    self.send_header('content-type', 'text/html')
     # Always have to close the header.
-    listener.end_headers()
+    self.end_headers()
 
     output = ''
     # Add opening html body tags
@@ -86,19 +93,19 @@ def collect_results(listener):
     output += '</form>'
     output += '</body></html>'
 
-    listener.wfile.write(output.encode())
+    self.wfile.write(output.encode())
     # ctype = content type, pdict = parameter dictionary
     # ctype will scan the above code within /new if block, it will see
     # enctype="multipar/form-data" and add that to the value of ctype
     # the input data is then added to the pdict.
-    ctype, pdict = cgi.parse_header(listener.headers.get('content-type'))
+    ctype, pdict = cgi.parse_header(self.headers.get('content-type'))
     pdict['boundary'] = bytes(pdict['boundary'], "utf-8")
     # Obtain content length of post that is being submitted.
-    content_len = int(listener.headers.get('Content-length'))
+    content_len = int(self.headers.get('Content-length'))
     pdict['CONTENT_LENGTH'] = content_len
     if ctype == 'multipart/form-data':
         # This reads each part of the form
-        fields = cgi.parse_multipart(listener.rfile, pdict)
+        fields = cgi.parse_multipart(self.rfile, pdict)
         # Grab the "task" field that was input by the post request.
         task_id = fields.get('task id')
         task_results = fields.get('task results')
@@ -109,20 +116,20 @@ def collect_results(listener):
 
         # 301 is a redirect status response. This case, we want the user
         # to be redirected to the tasklist/new page after submitting a task.
-        listener.send_response(201)
+        self.send_response(201)
         # listener.send_header('content-type', 'text/html')
         # listener.send_header('Location', '/new')
         # Always have to close the header.
-        listener.end_headers()
+        self.end_headers()
 
 
-def serve_tasks(listener):
-    listener.send_response(200)
-    listener.send_header('Content-type', 'text/html')
-    listener.send_header('Content-Disposition', 'attachment; filename="tasks.txt"')
-    listener.end_headers()
+def serve_tasks(self):
+    self.send_response(200)
+    self.send_header('Content-type', 'text/html')
+    self.send_header('Content-Disposition', 'attachment; filename="tasks.txt"')
+    self.end_headers()
 
     # Make this a relative path.
     with open('/home/jonathan/oopythonlabs/red_alert/data/tasks.txt', 'rb') as file: 
-        listener.wfile.write(file.read())
+        self.wfile.write(file.read())
 
