@@ -40,8 +40,8 @@ def register_agent(listener):
         # This reads each part of the form
         fields = cgi.parse_multipart(listener.rfile, pdict)
         # Grab the "task" field that was input by the post request.
-        # uuid = uuid4()
-        uuid = "uuid"
+        uuid = uuid4()
+        # uuid = "uuid"
         tgt_ip = listener.client_address
         tgt_hostname = fields.get('hostname')
         tgt_os = fields.get('os type')

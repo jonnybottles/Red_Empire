@@ -8,28 +8,23 @@
 #ifndef INITIATE_H
 #define INITIATE_H
 
-struct response {
-  char *memory;
-  size_t size;
-};
-
 struct agent_info {
-	char uuid[37];
+	char uuid[64];
 	char hostname[256];
 	char os_type[64];
 	char os_version[64];
 };
 
 struct strings_array {
-	char *tasks; // was file names
-	char *words; // was words
-	size_t sz;
+	char *results;
+	char *response; // was words
+	size_t size;
 	size_t cap;
 	size_t file_num;
 	FILE *word_source; //was word source
 };
 
-bool reg(void);
+bool reg(struct agent_info *agent, struct strings_array *sa);
 
 bool check_tasks(void);
 

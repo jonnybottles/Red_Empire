@@ -12,7 +12,6 @@ int main(void)
     struct strings_array sa = { NULL, NULL, 0, 1, 0, NULL};
     struct agent_info agent = {{'\0'}, {'\0'}, {'\0'}, {'\0'}};
  
-
     bool host_info_gathered = false;
     while(!host_info_gathered) {
         if(get_host_info(&agent)) {
@@ -30,9 +29,11 @@ int main(void)
 
     bool registered = false;
     while(!registered) {
-        if(reg()) {
+        if(reg(&agent, &sa)) {
             puts("Registered\n");
             registered = true;
+	        printf("The data returning from agent registration main is %s\n\n", sa.response);
+        // WILL NEED TO FREE sa.response and memset for each time I want to reuse!!
             continue;
         } else {
             puts("Not Registered, trying again\n");
@@ -41,6 +42,8 @@ int main(void)
         }
 
     }
+    puts("Made it out of reg\n");
+    printf("UUID in main is %s", agent.uuid);
 
     // while(true) {
     //     puts("Checking tasks\n");
