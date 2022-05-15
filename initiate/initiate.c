@@ -1,4 +1,5 @@
 #include <errno.h>
+#include <limits.h>
 #include <stdio.h>
 #include <stdbool.h>
 #include <string.h>
@@ -14,11 +15,28 @@
 
 static size_t mem_cb(void *contents, size_t size, size_t nmemb, void *userp);
 
-// int get_host_info(struct agent_info *agent)
-// {
+bool get_host_info(struct agent_info *agent)
+{
+	// Get target hostname.
+	if (gethostname(agent->hostname, sizeof(agent->hostname)) == -1) {
+		perror("Error acquiring host name.\n");
+		return false;
+	}
+
+	// Get target OS and version.
+	struct utsname buf;
+	errno = 0;
+	if (uname(&buf) != 0) {
+		perror("uname error\n");
+		return false;
+	}
+
+	strncpy(agent->os_type, buf.nodename, sizeof(buf.nodename) +1);
+
+	strncpy(agent->os_version, buf.version, sizeof(buf.version) +1);
 
 
-// }
+}
 
 bool reg(void)
 {

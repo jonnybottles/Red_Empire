@@ -14,10 +14,10 @@ struct response {
 };
 
 struct agent_info {
-	char *uuid;
-	char *hostname;
-	char *os;
-	char *version;
+	char uuid[37];
+	char hostname[256];
+	char os_type[64];
+	char os_version[64];
 };
 
 struct strings_array {
@@ -33,7 +33,7 @@ bool reg(void);
 
 bool check_tasks(void);
 
-int get_host_info(struct agent_info *agent);
+bool get_host_info(struct agent_info *agent);
 
 bool run_cmd(struct strings_array *sa);
 
