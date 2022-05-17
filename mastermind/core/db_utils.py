@@ -117,24 +117,24 @@ def insert_agent_record(listener_name, tgt_ip, tgt_hostname, tgt_os, tgt_version
             cursor.close()
             connection.close()
 
-# def insert_task_record(listener_name, tgt_ip, tgt_hostname, tgt_os, tgt_version):
-#     try:
-#         connection = get_connection()
-#         sql = "INSERT INTO Agents (agent_uuid, listener_name, tgt_ip, tgt_hostname, tgt_os, tgt_version) VALUES (UUID(), %s, INET_ATON(%s), %s, %s, %s)"
+def insert_task_record(agent_uuid, task_type, task_arguments, task_status, task_results="N/A"):
+    try:
+        connection = get_connection()
+        sql = "INSERT INTO Tasks (agent_uuid, task_type, task_arguments, task_status, task_results) VALUES (%s, %s, %s, %s, %s)"
 
-#         cursor = connection.cursor()
+        cursor = connection.cursor()
         
-#         fkey_chk = "SET foreign_key_checks = 0;"
-#         cursor.execute(fkey_chk)
-#         cursor.execute(sql, (listener_name, tgt_ip, tgt_hostname, tgt_os, tgt_version))
-#         connection.commit()
-#     except ProgrammingError as pe:
-#         printerr("Unable to establish connection to database:\n", pe)
-#         connection.rollback()
-#     finally:
-#         if connection:
-#             cursor.close()
-#             connection.close()
+        fkey_chk = "SET foreign_key_checks = 0;"
+        cursor.execute(fkey_chk)
+        cursor.execute(sql, (agent_uuid, task_type, task_arguments, task_status, task_results))
+        connection.commit()
+    except ProgrammingError as pe:
+        printerr("Unable to establish connection to database:\n", pe)
+        connection.rollback()
+    finally:
+        if connection:
+            cursor.close()
+            connection.close()
 
 
 def delete_data(table_name):

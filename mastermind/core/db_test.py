@@ -1,4 +1,4 @@
-from db_utils import create_table, drop_table, insert_listener_record, insert_agent_record
+from db_utils import create_table, drop_table, insert_listener_record, insert_agent_record, insert_task_record
 from exception_utils import printerr, TracebackContext
 
 
@@ -48,11 +48,15 @@ def main():
     # create_table("Agents", agents_schema)
     # create_table("Tasks", tasks_schema, 1)
 
-    insert_listener_record("listener_34", "192.200.2.90", 1000, "eth0", "Started")
-    insert_listener_record("listener_17", "192.200.2.91", 9999, "eth1", "Stopped")
-    insert_agent_record("listener_34", "120.17.29.2", "EXCH02", "Ubuntu", "20.04")
-    insert_agent_record("listener_34", "8.8.8.8", "DC01", "Windows", "SVR2016")
-    insert_agent_record("listener_17", "174.17.8.2", "ADMIN_457", "Windows", "Windows10")
+    # insert_listener_record("listener_34", "192.200.2.90", 1000, "eth0", "Started")
+    # insert_listener_record("listener_17", "192.200.2.91", 9999, "eth1", "Stopped")
+
+    # insert_agent_record("listener_34", "120.17.29.2", "EXCH02", "Ubuntu", "20.04")
+    # insert_agent_record("listener_34", "8.8.8.8", "DC01", "Windows", "SVR2016")
+    # insert_agent_record("listener_17", "174.17.8.2", "ADMIN_457", "Windows", "Windows10")
+
+    # insert_task_record("291eba4d-d61e-11ec-bdcc-000c29c7a3f6", "cmd", "ps -ef", "served", "N/A")
+    insert_task_record("291eba4d-d61e-11ec-bdcc-000c29c7a3f6", "sleep", "10", "issued", "N/A")
 
 if __name__ == "__main__":
     with TracebackContext(True):

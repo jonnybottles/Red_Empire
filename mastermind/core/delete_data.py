@@ -6,8 +6,8 @@ from db_utils import delete_data
 
 def main():
     delete_data("Listeners")
-    # delete_data("Agents")
-    # delete_data("Tasks")
+    delete_data("Agents")
+    delete_data("Tasks")
 
 
 if __name__ == "__main__":
