@@ -1,3 +1,4 @@
+from socket import inet_aton
 import mysql.connector
 from exception_utils import printerr, TracebackContext
 from mysql.connector.errors import ProgrammingError
@@ -78,18 +79,25 @@ def drop_table(table_name):
             cursor.close()
             connection.close()
 
-def insert_listener_record():
-    connection = get_connection()
-    sql = "INSERT INTO Listeners (listener_name, listener_ip, listener_port, status) VALUES (%s, %s, %s, %s)"
-    cursor = connection.cursor()
-    
-    fkey_chk = "SET foreign_key_checks = 0;"
-    cursor.execute(fkey_chk)
+def insert_listener_record(listener_name, listener_ip, listener_port, listener_status):
+    try:
+        connection = get_connection()
+        sql = "INSERT INTO Listeners (listener_name, listener_ip, listener_port, status) VALUES (%s, INET_ATON(%s), %s, %s)"
 
-    cursor.execute(sql, ('listener 4802', 192, 9000, 'Started'))
-    connection.commit()
-    cursor.close()
-    connection.close()
+        cursor = connection.cursor()
+        
+        fkey_chk = "SET foreign_key_checks = 0;"
+        cursor.execute(fkey_chk)
+        cursor.execute(sql, (listener_name, listener_ip, listener_port, listener_status))
+        connection.commit()
+    except ProgrammingError as pe:
+        printerr("Unable to establish connection to database:\n", pe)
+        connection.rollback()
+    finally:
+        if connection:
+            cursor.close()
+            connection.close()
+
 
 def delete_data(table_name):
     connection = None
