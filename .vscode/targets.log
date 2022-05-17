@@ -1,5 +1,6 @@
 make all -C /home/jonathan/oopythonlabs/c2_server/initiate --print-data-base --no-builtin-variables --no-builtin-rules --question
-# make: Entering directory '/home/jonathan/oopythonlabs/c2_server/initiate'
+make: *** /home/jonathan/oopythonlabs/c2_server/initiate: No such file or directory.  Stop.
+
 # GNU Make 4.2.1
 # Built for x86_64-pc-linux-gnu
 # Copyright (C) 1988-2016 Free Software Foundation, Inc.
@@ -7,14 +8,10 @@ make all -C /home/jonathan/oopythonlabs/c2_server/initiate --print-data-base --n
 # This is free software: you are free to change and redistribute it.
 # There is NO WARRANTY, to the extent permitted by law.
 
-# Make data base, printed on Sun May 15 09:12:39 2022
+# Make data base, printed on Tue May 17 07:35:45 2022
 
 # Variables
 
-# automatic
-<D = $(patsubst %/,%,$(dir $<))
-# automatic
-?F = $(notdir $?)
 # default
 .SHELLFLAGS := -c
 # environment
@@ -25,27 +22,13 @@ VSCODE_AGENT_FOLDER = /home/jonathan/.vscode-server
 XDG_SESSION_TYPE = tty
 # environment
 VSCODE_LOG_NATIVE = false
-# automatic
-?D = $(patsubst %/,%,$(dir $?))
-# automatic
-@D = $(patsubst %/,%,$(dir $@))
-# automatic
-@F = $(notdir $@)
-# default
-MAKE_VERSION := 4.2.1
-# makefile
-CURDIR := /home/jonathan/oopythonlabs/c2_server/initiate
-# makefile
-SHELL = /bin/sh
+# environment
+SHELL = /usr/bin/zsh
 # environment
 VSCODE_NLS_CONFIG = {"locale":"en","availableLanguages":{}}
 # environment
 _ = /home/jonathan/.vscode-server/bin/da15b6fd3ef856477bf6f4fb29ba1b7af717770d/node
-# makefile (from 'Makefile', line 4)
-CFLAGS = -Wall -Wextra -Wpedantic -Wvla -Waggregate-return -Wfloat-equal -Wwrite-strings -std=c18
-# makefile (from 'Makefile', line 1)
-MAKEFILE_LIST :=  Makefile
-# 'override' directive
+# environment
 GNUMAKEFLAGS := 
 # environment
 DBUS_SESSION_BUS_ADDRESS = unix:path=/run/user/1000/bus
@@ -54,7 +37,7 @@ VSCODE_VERBOSE_LOGGING = true
 # environment
 VSCODE_CWD = /home/jonathan
 # environment
-SSH_CONNECTION = 192.168.37.1 61507 192.168.37.128 22
+SSH_CONNECTION = 192.168.37.1 55686 192.168.37.128 22
 # environment
 PATH = /home/jonathan/.vscode-server/bin/da15b6fd3ef856477bf6f4fb29ba1b7af717770d/bin/remote-cli:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
 # environment
@@ -64,21 +47,17 @@ XDG_RUNTIME_DIR = /run/user/1000
 # environment
 VSCODE_LOG_STACK = false
 # environment
-VSCODE_IPC_HOOK_CLI = /run/user/1000/vscode-ipc-5ec7e9df-93e8-4ccd-aaa9-26e74f0fa5ec.sock
+VSCODE_IPC_HOOK_CLI = /run/user/1000/vscode-ipc-400a023a-2361-4f99-95c7-863754bf3866.sock
 # default
 .FEATURES := target-specific order-only second-expansion else-if shortest-stem undefine oneshell archives jobserver output-sync check-symlink load
 # environment
 LS_COLORS = 
-# automatic
-%F = $(notdir $%)
 # environment
 VSCODE_PIPE_LOGGING = true
 # environment
 PWD = /home/jonathan/oopythonlabs/red_alert
 # default
 .LOADED := 
-# automatic
-*D = $(patsubst %/,%,$(dir $*))
 # environment
 VSCODE_AMD_ENTRYPOINT = vs/workbench/api/node/extensionHostProcess
 # environment
@@ -86,75 +65,43 @@ HOME = /home/jonathan
 # environment
 LOGNAME = jonathan
 # environment
-APPLICATION_INSIGHTS_NO_DIAGNOSTIC_CHANNEL = 1
-# automatic
-+F = $(notdir $+)
+APPLICATION_INSIGHTS_NO_DIAGNOSTIC_CHANNEL = true
 # environment
 ZSH = /home/jonathan/.oh-my-zsh
 # environment
 VSCODE_HANDLES_UNCAUGHT_ERRORS = true
-# automatic
-^D = $(patsubst %/,%,$(dir $^))
-# environment
-MAKELEVEL := 0
 # default
 MAKE = $(MAKE_COMMAND)
 # default
 MAKECMDGOALS := all
 # environment
 SHLVL = 0
-# makefile (from 'Makefile', line 1)
-CC = gcc
 # environment
 XDG_SESSION_ID = 6
 # environment
 USER = jonathan
-# makefile
-.DEFAULT_GOAL := initiate
 # environment
 LESS = -R
-# automatic
-%D = $(patsubst %/,%,$(dir $%))
 # default
 MAKE_COMMAND := make
 # environment
 OLDPWD = /home/jonathan
 # default
 .VARIABLES := 
-# automatic
-*F = $(notdir $*)
 # environment
 PYTHONPATH = /home/jonathan/pythonlabs:/home/jonathan/oopythonlabs:/home/jonathan/sqlpythonlabs
-# makefile
-MAKEFLAGS = pqrRw
 # environment
-MFLAGS = -pqrRw
-# environment
-SSH_CLIENT = 192.168.37.1 61507 22
-# automatic
-+D = $(patsubst %/,%,$(dir $+))
+SSH_CLIENT = 192.168.37.1 55686 22
 # environment
 BROWSER = /home/jonathan/.vscode-server/bin/da15b6fd3ef856477bf6f4fb29ba1b7af717770d/bin/helpers/browser.sh
 # environment
 VSCODE_HANDLES_SIGPIPE = true
-# default
-MAKEFILES := 
-# automatic
-<F = $(notdir $<)
 # environment
 PAGER = less
 # environment
 LC_ALL = C
-# automatic
-^F = $(notdir $^)
-# default
-SUFFIXES := 
-# default
-.INCLUDE_DIRS = /usr/include /usr/local/include /usr/include
 # default
 .RECIPEPREFIX := 
-# default
-MAKE_HOST := x86_64-pc-linux-gnu
 # environment
 LANG = C
 # environment
@@ -162,7 +109,7 @@ VSCODE_EXTHOST_WILL_SEND_SOCKET = true
 # environment
 MOTD_SHOWN = pam
 # variable set hash-table stats:
-# Load=75/1024=7%, Rehash=0, Collisions=9/107=8%
+# Load=48/1024=5%, Rehash=0, Collisions=3/52=6%
 
 # Pattern-specific Variable Values
 
@@ -170,9 +117,8 @@ MOTD_SHOWN = pam
 
 # Directories
 
-# . (device 2053, inode 2490919): 13 files, no impossibilities.
 
-# 13 files, no impossibilities in 1 directories.
+# No files, no impossibilities in 0 directories.
 
 # Implicit Rules
 
@@ -180,104 +126,27 @@ MOTD_SHOWN = pam
 
 # Files
 
-initiate: initiate.o initiate_driver.o -lcurl
-#  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
-
-# makefile (from 'Makefile', line 9)
-initiate.o: CPPFLAGS += -D_GNU_SOURCE
-initiate.o: initiate.h initiate.c
-#  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
-# variable set hash-table stats:
-# Load=1/32=3%, Rehash=0, Collisions=0/2=0%
-
 # Not a target:
 all:
 #  Command line target.
-#  Implicit rule search has been done.
-#  File does not exist.
-#  File has not been updated.
-
-.PHONY: debug clean
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
-
-# Not a target:
-Makefile:
-#  Implicit rule search has been done.
-#  Last modified 2022-05-06 13:30:45.978869176
-#  File has been updated.
-#  Successfully updated.
-
-# makefile (from 'Makefile', line 12)
-debug: CFLAGS += -g
-debug: initiate
-#  Phony target (prerequisite of .PHONY).
-#  Implicit rule search has not been done.
-#  File does not exist.
-#  File has not been updated.
-# variable set hash-table stats:
-# Load=1/32=3%, Rehash=0, Collisions=0/2=0%
-
-# Not a target:
-initiate.c:
-#  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
-
-# Not a target:
--lcurl:
-#  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
-
-# Not a target:
-initiate.h:
-#  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
-
-# Not a target:
-.DEFAULT:
-#  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
-
-# Not a target:
-initiate_driver.o:
-#  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
-
-clean:
-#  Phony target (prerequisite of .PHONY).
-#  Implicit rule search has not been done.
-#  File does not exist.
-#  File has not been updated.
-#  recipe to execute (from 'Makefile', line 17):
-	$(RM) initiate *.o
 
 # files hash-table stats:
-# Load=13/1024=1%, Rehash=0, Collisions=0/37=0%
+# Load=1/1024=0%, Rehash=0, Collisions=0/1=0%
 # VPATH Search Paths
 
 # No 'vpath' search paths.
 
 # No general ('VPATH' variable) search path.
 
-# strcache buffers: 1 (0) / strings = 23 / storage = 258 B / avg = 11 B
-# current buf: size = 8162 B / used = 258 B / count = 23 / avg = 11 B
+# strcache buffers: 1 (0) / strings = 2 / storage = 51 B / avg = 25 B
+# current buf: size = 8162 B / used = 51 B / count = 2 / avg = 25 B
 
-# strcache performance: lookups = 45 / hit rate = 48%
+# strcache performance: lookups = 3 / hit rate = 33%
 # hash-table stats:
-# Load=23/8192=0%, Rehash=0, Collisions=1/45=2%
-# Finished Make data base on Sun May 15 09:12:39 2022
+# Load=2/8192=0%, Rehash=0, Collisions=0/3=0%
+# Finished Make data base on Tue May 17 07:35:45 2022
 
-# make: Leaving directory '/home/jonathan/oopythonlabs/c2_server/initiate'
  
-make: *** No rule to make target 'all'.  Stop.
-
