@@ -1,4 +1,4 @@
-from db_helper import create_table
+from db_helper import create_table, drop_table
 from exception_utils import printerr, TracebackContext
 
 
@@ -19,8 +19,10 @@ def main():
         "tgt_hostname VARCHAR(255) NOT NULL",
         "tgt_os VARCHAR(15) NOT NULL",
         "tgt_version VARCHAR(20) NOT NULL",
+        "CONSTRAINT uniq_uuid UNIQUE(agent_uuid)",
+        "INDEX (agent_uuid)",
         "FOREIGN KEY (agent_id) REFERENCES Listeners (listener_id) ",
-        "FOREIGN KEY (agent_uuid) REFERENCES Tasks (agent_uuid) ",
+        # "FOREIGN KEY (agent_uuid) REFERENCES Tasks (agent_uuid) ",
     ]
 
     tasks_columns = [
@@ -30,8 +32,16 @@ def main():
         "task_arguments VARCHAR(50)",
         "task_status ENUM('issued', 'collected', 'complete') NOT NULL",
         "task_results TEXT",
+        "CONSTRAINT uniq_uuid UNIQUE(agent_uuid)",
+        "INDEX (agent_uuid)",
         "FOREIGN KEY (agent_uuid) REFERENCES Agents (agent_uuid) ",
     ]
+
+# https://stackoverflow.com/questions/69921907/failed-to-add-the-foreign-key-constraint-missing-index-for-constraint-informat
+
+    drop_table("Listeners")
+    drop_table("Agents")
+    drop_table("Tasks")
 
     create_table("Listeners", listeners_columns, 1)
     create_table("Agents", agents_columns, 1)
@@ -39,5 +49,5 @@ def main():
 
 
 if __name__ == "__main__":
-    with TracebackContext(False):
+    with TracebackContext(True):
         main()
