@@ -79,16 +79,16 @@ def drop_table(table_name):
             cursor.close()
             connection.close()
 
-def insert_listener_record(listener_name, listener_ip, listener_port, listener_status):
+def insert_listener_record(listener_name, listener_ip, listener_port, listener_interface, listener_status):
     try:
         connection = get_connection()
-        sql = "INSERT INTO Listeners (listener_name, listener_ip, listener_port, status) VALUES (%s, INET_ATON(%s), %s, %s)"
+        sql = "INSERT INTO Listeners (listener_name, listener_ip, listener_port, listener_interface, status) VALUES (%s, INET_ATON(%s), %s, %s, %s)"
 
         cursor = connection.cursor()
         
         fkey_chk = "SET foreign_key_checks = 0;"
         cursor.execute(fkey_chk)
-        cursor.execute(sql, (listener_name, listener_ip, listener_port, listener_status))
+        cursor.execute(sql, (listener_name, listener_ip, listener_port, listener_interface, listener_status))
         connection.commit()
     except ProgrammingError as pe:
         printerr("Unable to establish connection to database:\n", pe)
@@ -97,6 +97,44 @@ def insert_listener_record(listener_name, listener_ip, listener_port, listener_s
         if connection:
             cursor.close()
             connection.close()
+
+def insert_agent_record(listener_name, tgt_ip, tgt_hostname, tgt_os, tgt_version):
+    try:
+        connection = get_connection()
+        sql = "INSERT INTO Agents (agent_uuid, listener_name, tgt_ip, tgt_hostname, tgt_os, tgt_version) VALUES (UUID(), %s, INET_ATON(%s), %s, %s, %s)"
+
+        cursor = connection.cursor()
+        
+        fkey_chk = "SET foreign_key_checks = 0;"
+        cursor.execute(fkey_chk)
+        cursor.execute(sql, (listener_name, tgt_ip, tgt_hostname, tgt_os, tgt_version))
+        connection.commit()
+    except ProgrammingError as pe:
+        printerr("Unable to establish connection to database:\n", pe)
+        connection.rollback()
+    finally:
+        if connection:
+            cursor.close()
+            connection.close()
+
+# def insert_task_record(listener_name, tgt_ip, tgt_hostname, tgt_os, tgt_version):
+#     try:
+#         connection = get_connection()
+#         sql = "INSERT INTO Agents (agent_uuid, listener_name, tgt_ip, tgt_hostname, tgt_os, tgt_version) VALUES (UUID(), %s, INET_ATON(%s), %s, %s, %s)"
+
+#         cursor = connection.cursor()
+        
+#         fkey_chk = "SET foreign_key_checks = 0;"
+#         cursor.execute(fkey_chk)
+#         cursor.execute(sql, (listener_name, tgt_ip, tgt_hostname, tgt_os, tgt_version))
+#         connection.commit()
+#     except ProgrammingError as pe:
+#         printerr("Unable to establish connection to database:\n", pe)
+#         connection.rollback()
+#     finally:
+#         if connection:
+#             cursor.close()
+#             connection.close()
 
 
 def delete_data(table_name):
@@ -129,3 +167,20 @@ def delete_data(table_name):
 #     connection.commit()
 #     cursor.close()
 #     connection.close()
+
+# def rowin(self, table_name, ColumnData=[]):
+#     # First check number columns in the table TableName to confirm ColumnData=[] fits
+#     check = f"SELECT count(*) FROM information_schema.columns WHERE table_name = {table_name}"
+#     connection = get_connection()
+#     cursor = connection.cursor()
+#     cursor.execute(check)
+#     col_count = len(cursor.fetchall())
+#     # Compare TableName Column count to len(ColumnData)
+
+#     if col_count == len(ColumnData):
+#         # I want to be have the number of ? = ColCount
+#         connection.executemany('''INSERT INTO {tn} VALUES (%s, %s)'''.format(tn=table_name), ColumnData)
+#         connection.commit()
+
+#     else:
+#         print("Input doesn't match number of columns")
