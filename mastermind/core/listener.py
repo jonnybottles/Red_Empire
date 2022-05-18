@@ -9,7 +9,7 @@
 # The BaseHTTPRequestHandler class enables management of your various
 # HTTP requests (e.g. GET, POST, etc)
 from http.server import HTTPServer, BaseHTTPRequestHandler
-from .listener_helper import register_agent, serve_tasks, collect_results
+from .listener_helper import register_agent, serve_tasks, collect_results, get_agent_uuid
 import os
 
 
@@ -39,13 +39,9 @@ class http_server:
 
 class Handler(BaseHTTPRequestHandler):
     listener = None
-
     def do_GET(self):
-        for key, value in self.listener.agents.items():
-            print("Key in listener class\n")
-            print(key)
-            if self.path.endswith(f'/tasks/{key}'):
-                serve_tasks(self)
+        if self.path.endswith(f'/tasks/{get_agent_uuid(self)}'):
+            serve_tasks(self)
 
     def do_POST(self):
         if self.path.endswith('/reg'):

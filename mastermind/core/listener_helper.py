@@ -133,3 +133,7 @@ def serve_tasks(self):
     with open('/home/jonathan/oopythonlabs/red_alert/data/tasks.txt', 'rb') as file: 
         self.wfile.write(file.read())
 
+def get_agent_uuid(self):
+    for key, value in self.listener.agents.items():
+        print("Agent UUID from dict is:\n", key)
+        return key
