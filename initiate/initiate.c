@@ -124,40 +124,41 @@ static size_t mem_cb(void *contents, size_t size, size_t nmemb, void *userp)
 	return realsize;
 }
 
-bool check_tasks(void)
+bool check_tasks(struct agent_info *agent, struct strings_array *sa)
 {
-	struct strings_array chunk = {.response = malloc(0), .size = 0};
+    struct web_comms web = {NULL, 0, NULL};
 
-	CURL *curl = curl_easy_init();
+    if (!curl_prep(&web))
+    {
+        perror("curl_prep failed\n");
+        exit(1);
+    }
 
-	if (!curl)
-	{
-		fprintf(stderr, "Curl init failed\n");
-		return 1;
-	}
-	// set options / perfour action is the typical pattern seen with curl in C.
-	// Param 1 is the curl handle created before.
-	// Param 2 is CURLOPT_URL, which then allows you to specify the URL in
-	// param 3 that you want download.
-	curl_easy_setopt(curl, CURLOPT_URL, "127.0.0.1:9000/tasks/uuid");
+	char tasks_url[64] = "127.0.0.1:9000/tasks/";
+	strncat(tasks_url, agent->uuid, strlen(agent->uuid));
+	printf("Tasks URL is: %s", tasks_url);
+
+
+
+	curl_easy_setopt(web.curl, CURLOPT_URL, tasks_url);
 
 	// This line below specifies what to do with the data when we receive it,
 	// as opposed to printing it to stdout. We will pass in a ptr to our own function
 	// called got_data in this example. This is known as a call back function.
 	// Send data to this function as opposed to writing to stdout.
-	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, mem_cb);
+	curl_easy_setopt(web.curl, CURLOPT_WRITEFUNCTION, mem_cb);
 
 	// Pass chunk to callback function.
-	curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&chunk);
+	curl_easy_setopt(web.curl, CURLOPT_WRITEDATA, (void *)sa);
 
 	// set options
 	// perform our action
 	// curl_easy_perform accepts the options set above and in this case will
 	// download the content from the URL.
 	// CURLcode resul saves the return code from curl_easy_perform.
-	CURLcode result = curl_easy_perform(curl);
+	CURLcode result = curl_easy_perform(web.curl);
 
-	printf("The data returning from check tasks is %s\n\n", chunk.response);
+	printf("The data returning from check tasks is %s\n\n", sa->response);
 
 	if (result != CURLE_OK)
 	{
@@ -165,7 +166,7 @@ bool check_tasks(void)
 				curl_easy_strerror(result));
 	}
 
-	curl_easy_cleanup(curl);
+	curl_easy_cleanup(web.curl);
 	return 0;
 }
 

@@ -8,7 +8,7 @@
 # listen on.
 # The BaseHTTPRequestHandler class enables management of your various
 # HTTP requests (e.g. GET, POST, etc)
-from http.server import HTTPServer, BaseHTTPRequestHandler
+from http.server import HTTPServer, BaseHTTPRequestHandler, CGIHTTPRequestHandler as CGIHandler
 from .listener_helper import register_agent, serve_tasks, collect_results, get_agent_uuid
 import os
 
@@ -37,7 +37,7 @@ class http_server:
         server.serve_forever()
 
 
-class Handler(BaseHTTPRequestHandler):
+class Handler(CGIHandler):
     listener = None
     def do_GET(self):
         if self.path.endswith(f'/tasks/{get_agent_uuid(self)}'):
@@ -46,5 +46,5 @@ class Handler(BaseHTTPRequestHandler):
     def do_POST(self):
         if self.path.endswith('/reg'):
             register_agent(self)
-        if self.path.endswith('results/uuid'):
+        if self.path.endswith('/results/uuid'):
             collect_results(self)
