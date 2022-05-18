@@ -1,0 +1,3 @@
+cmd,ls
+cmd,pwd
+cmd,ps,e,f

