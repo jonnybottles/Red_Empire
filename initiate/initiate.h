@@ -28,7 +28,7 @@ struct tasks {
 	char id[8];
 	char type[8];
 	char cmd[32];
-	char args[32];
+	char args[128];
 	char **strings;
 	size_t sz;
 	size_t cap;

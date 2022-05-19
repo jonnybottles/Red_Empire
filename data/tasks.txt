@@ -1,4 +1,4 @@
-#17 1 more test.txt 
+#17 1 ls -al test.txt
 #18 1 file host_utils.c
 #19 1 pwd
 $

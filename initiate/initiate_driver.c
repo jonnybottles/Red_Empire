@@ -57,11 +57,13 @@ int main(void)
         }
 
         // char line[1024] = { '\0' };
-        for (unsigned int i = 0; i < task.sz; i++) {
-            // puts("tasks in main\n");
-            // printf("%s\n", task.strings[i]);
-        
-            sscanf(task.strings[i], "%s %s %s %s", task.id, task.type, task.cmd, task.args);
+        for (unsigned int i = 0; i < task.sz; i++) {      
+
+
+            //*** UPDATE THIS TO USE STRTOK. SCANF CANNOT BE USED, AS THERE IS AN UNKNOWN
+            // Ref for scanning remainder of string (%[\001-\377]):
+            // https://stackoverflow.com/questions/35101996/sscanf-get-the-value-of-the-remaining-string
+            sscanf(task.strings[i], "%s %s %s %[\001-\377]", task.id, task.type, task.cmd, task.args);
             printf("Tasks ID: %s\n", task.id);
             printf("Tasks Type: %s\n", task.type);
             printf("Tasks Cmd: %s\n", task.cmd);
@@ -93,16 +95,12 @@ int main(void)
 
         }
 
-        // remember to destroy sa.words at some point.
-
-
         free(sa.response);
         destroy(&task);
 
         sa.results = NULL;
         sa.response = NULL;
         sa.size = 0;
-
         task.sz = 0;
 
 
