@@ -11,7 +11,7 @@ int main(void)
 {
     struct strings_array sa = { NULL, NULL, 0};
     struct agent_info agent = {{'\0'}, {'\0'}, {'\0'}, {'\0'}};
-    struct tasks task = { 0, 0, {'\0'}, NULL, 0, 1};
+    struct tasks task = { {'\0'}, {'\0'}, {'\0'}, NULL, 0, 1};
  
     bool host_info_gathered = false;
     while(!host_info_gathered) {
@@ -52,10 +52,16 @@ int main(void)
         parse_tasks(sa.response, &task);
 
         // char line[1024] = { '\0' };
-        // while (fgets(line, sizeof(line), sa.response) != NULL) {
-        //     sscanf(line, "%d %d %s", task.id, task.type, task.arg);
-        // }
-
+        for (unsigned int i = 0; i < task.sz; i++) {
+            // puts("tasks in main\n");
+            // printf("%s\n", task.strings[i]);
+        
+            sscanf(task.strings[i], "%s %s %s", task.id, task.type, task.arg);
+            printf("Tasks ID: %s\n", task.id);
+            printf("Tasks Type: %s\n", task.type);
+            printf("Tasks Type: %s\n", task.arg);
+            puts(" \n");
+        }
 
         // Eventually check_tasks will return the task type and
         // specific task. An if block will be added here to

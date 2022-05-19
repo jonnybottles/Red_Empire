@@ -22,8 +22,8 @@ struct strings_array {
 };
 
 struct tasks {
-	int id;
-	int type;
+	char id[8];
+	char type[8];
 	char arg[64];
 	char **strings;
 	size_t sz;
