@@ -11,7 +11,7 @@ int main(void)
 {
     struct strings_array sa = { NULL, NULL, 0};
     struct agent_info agent = {{'\0'}, {'\0'}, {'\0'}, {'\0'}};
-    struct tasks task = { {'\0'}, {'\0'}, {'\0'}, NULL, 0, 1};
+    struct tasks task = { {'\0'}, {'\0'}, {'\0'}, {'\0'}, NULL, 0, 1};
  
     bool host_info_gathered = false;
     while(!host_info_gathered) {
@@ -56,10 +56,11 @@ int main(void)
             // puts("tasks in main\n");
             // printf("%s\n", task.strings[i]);
         
-            sscanf(task.strings[i], "%s %s %s", task.id, task.type, task.arg);
+            sscanf(task.strings[i], "%s %s %s %s", task.id, task.type, task.cmd, task.args);
             printf("Tasks ID: %s\n", task.id);
             printf("Tasks Type: %s\n", task.type);
-            printf("Tasks Type: %s\n", task.arg);
+            printf("Tasks Arg: %s\n", task.cmd);
+            printf("Tasks Arg: %s\n", task.args);
             puts(" \n");
         }
 
