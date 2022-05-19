@@ -8,7 +8,7 @@ make: *** /home/jonathan/oopythonlabs/c2_server/initiate: No such file or direct
 # This is free software: you are free to change and redistribute it.
 # There is NO WARRANTY, to the extent permitted by law.
 
-# Make data base, printed on Wed May 18 09:06:03 2022
+# Make data base, printed on Thu May 19 07:22:34 2022
 
 # Variables
 
@@ -37,7 +37,7 @@ VSCODE_VERBOSE_LOGGING = true
 # environment
 VSCODE_CWD = /home/jonathan
 # environment
-SSH_CONNECTION = 192.168.37.1 56585 192.168.37.128 22
+SSH_CONNECTION = 192.168.37.1 63377 192.168.37.128 22
 # environment
 PATH = /home/jonathan/.vscode-server/bin/da15b6fd3ef856477bf6f4fb29ba1b7af717770d/bin/remote-cli:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
 # environment
@@ -47,7 +47,7 @@ XDG_RUNTIME_DIR = /run/user/1000
 # environment
 VSCODE_LOG_STACK = false
 # environment
-VSCODE_IPC_HOOK_CLI = /run/user/1000/vscode-ipc-8752b1cb-a0f6-4958-ac5f-03a91e72ee7a.sock
+VSCODE_IPC_HOOK_CLI = /run/user/1000/vscode-ipc-36048d9c-3349-435b-b14b-47145073cc9b.sock
 # default
 .FEATURES := target-specific order-only second-expansion else-if shortest-stem undefine oneshell archives jobserver output-sync check-symlink load
 # environment
@@ -65,7 +65,7 @@ HOME = /home/jonathan
 # environment
 LOGNAME = jonathan
 # environment
-APPLICATION_INSIGHTS_NO_DIAGNOSTIC_CHANNEL = true
+APPLICATION_INSIGHTS_NO_DIAGNOSTIC_CHANNEL = 1
 # environment
 ZSH = /home/jonathan/.oh-my-zsh
 # environment
@@ -91,7 +91,7 @@ OLDPWD = /home/jonathan
 # environment
 PYTHONPATH = /home/jonathan/pythonlabs:/home/jonathan/oopythonlabs:/home/jonathan/sqlpythonlabs
 # environment
-SSH_CLIENT = 192.168.37.1 56585 22
+SSH_CLIENT = 192.168.37.1 63377 22
 # environment
 BROWSER = /home/jonathan/.vscode-server/bin/da15b6fd3ef856477bf6f4fb29ba1b7af717770d/bin/helpers/browser.sh
 # environment
@@ -147,6 +147,6 @@ all:
 # strcache performance: lookups = 3 / hit rate = 33%
 # hash-table stats:
 # Load=2/8192=0%, Rehash=0, Collisions=0/3=0%
-# Finished Make data base on Wed May 18 09:06:03 2022
+# Finished Make data base on Thu May 19 07:22:34 2022
 
  

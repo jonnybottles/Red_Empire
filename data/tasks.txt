@@ -1,3 +1,4 @@
-cmd,ls
-cmd,pwd
-cmd,ps,e,f
+#17 1 ls
+#18 1 pwd
+#19 1 ps -ef
+$

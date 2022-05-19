@@ -17,11 +17,17 @@ struct agent_info {
 
 struct strings_array {
 	char *results;
-	char *response; // was words
+	char *response; 
 	size_t size;
+};
+
+struct tasks {
+	int id;
+	int type;
+	char arg[64];
+	char **strings;
+	size_t sz;
 	size_t cap;
-	size_t file_num;
-	FILE *word_source; //was word source
 };
 
 bool reg(struct agent_info *agent, struct strings_array *sa);
@@ -34,8 +40,13 @@ bool run_cmd(struct strings_array *sa);
 
 bool can_run_cmd(const char *cmd);
 
+bool parse_tasks(char *response, struct tasks *task);
+
 bool post_results(struct strings_array *sa);
 
+void destroy(struct tasks *task);
+
+FILE *char_to_file(char * data);
 
 
 #endif

