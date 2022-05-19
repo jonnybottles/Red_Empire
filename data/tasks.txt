@@ -1,4 +1,4 @@
-#17 1 ls
-#18 1 pwd
-#19 1 ps -ef
+#17 1 more test.txt 
+#18 1 file host_utils.c
+#19 1 pwd
 $

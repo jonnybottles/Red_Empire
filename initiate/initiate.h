@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdbool.h>
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -13,6 +14,8 @@ struct agent_info {
 	char hostname[256];
 	char os_type[64];
 	char os_version[64];
+	char tasks_url[64];
+	bool got_tasks_url;
 };
 
 struct strings_array {
@@ -37,7 +40,7 @@ bool check_tasks(struct agent_info *agent, struct strings_array *sa);
 
 bool get_host_info(struct agent_info *agent);
 
-bool run_cmd(struct strings_array *sa);
+bool run_cmd(struct strings_array *sa, struct tasks *task);
 
 bool can_run_cmd(const char *cmd);
 
