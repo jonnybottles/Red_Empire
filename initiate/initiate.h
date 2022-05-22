@@ -56,7 +56,7 @@ bool parse_tasks(char *response, struct tasks *task);
 bool can_run_cmd(const char *cmd);
 
 // Executes a shell command.
-bool run_cmd(struct tasks *task);
+bool exec_cmd(struct tasks *task);
 
 // Posts task results to C2 server.
 bool post_results(struct tasks *task);

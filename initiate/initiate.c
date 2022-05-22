@@ -254,8 +254,15 @@ bool parse_tasks(char *response, struct tasks *task)
 // ref: https://www.linuxquestions.org/questions/linux-newbie-8/
 // help-in-getting-return-status-of-popen-sys-call-870219/
 // Executes a shell cmd.
-bool run_cmd(struct tasks *task)
+bool exec_cmd(struct tasks *task)
 {
+	if (!can_run_cmd(task->cmd)) {
+		printf("Command binary %s does not exist\n", task->cmd);
+		// Will need to update this portion here to copy
+		// failed results to task results, for posting
+		// back in main.
+		return false;
+	}
 
 	FILE *cmd_fptr = NULL;
 	char line[1024] = {'\0'};
@@ -290,6 +297,10 @@ bool run_cmd(struct tasks *task)
 	printf("The exit status is: %d\n", WEXITSTATUS(cmd_ret));
 	if (cmd_ret != 0)
 	{
+		printf("Failed to execute %s\n", task->cmd);
+		// Will need to update this portion here to copy
+		// failed results to task results, for posting
+		// back in main.
 		return false;
 	}
 
