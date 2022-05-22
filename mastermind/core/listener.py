@@ -46,5 +46,5 @@ class Handler(CGIHandler):
     def do_POST(self):
         if self.path.endswith('/reg'):
             register_agent(self)
-        if self.path.endswith('/results/uuid'):
+        if self.path.endswith(f'/results/{get_agent_uuid(self)}'):
             collect_results(self)

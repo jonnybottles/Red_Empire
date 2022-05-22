@@ -10,8 +10,8 @@
 int main(void)
 {
     struct strings_array sa = { NULL, 0};
-    struct agent_info agent = {{'\0'}, {'\0'}, {'\0'}, {'\0'}, {'\0'}, false};
-    struct tasks task = { {'\0'}, 0, {'\0'}, {'\0'}, NULL, NULL, 0, 1};
+    struct agent_info agent = {{'\0'}, {'\0'}, {'\0'}, {'\0'}, {'\0'}};
+    struct tasks task = { {'\0'}, 0, {'\0'}, {'\0'}, NULL, NULL, {'\0'}, 0, 1};
  
     bool host_info_gathered = false;
     while(!host_info_gathered) {
@@ -46,6 +46,7 @@ int main(void)
     printf("UUID in main is %s", agent.uuid);
 
     create_tasks_url(sa.response, &agent);
+    create_results_url(&agent, &task);
 
     while(true) {
         puts("Checking tasks\n");

