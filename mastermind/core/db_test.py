@@ -1,4 +1,4 @@
-from db_utils import create_table, drop_table, insert_listener_record, insert_agent_record, insert_task_record
+from db_utils import create_table, drop_table, insert_listener_record,insert_agent_record, insert_task_record, get_tasks
 from exception_utils import printerr, TracebackContext
 
 
@@ -56,7 +56,8 @@ def main():
     # insert_agent_record("listener_17", "174.17.8.2", "ADMIN_457", "Windows", "Windows10")
 
     # insert_task_record("291eba4d-d61e-11ec-bdcc-000c29c7a3f6", "cmd", "ps -ef", "served", "N/A")
-    insert_task_record("291eba4d-d61e-11ec-bdcc-000c29c7a3f6", "sleep", "10", "issued", "N/A")
+    # insert_task_record("291eba4d-d61e-11ec-bdcc-000c29c7a3f6", "sleep", "10", "issued", "N/A")
+    get_tasks("blah")
 
 if __name__ == "__main__":
     with TracebackContext(True):

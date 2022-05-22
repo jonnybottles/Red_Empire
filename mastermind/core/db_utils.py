@@ -158,6 +158,31 @@ def delete_data(table_name):
             cursor.close()
             connection.close()
 
+def get_tasks(uuid):
+    connection = None
+    try:
+        connection = get_connection()
+        cursor = connection.cursor()
+        
+        sql = "SELECT * FROM Tasks"
+        cursor.execute(sql)
+
+        for id, uuid, type, args, status, results in cursor.fetchall():
+            print("ID: ", id)
+            print("UUID: ", uuid)
+            print("Type: ", type)
+            print("Args: ", args)
+            print("Status: ", status)
+            print("Results: ", results)
+
+    except ProgrammingError as pe:
+        printerr("Unable to establish connection to database:\n", pe)
+        connection.rollback()
+    finally:
+        if connection:
+            cursor.close()
+            connection.close()
+
 
 # def insert_record():
 #     connection = get_connection()
