@@ -192,8 +192,8 @@ bool parse_tasks(char *response, struct tasks *task)
 	char line[1024] = { '\0' };
 	FILE *response_file = char_to_file(response);
 
-	task->strings = malloc((task->cap) * sizeof(*task->strings));
-	if (!task->strings) {
+	task->tasks_array = malloc((task->cap) * sizeof(*task->tasks_array));
+	if (!task->tasks_array) {
 		perror("Unable to create space for words.\n");
 		return 1;
 	}
@@ -208,22 +208,22 @@ bool parse_tasks(char *response, struct tasks *task)
 			space for new token. */
 		if (task->sz == task->cap) {
 			task->cap *= 2;
-			char **tmp_space = realloc(task->strings,
+			char **tmp_space = realloc(task->tasks_array,
 							task->cap *
-							sizeof(*task->strings));
+							sizeof(*task->tasks_array));
 			if (!tmp_space) {
 				perror("Unable to resize.\n");
 				fclose(response_file);
 				destroy(task);
 				return false;
 			}
-			task->strings = tmp_space;
+			task->tasks_array = tmp_space;
 		}
 
 		size_t len = strlen(line) + 1;
-		task->strings[task->sz] =
-			malloc(len * sizeof(task->strings[task->sz]));
-		if (!task->strings[task->sz]) {
+		task->tasks_array[task->sz] =
+			malloc(len * sizeof(task->tasks_array[task->sz]));
+		if (!task->tasks_array[task->sz]) {
 			perror("Unable to resize.\n");
 			fclose(response_file);
 			destroy(task);
@@ -231,7 +231,7 @@ bool parse_tasks(char *response, struct tasks *task)
 		}
 		
 		if (line[0] == TASK_LINE) {
-			strncpy(task->strings[task->sz], line + 1, len);
+			strncpy(task->tasks_array[task->sz], line + 1, len);
 			task->sz++;
 		}
 
@@ -245,7 +245,7 @@ bool parse_tasks(char *response, struct tasks *task)
 	}
 	puts("********PARSED TASKS*************************");
 	for (unsigned int i = 0; i < task->sz; i++) {
-		printf("%s\n", task->strings[i]);
+		printf("%s\n", task->tasks_array[i]);
 	}
 	fclose(response_file);
 	return true;
@@ -358,12 +358,12 @@ void destroy(struct tasks *task)
 	/* Iterates through array elements and frees memory of each line in words
 	array.*/
 	for (unsigned int j = 0; j < task->sz; j++) {
-		if (task->strings[j]) {
-			free(task->strings[j]);
+		if (task->tasks_array[j]) {
+			free(task->tasks_array[j]);
 		}
 	}
 	// Frees memory for entire file names array.
-	free(task->strings);
+	free(task->tasks_array);
 }
 
 void reset_task_vals(struct tasks *task)

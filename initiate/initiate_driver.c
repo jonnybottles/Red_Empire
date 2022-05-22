@@ -58,14 +58,14 @@ int main(void)
             continue;
         }
 
-        // Begin iterating through task.strings array and extracting task ID
+        // Begin iterating through task.tasks_array array and extracting task ID
         // task type, task cmd, and args to then call follow on task execution
         // functions.
         for (unsigned int i = 0; i < task.sz; i++) {      
 
             // Ref for scanning remainder of string (%[\001-\377]):
             // https://stackoverflow.com/questions/35101996/sscanf-get-the-value-of-the-remaining-string
-            sscanf(task.strings[i], "%s %d %s %[\001-\377]", task.id, &task.type, task.cmd, task.args);
+            sscanf(task.tasks_array[i], "%s %d %s %[\001-\377]", task.id, &task.type, task.cmd, task.args);
             printf("Tasks ID: %s\n", task.id);
             printf("Tasks Type: %d\n", task.type);
             printf("Tasks Cmd: %s\n", task.cmd);

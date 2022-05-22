@@ -28,7 +28,7 @@ struct tasks {
 	int type;
 	char cmd[32];
 	char args[128];
-	char **strings;
+	char **tasks_array;
 	char *results;
 	size_t sz;
 	size_t cap;
