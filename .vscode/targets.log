@@ -8,7 +8,7 @@ make: *** /home/jonathan/oopythonlabs/c2_server/initiate: No such file or direct
 # This is free software: you are free to change and redistribute it.
 # There is NO WARRANTY, to the extent permitted by law.
 
-# Make data base, printed on Thu May 19 07:22:34 2022
+# Make data base, printed on Mon May 23 08:08:15 2022
 
 # Variables
 
@@ -27,7 +27,7 @@ SHELL = /usr/bin/zsh
 # environment
 VSCODE_NLS_CONFIG = {"locale":"en","availableLanguages":{}}
 # environment
-_ = /home/jonathan/.vscode-server/bin/da15b6fd3ef856477bf6f4fb29ba1b7af717770d/node
+_ = /home/jonathan/.vscode-server/bin/c3511e6c69bb39013c4a4b7b9566ec1ca73fc4d5/node
 # environment
 GNUMAKEFLAGS := 
 # environment
@@ -37,9 +37,9 @@ VSCODE_VERBOSE_LOGGING = true
 # environment
 VSCODE_CWD = /home/jonathan
 # environment
-SSH_CONNECTION = 192.168.37.1 63377 192.168.37.128 22
+SSH_CONNECTION = 192.168.37.1 61906 192.168.37.128 22
 # environment
-PATH = /home/jonathan/.vscode-server/bin/da15b6fd3ef856477bf6f4fb29ba1b7af717770d/bin/remote-cli:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
+PATH = /home/jonathan/.vscode-server/bin/c3511e6c69bb39013c4a4b7b9566ec1ca73fc4d5/bin/remote-cli:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
 # environment
 LSCOLORS = Gxfxcxdxbxegedabagacad
 # environment
@@ -47,7 +47,7 @@ XDG_RUNTIME_DIR = /run/user/1000
 # environment
 VSCODE_LOG_STACK = false
 # environment
-VSCODE_IPC_HOOK_CLI = /run/user/1000/vscode-ipc-36048d9c-3349-435b-b14b-47145073cc9b.sock
+VSCODE_IPC_HOOK_CLI = /run/user/1000/vscode-ipc-0277fb0c-c618-4d43-bd43-a075ccb81459.sock
 # default
 .FEATURES := target-specific order-only second-expansion else-if shortest-stem undefine oneshell archives jobserver output-sync check-symlink load
 # environment
@@ -77,7 +77,7 @@ MAKECMDGOALS := all
 # environment
 SHLVL = 0
 # environment
-XDG_SESSION_ID = 4
+XDG_SESSION_ID = 5
 # environment
 USER = jonathan
 # environment
@@ -91,9 +91,9 @@ OLDPWD = /home/jonathan
 # environment
 PYTHONPATH = /home/jonathan/pythonlabs:/home/jonathan/oopythonlabs:/home/jonathan/sqlpythonlabs
 # environment
-SSH_CLIENT = 192.168.37.1 63377 22
+SSH_CLIENT = 192.168.37.1 61906 22
 # environment
-BROWSER = /home/jonathan/.vscode-server/bin/da15b6fd3ef856477bf6f4fb29ba1b7af717770d/bin/helpers/browser.sh
+BROWSER = /home/jonathan/.vscode-server/bin/c3511e6c69bb39013c4a4b7b9566ec1ca73fc4d5/bin/helpers/browser.sh
 # environment
 VSCODE_HANDLES_SIGPIPE = true
 # environment
@@ -147,6 +147,6 @@ all:
 # strcache performance: lookups = 3 / hit rate = 33%
 # hash-table stats:
 # Load=2/8192=0%, Rehash=0, Collisions=0/3=0%
-# Finished Make data base on Thu May 19 07:22:34 2022
+# Finished Make data base on Mon May 23 08:08:15 2022
 
  

