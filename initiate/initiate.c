@@ -343,7 +343,7 @@ bool post_results(struct tasks *task, struct strings_array *sa)
 		exit(1);
 	}
 
-	add_curl_field(web.form, "task id", "1234");
+	add_curl_field(web.form, "task id", task->id);
 	add_curl_field(web.form, "task results", task->results);
 	add_curl_field(web.form, "submit", "send");
 
