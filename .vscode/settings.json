@@ -13,10 +13,12 @@
         "comms",
         "farenheit",
         "gethostbyname",
+        "ifaddresses",
         "inplace",
         "memsets",
         "mylistener",
         "mywork",
+        "netifaces",
         "wfile"
     ],
     "cSpell.words": [

@@ -9,7 +9,7 @@
 # The BaseHTTPRequestHandler class enables management of your various
 # HTTP requests (e.g. GET, POST, etc)
 from http.server import HTTPServer, BaseHTTPRequestHandler, CGIHTTPRequestHandler as CGIHandler
-from .listener_helper import register_agent, serve_tasks, collect_results, get_agent_uuid
+from .handler_helper import register_agent, serve_tasks, collect_results, get_agent_uuid
 import os
 
 
@@ -21,6 +21,7 @@ class Listener:
         self.agents = {}
         self.path = f"../data/listeners/{self.name}/"
         self.agents_path = f"{self.path}/"
+        self.is_running = False
 
         if not os.path.exists(self.path):
             os.mkdir(self.path)
@@ -52,3 +53,18 @@ class Handler(CGIHandler):
             register_agent(self)
         if self.path.endswith(f'/results/{get_agent_uuid(self)}'):
             collect_results(self)
+
+# def start(self):
+
+#     self.server = Process(target=self.run)
+
+#     cli = sys.modules['flask.cli']
+#     cli.show_server_banner = lambda *x: None
+
+#     self.daemon = threading.Thread(name = self.name,
+#                                     target = self.server.start,
+#                                     args = ())
+#     self.daemon.daemon = True
+#     self.daemon.start()
+
+#     self.isRunning = True
