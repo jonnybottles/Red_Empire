@@ -31,10 +31,14 @@ class Listener:
 
 class http_server:
     def __init__(self, listener):
-        Handler.listener = listener
-        server = HTTPServer((listener.ip_addr, listener.port), Handler)
-        print(f"Listener running on port 9000\n")
-        server.serve_forever()
+        try:
+            Handler.listener = listener
+            server = HTTPServer((listener.ip_addr, listener.port), Handler)
+            print(f"Listener running on port 9000\n")
+            server.serve_forever()
+        except Exception as e:
+            print("Unable to create / start listener", e)
+            return
 
 
 class Handler(CGIHandler):

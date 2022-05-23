@@ -2,6 +2,7 @@
 
 from core.listener import Listener, http_server
 import os
+from core.menu import *
 
 
 def main():
@@ -20,6 +21,8 @@ def main():
 
     # Instantiate server object.
     http_server(mylistener)
+
+    # home()
 
 
 if __name__ == '__main__':

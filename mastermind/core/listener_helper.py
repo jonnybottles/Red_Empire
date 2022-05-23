@@ -137,3 +137,50 @@ def get_agent_uuid(self):
     for key, value in self.listener.agents.items():
         print("Agent UUID from dict is:\n", key)
         return key
+
+def startListener(args):
+
+    if len(args) == 1:
+        name = args[0]
+        if listeners[name].isRunning == False:
+            try:
+                listeners[name].start()
+                success("Started listener {}.".format(name))
+            except:
+                error("Invalid listener.")
+        else:
+            error("Listener {} is already running.".format(name))
+    else:
+        if len(args) != 3:
+            error("Invalid arguments.")
+        else:
+            name = args[0]
+
+            try:
+                port = int(args[1])
+            except:
+                error("Invalid port.")
+                return 0
+            
+            iface = args[2]
+
+            try:
+                netifaces.ifaddresses(iface)
+                ipaddress = netifaces.ifaddresses(iface)[netifaces.AF_INET][0]['addr']
+            except:
+                error("Invalid interface.")
+                return 0
+
+            if isValidListener(name, 0):
+                error("Listener {} already exists.".format(name))
+            else:
+            
+                listeners[name] = Listener(name, port, ipaddress)
+                progress("Starting listener {} on {}:{}.".format(name, ipaddress, str(port)))
+
+                try:
+                    listeners[name].start()
+                    success("Listener started.")
+                except:
+                    error("Failed. Check your options.")
+                    del listeners[name]
