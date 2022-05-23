@@ -100,7 +100,7 @@ int main(void)
                 continue;
             }
 
-            post_results(&task);
+            post_results(&task, &sa);
 
             // After executing each task and posting results reset values
             // to execute  next task.

