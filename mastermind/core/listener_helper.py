@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-from .listener import Listener
+from .listener import Listener, http_server
 
 from collections import OrderedDict
 from .common import *
@@ -102,11 +102,12 @@ def startListener(args):
                 error(f"Listener {name} already exists.")
             else:
             
-                listeners[name] = Listener(name, port, ipaddress)
-                progress("Starting listener {} on {}:{}.".format(name, ipaddress, str(port)))
+                listeners[name] = Listener(name, ipaddress, port)
+                progress(f"Starting listener {name} on {port}:{ipaddress}.")
 
                 try:
-                    listeners[name].start()
+                    http_server(listeners[name])
+                    # listeners[name].start()
                     success("Listener started.")
                 except:
                     error("Failed. Check your options.")

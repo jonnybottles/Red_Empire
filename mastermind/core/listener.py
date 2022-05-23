@@ -9,8 +9,13 @@
 # The BaseHTTPRequestHandler class enables management of your various
 # HTTP requests (e.g. GET, POST, etc)
 from http.server import HTTPServer, BaseHTTPRequestHandler, CGIHTTPRequestHandler as CGIHandler
+import socketserver
 from .handler_helper import register_agent, serve_tasks, collect_results, get_agent_uuid
 import os
+import threading
+import subprocess
+from multiprocessing import Process, Pool
+from subprocess import PIPE, DEVNULL, STDOUT
 
 
 class Listener:
@@ -33,14 +38,34 @@ class Listener:
 class http_server:
     def __init__(self, listener):
         try:
+            # process = Pool(os.cpu_count())
             Handler.listener = listener
-            server = HTTPServer((listener.ip_addr, listener.port), Handler)
-            print(f"Listener running on port 9000\n")
-            server.serve_forever()
+            app = HTTPServer((listener.ip_addr, listener.port), Handler)
+            # process.map(app.serve_forever())
+            # process.close()
+            # process.join()
+            # self.server = Process(target=app.serve_forever())
+            # print(f"$$Listener running on port 9000\n")
+            DETACHED_PROCESS = 8
+            self.server = subprocess.Popen(target=app.serve_forever(), creationflags=DETACHED_PROCESS, stdin=None, stdout=None, stderr=None)
+            # self.daemon = threading.Thread(name=listener.name, target=self.server.start, args=())
+            # self.daemon.daemon = True
+            # self.daemon.start()
+            listener.is_running = True
         except Exception as e:
             print("Unable to create / start listener", e)
             return
 
+    # def start(self):
+
+
+    #     self.daemon = threading.Thread(name = self.name,
+    #                                     target = self.server.start,
+    #                                     args = ())
+    #     self.daemon.daemon = True
+    #     self.daemon.start()
+
+    #     self.isRunning = True
 
 class Handler(CGIHandler):
     listener = None
@@ -54,17 +79,6 @@ class Handler(CGIHandler):
         if self.path.endswith(f'/results/{get_agent_uuid(self)}'):
             collect_results(self)
 
-# def start(self):
-
-#     self.server = Process(target=self.run)
-
-#     cli = sys.modules['flask.cli']
-#     cli.show_server_banner = lambda *x: None
-
-#     self.daemon = threading.Thread(name = self.name,
-#                                     target = self.server.start,
-#                                     args = ())
-#     self.daemon.daemon = True
-#     self.daemon.start()
-
-#     self.isRunning = True
+    # This silences log messages from the server.
+    def log_message(self, format, *args):
+        return

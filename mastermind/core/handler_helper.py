@@ -45,20 +45,19 @@ def register_agent(self):
         tgt_hostname = fields.get('hostname')
         tgt_os = fields.get('os type')
         tgt_os_version = fields.get('os version')
-        print(f"Agent UUID:          {uuid}")
-        print(f"Target IP Address:   {tgt_ip}")
-        print(f"Target Hostname:     {tgt_hostname}")
-        print(f"Target OS:           {tgt_os}")
-        print(f"Target OS Version:   {tgt_os_version}\n")
+        # print(f"$$Agent UUID:          {uuid}")
+        # print(f"$$Target IP Address:   {tgt_ip}")
+        # print(f"$$Target Hostname:     {tgt_hostname}")
+        # print(f"$$Target OS:           {tgt_os}")
+        # print(f"$$Target OS Version:   {tgt_os_version}\n")
         new_agent = Agent(self.listener.name, uuid, tgt_ip, tgt_hostname, tgt_os, tgt_os_version)
 
         self.listener.agents[uuid] = new_agent
 
-        for key, value in self.listener.agents.items():
-            print(
-                f"UUID: {key}\n Listener name: {value.listener_name}\n")
+        # for key, value in self.listener.agents.items():
+        #     print(f"$$UUID: {key}\n Listener name: {value.listener_name}\n")
 
-        print(f" Agent listener name: {new_agent.listener_name}")
+        # print(f"$$Agent listener name: {new_agent.listener_name}")
         
         # Come back to this later to add to dict ******************************************
         # tasklist.append(new_task[0])
@@ -108,8 +107,8 @@ def collect_results(self):
         # Grab the "task" field that was input by the post request.
         task_id = fields.get('task id')
         task_results = fields.get('task results')
-        print(f"Task ID:             {task_id}")
-        print(f"Task Results:        {task_results}")
+        # print(f"$$Task ID:             {task_id}")
+        # print(f"$$Task Results:        {task_results}")
         # Come back to this later to add to dict ******************************************
         # tasklist.append(new_task[0])
 
@@ -134,5 +133,5 @@ def serve_tasks(self):
 
 def get_agent_uuid(self):
     for key, value in self.listener.agents.items():
-        print("Agent UUID from dict is:\n", key)
+        # print("$$Agent UUID from dict is:\n", key)
         return key
