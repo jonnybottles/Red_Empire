@@ -92,16 +92,16 @@ class Menu:
 def evListeners(command, args):
 
     if command == "list":
-        viewListeners()
+        view_listeners()
     
     elif command == "start":
-        startListener(args)
+        start_listener(args)
 
     elif command == "stop":
-        stopListener(args)
+        stop_listener(args)
     
     elif command == "remove":
-        removeListener(args)
+        remove_listener(args)
 
 def evAgents(command, args):
 

@@ -57,6 +57,13 @@ class http_server:
             print("Unable to create / start listener", e)
             return
 
+
+def stop(self):
+    self.server.close()
+    self.server.terminate()
+    # self.server    = None
+    # self.daemon    = None
+    self.listener.is_running = False
     # def start(self):
 
 

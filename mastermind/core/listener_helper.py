@@ -35,7 +35,7 @@ def isValidListener(name, s):
         else:
             return False
 
-def viewListeners():
+def view_listeners():
 
     if checkListenersEmpty(1) == False:
         
@@ -65,7 +65,7 @@ def ulisteners():
     
     return l
 
-def startListener(args):
+def start_listener(args):
 
     if len(args) == 1:
         name = args[0]
@@ -112,3 +112,22 @@ def startListener(args):
                 except:
                     error("Failed. Check your options.")
                     del listeners[name]
+
+def stop_listener(args):
+
+    if len(args) != 1:
+        error("Invalid arguments.")
+    else:
+        
+        name = args[0]
+        
+        if isValidListener(name, 1):
+            
+            if listeners[name].is_running == True:
+                progress(f"Stopping listener {name}")
+                listeners[name].stop()
+                success("Stopped.")
+            else:
+                error(f"Listener {name} is already stopped.")
+        else:
+            pass
