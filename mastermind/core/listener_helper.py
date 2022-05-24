@@ -47,12 +47,12 @@ def viewListeners():
         
         for i in listeners:
  
-            if listeners[i].isRunning == True:
+            if listeners[i].is_running == True:
                 status = "Running"
             else:
                 status = "Stopped"
 
-            print(" {}".format(listeners[i].name) + " " * (29 - len(listeners[i].name)) + "{}:{}".format(listeners[i].ipaddress, str(listeners[i].port)) + " " * (41 - (len(str(listeners[i].port)) + len(":{}".format(listeners[i].ipaddress)))) + status)
+            print(" {}".format(listeners[i].name) + " " * (29 - len(listeners[i].name)) + "{}:{}".format(listeners[i].ip_addr, str(listeners[i].port)) + " " * (41 - (len(str(listeners[i].port)) + len(":{}".format(listeners[i].ip_addr)))) + status)
         
         print(cRESET)
 
