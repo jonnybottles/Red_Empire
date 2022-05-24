@@ -1,12 +1,12 @@
 #!/usr/bin/python3
 
 from .listener import Listener
-
-from collections import OrderedDict
+from .agents_helpers import get_agents_for_listener
 from .common import *
 import netifaces
+from shutil import rmtree
 
-listeners = OrderedDict()
+listeners = {}
 
 
 def checkListenersEmpty(s):
@@ -132,7 +132,7 @@ def stop_listener(args):
         else:
             pass
 
-def removeListener(args):
+def remove_listener(args):
     
     if len(args) != 1:
         error("Invalid arguments.")
@@ -140,17 +140,18 @@ def removeListener(args):
         
         name = args[0]
         
-        if isValidListener(name,1):
-            
-            listenerAgents = getAgentsForListener(name)
+        if isValidListener(name, 1):
+            # Pass in listener object, look for valid agents and return list
+            # of listeners agents.
+            listener_agents = get_agents_for_listener(name, listeners[name].agents)
 
-            for agent in listenerAgents:
-                removeAgent([agent])
+            for agent in listener_agents:
+                remove_agent(listeners[name].agents, [agent])
 
-            rmtree(listeners[name].Path)
+            rmtree(listeners[name].path)
             
-            if listeners[name].isRunning == True:
-                stopListener([name])
+            if listeners[name].is_running == True:
+                stop_listener([name])
                 del listeners[name]
             else:
                 del listeners[name]
