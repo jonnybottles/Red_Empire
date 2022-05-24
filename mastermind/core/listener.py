@@ -41,13 +41,14 @@ class http_server:
             # process = Pool(os.cpu_count())
             Handler.listener = listener
             app = HTTPServer((listener.ip_addr, listener.port), Handler)
-            # process.map(app.serve_forever())
-            # process.close()
-            # process.join()
-            # self.server = Process(target=app.serve_forever())
-            # print(f"$$Listener running on port 9000\n")
-            DETACHED_PROCESS = 8
-            self.server = subprocess.Popen(target=app.serve_forever(), creationflags=DETACHED_PROCESS, stdin=None, stdout=None, stderr=None)
+            self.server = Process(target=app.serve_forever)
+            self.server.start()
+            # self.server.close()
+            # Process.join()
+
+            # # print(f"$$Listener running on port 9000\n")
+            # DETACHED_PROCESS = 8
+            # self.server = subprocess.Popen(target=app.serve_forever(), creationflags=DETACHED_PROCESS, stdin=None, stdout=None, stderr=None)
             # self.daemon = threading.Thread(name=listener.name, target=self.server.start, args=())
             # self.daemon.daemon = True
             # self.daemon.start()
