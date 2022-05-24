@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-from .listener import Listener, http_server
+from .listener import Listener
 
 from collections import OrderedDict
 from .common import *
@@ -106,8 +106,8 @@ def start_listener(args):
                 progress(f"Starting listener {name} on {port}:{ipaddress}.")
 
                 try:
-                    http_server(listeners[name])
-                    # listeners[name].start()
+                    # http_server(listeners[name])
+                    listeners[name].start()
                     success("Listener started.")
                 except:
                     error("Failed. Check your options.")
@@ -129,5 +129,31 @@ def stop_listener(args):
                 success("Stopped.")
             else:
                 error(f"Listener {name} is already stopped.")
+        else:
+            pass
+
+def removeListener(args):
+    
+    if len(args) != 1:
+        error("Invalid arguments.")
+    else:
+        
+        name = args[0]
+        
+        if isValidListener(name,1):
+            
+            listenerAgents = getAgentsForListener(name)
+
+            for agent in listenerAgents:
+                removeAgent([agent])
+
+            rmtree(listeners[name].Path)
+            
+            if listeners[name].isRunning == True:
+                stopListener([name])
+                del listeners[name]
+            else:
+                del listeners[name]
+
         else:
             pass

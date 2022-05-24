@@ -107,8 +107,8 @@ def collect_results(self):
         # Grab the "task" field that was input by the post request.
         task_id = fields.get('task id')
         task_results = fields.get('task results')
-        # print(f"$$Task ID:             {task_id}")
-        # print(f"$$Task Results:        {task_results}")
+        print(f"$$Task ID:             {task_id}")
+        print(f"$$Task Results:        {task_results}")
         # Come back to this later to add to dict ******************************************
         # tasklist.append(new_task[0])
 

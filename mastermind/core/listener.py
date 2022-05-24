@@ -18,31 +18,32 @@ from multiprocessing import Process, Pool
 from subprocess import PIPE, DEVNULL, STDOUT
 
 
+# class Listener:
+#     def __init__(self, name, ip_addr, port):
+
+
 class Listener:
     def __init__(self, name, ip_addr, port):
-        self.name = name
-        self.ip_addr = ip_addr
-        self.port = port
-        self.agents = {}
-        self.path = f"../data/listeners/{self.name}/"
-        self.agents_path = f"{self.path}/"
-        self.is_running = False
-
-        if not os.path.exists(self.path):
-            os.mkdir(self.path)
-
-        if not os.path.exists(self.agents_path):
-            os.mkdir(self.agents_path)
-
-
-class http_server:
-    def __init__(self, listener):
         try:
+            self.name = name
+            self.ip_addr = ip_addr
+            self.port = port
+            self.agents = {}
+            self.path = f"../data/listeners/{self.name}/"
+            self.agents_path = f"{self.path}/"
+            self.is_running = False
+
+            if not os.path.exists(self.path):
+                os.mkdir(self.path)
+
+            if not os.path.exists(self.agents_path):
+                os.mkdir(self.agents_path)
+
             # process = Pool(os.cpu_count())
-            Handler.listener = listener
-            app = HTTPServer((listener.ip_addr, listener.port), Handler)
-            self.server = Process(target=app.serve_forever)
-            self.server.start()
+            Handler.listener = self
+            self.app = HTTPServer((self.ip_addr, self.port), Handler)
+            # self.server = Process(target=app.serve_forever)
+            # self.server.start()
             # self.server.close()
             # Process.join()
 
@@ -52,19 +53,30 @@ class http_server:
             # self.daemon = threading.Thread(name=listener.name, target=self.server.start, args=())
             # self.daemon.daemon = True
             # self.daemon.start()
-            listener.is_running = True
+            # listener.is_running = True
         except Exception as e:
             print("Unable to create / start listener", e)
             return
 
+    def start(self):
 
-def stop(self):
-    self.server.close()
-    self.server.terminate()
-    # self.server    = None
-    # self.daemon    = None
-    self.listener.is_running = False
-    # def start(self):
+        self.server = Process(target=self.app.serve_forever)
+        self.daemon = threading.Thread(name = self.name,
+                                       target = self.server.start,
+                                       args = ())
+        # self.server.start()
+        self.daemon.daemon = True
+        self.daemon.start()
+        self.is_running = True
+
+    def stop(self):
+        # self.server.join()
+        # self.server.close()
+        self.server.terminate()
+        self.server    = None
+        self.daemon    = None
+        self.is_running = False
+        # def start(self):
 
 
     #     self.daemon = threading.Thread(name = self.name,
