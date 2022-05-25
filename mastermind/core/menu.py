@@ -6,7 +6,7 @@ from .common import *
 
 from .listener_helper import *
 # from listenershelpers import *
-# from agentshelpers import *
+from .agents_helpers import *
 # from payloadshelpers import *
 
 class AutoComplete(object):
@@ -106,7 +106,7 @@ def evListeners(command, args):
 def evAgents(command, args):
 
     if command == "list":
-        viewAgents()
+        view_agents()
     elif command == "remove":
         removeAgent(args)
     elif command == "rename":

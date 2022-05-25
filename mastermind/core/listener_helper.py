@@ -1,11 +1,12 @@
 #!/usr/bin/python3
 
 from .listener import Listener
-from .agents_helpers import get_agents_for_listener
+from .agents_helpers import get_agents_for_listener, remove_agent
 from .common import *
 import netifaces
 from shutil import rmtree
 
+# NEED TO ADD LOCKS HERE WHEN I START WORKING WITH MULTIPLE THREADS
 listeners = {}
 
 
@@ -143,10 +144,10 @@ def remove_listener(args):
         if isValidListener(name, 1):
             # Pass in listener object, look for valid agents and return list
             # of listeners agents.
-            listener_agents = get_agents_for_listener(name, listeners[name].agents)
+            listener_agents = get_agents_for_listener(name)
 
             for agent in listener_agents:
-                remove_agent(listeners[name].agents, [agent])
+                remove_agent([agent])
 
             rmtree(listeners[name].path)
             
