@@ -39,8 +39,10 @@ def register_agent(self):
     if ctype == 'multipart/form-data':
         # This reads each part of the form
         fields = cgi.parse_multipart(self.rfile, pdict)
-        # Grab the "task" field that was input by the post request.
+        # Grab the "task" field that was input by the post request.\
         uuid = uuid4()
+        
+        print(f"uuid type is {type(uuid)}")
         # uuid = "uuid"
         ip_port = self.client_address
         (tgt_ip, tgt_port) = ip_port
@@ -52,7 +54,7 @@ def register_agent(self):
         print(f"$$Target Hostname:     {tgt_hostname}")
         print(f"$$Target OS:           {tgt_os}")
         print(f"$$Target OS Version:   {tgt_os_version}\n")
-        new_agent = Agent(self.listener.name, uuid, tgt_ip, tgt_hostname[0], tgt_os[0], tgt_os_version[0])
+        new_agent = Agent(self.listener.name, str(uuid), tgt_ip, tgt_hostname[0], tgt_os[0], tgt_os_version[0])
         add_agent(new_agent)
 
         # self.listener.agents[uuid] = new_agent
