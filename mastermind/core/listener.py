@@ -11,7 +11,7 @@
 from http.server import HTTPServer, BaseHTTPRequestHandler, CGIHTTPRequestHandler as CGIHandler
 import socketserver
 from .handler_helper import register_agent, serve_tasks, collect_results
-from .agents_helpers import get_agent_uuid
+from .agents_helpers import get_agent_uuid, agents
 import os
 import threading
 import subprocess
@@ -91,14 +91,16 @@ class Listener:
 class Handler(CGIHandler):
     listener = None
     def do_GET(self):
-        if self.path.endswith(f'/tasks/{get_agent_uuid()}'):
-            serve_tasks(self)
+        for key, value in agents.items():
+            if self.path.endswith(f'/tasks/{key}'):
+                serve_tasks(self, value)
 
     def do_POST(self):
         if self.path.endswith('/reg'):
             register_agent(self)
-        if self.path.endswith(f'/results/{get_agent_uuid()}'):
-            collect_results(self)
+        for key, value in agents.items():
+            if self.path.endswith(f'/results/{key}'):
+                collect_results(self)
 
     # This silences log messages from the server.
     def log_message(self, format, *args):

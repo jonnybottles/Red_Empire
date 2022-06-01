@@ -353,6 +353,9 @@ bool post_results(struct tasks *task, struct strings_array *sa)
 	add_curl_field(web.form, "task results", task->results);
 	add_curl_field(web.form, "submit", "send");
 
+	printf("**** TASK RESULTS ****");
+	printf("%s", task->results);
+
 	// // Registration URL
 	// const char resurl[27] = "127.0.0.1:9000/results/uuid";
 

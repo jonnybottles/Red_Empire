@@ -28,7 +28,7 @@ class Agent:
 
         if not os.path.exists(self.tasks_path):
             with open(self.tasks_path, "w") as f:
-                f.write("$")
+                f.write("$\n")
                 f.close()
                 # f = open(self.tasks_path, "w")
                 # f.close()

@@ -126,14 +126,14 @@ def collect_results(self):
         self.end_headers()
 
 
-def serve_tasks(self):
+def serve_tasks(self, agent):
     self.send_response(200)
     self.send_header('Content-type', 'text/html')
     self.send_header('Content-Disposition', 'attachment; filename="tasks.txt"')
     self.end_headers()
 
     # Make this a relative path.
-    with open('/home/jonathan/oopythonlabs/red_alert/data/tasks.txt', 'rb') as file: 
+    with open(agent.tasks_path, 'rb') as file:
         self.wfile.write(file.read())
 
 
