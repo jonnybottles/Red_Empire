@@ -10,7 +10,8 @@
 # HTTP requests (e.g. GET, POST, etc)
 from http.server import HTTPServer, BaseHTTPRequestHandler, CGIHTTPRequestHandler as CGIHandler
 import socketserver
-from .handler_helper import register_agent, serve_tasks, collect_results, get_agent_uuid
+from .handler_helper import register_agent, serve_tasks, collect_results
+from .agents_helpers import get_agent_uuid, agents
 import os
 import threading
 import subprocess
@@ -30,7 +31,7 @@ class Listener:
             self.port = port
             self.agents = {}
             self.path = f"../data/listeners/{self.name}/"
-            self.agents_path = f"{self.path}/"
+            self.agents_path = f"{self.path}agents/"
             self.is_running = False
 
             if not os.path.exists(self.path):
@@ -60,9 +61,9 @@ class Listener:
 
     def start(self):
 
-        self.server = Process(target=self.app.serve_forever)
+        # self.server = Process(target=self.app.serve_forever)
         self.daemon = threading.Thread(name = self.name,
-                                       target = self.server.start,
+                                       target = self.app.serve_forever,
                                        args = ())
         # self.server.start()
         self.daemon.daemon = True
@@ -70,10 +71,10 @@ class Listener:
         self.is_running = True
 
     def stop(self):
-        # self.server.join()
-        # self.server.close()
-        self.server.terminate()
-        self.server    = None
+        # self.daemon.close()
+        # self.daemon.join()
+        self.daemon.terminate()
+        # self.server    = None
         self.daemon    = None
         self.is_running = False
         # def start(self):
@@ -90,14 +91,16 @@ class Listener:
 class Handler(CGIHandler):
     listener = None
     def do_GET(self):
-        if self.path.endswith(f'/tasks/{get_agent_uuid(self)}'):
-            serve_tasks(self)
+        for key, value in agents.items():
+            if self.path.endswith(f'/tasks/{key}'):
+                serve_tasks(self, value)
 
     def do_POST(self):
         if self.path.endswith('/reg'):
             register_agent(self)
-        if self.path.endswith(f'/results/{get_agent_uuid(self)}'):
-            collect_results(self)
+        for key, value in agents.items():
+            if self.path.endswith(f'/results/{key}'):
+                collect_results(self)
 
     # This silences log messages from the server.
     def log_message(self, format, *args):

