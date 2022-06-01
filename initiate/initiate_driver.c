@@ -49,7 +49,7 @@ int main(void)
     create_results_url(&agent, &task);
 
     puts("Give you time to create tasks\n");
-    sleep(15);
+    sleep(20);
     while(true) {
         puts("Checking tasks\n");
         if(!check_tasks(&agent, &sa)) {

