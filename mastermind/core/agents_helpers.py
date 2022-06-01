@@ -92,14 +92,14 @@ def get_agents_for_listener(name):
 
     return result
 
-def interactWithAgent(args):
+def task_agent(args):
     
     if len(args) != 1:
         error("Invalid arguments.")
     else:
         name = args[0]
         if is_valid_agent(name, 1):
-            agents[name].interact()
+            agents[name].task_agent()
         else:
             pass
 

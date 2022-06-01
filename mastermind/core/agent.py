@@ -19,6 +19,7 @@ class Agent:
         self.tgt_hostname = tgt_hostname
         self.tgt_os = tgt_os
         self.tgt_version = tgt_version
+        self.has_tasks = False
         self.path = f"../data/listeners/{self.listener_name}/agents/{self.name}/"
         self.tasks_path = "{}tasks.txt".format(self.path, self.name)
         # self.task_ids = []
@@ -26,12 +27,12 @@ class Agent:
         if not os.path.exists(self.path):
             os.mkdir(self.path)
 
-        if not os.path.exists(self.tasks_path):
-            with open(self.tasks_path, "w") as f:
-                f.write("$\n")
-                f.close()
-                # f = open(self.tasks_path, "w")
-                # f.close()
+        # if not os.path.exists(self.tasks_path):
+        #     with open(self.tasks_path, "w") as f:
+        #         f.write("$\n")
+        #         f.close()
+        #         # f = open(self.tasks_path, "w")
+        #         # f.close()
 
         self.menu = men.Menu(self.name)
         
@@ -51,10 +52,18 @@ class Agent:
         # Reads file into memory and prepends file with new task.
         # Each task is inserted as beginning of file, as initiate looks for end of file
         # indicator which is "$"
+        if not os.path.exists(self.tasks_path):
+            with open(self.tasks_path, "w") as f:
+                f.write("$\n")
+                f.close()
+                # f = open(self.tasks_path, "w")
+                # f.close()
+
         with open(self.tasks_path, 'r+') as f:
             content = f.read()
             f.seek(0, 0)
             f.write(task.rstrip('\r\n') + '\n' + content)
+            self.has_tasks = True
             f.close
 
     def clearTasks(self):
@@ -172,7 +181,7 @@ class Agent:
         elif command == "quit":
             self.QuitandRemove()
 
-    def interact(self):
+    def task_agent(self):
 
         self.menu.clearScreen()
 

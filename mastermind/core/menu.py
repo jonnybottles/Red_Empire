@@ -111,8 +111,8 @@ def evAgents(command, args):
         removeAgent(args)
     elif command == "rename":
         renameAgent(args)
-    elif command == "interact":
-        interactWithAgent(args)
+    elif command == "task":
+        task_agent(args)
 
 def evPayloads(command, args):
 
@@ -220,7 +220,6 @@ def home():
             evHome(command, args)
 
 def Exit():
-    saveListeners()
     exit()
 
 Amenu = Menu("agents")
@@ -229,7 +228,7 @@ Pmenu = Menu("payloads")
 Hmenu = Menu("c2")
 
 Amenu.registerCommand("list", "List active agents.", "")
-Amenu.registerCommand("interact", "Interact with an agent.", "<uuid>")
+Amenu.registerCommand("task", "Task an agent.", "<uuid>")
 Amenu.registerCommand("rename", "Rename agent.", "<agent> <new name>")
 Amenu.registerCommand("remove", "Remove an agent.", "<name>")
 

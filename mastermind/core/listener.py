@@ -92,8 +92,9 @@ class Handler(CGIHandler):
     listener = None
     def do_GET(self):
         for key, value in agents.items():
-            if self.path.endswith(f'/tasks/{key}'):
-                serve_tasks(self, value)
+            if value.has_tasks:
+                if self.path.endswith(f'/tasks/{key}'):
+                    serve_tasks(self, value)
 
     def do_POST(self):
         if self.path.endswith('/reg'):

