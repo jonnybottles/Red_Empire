@@ -54,7 +54,7 @@ int main(void)
         if(!check_tasks(&agent, &sa)) {
             puts("No tasks during check in.\n");
             puts("Checking back in for more tasks shortly.\n");
-            sleep(5);
+            sleep(20);
             continue;
         }
         if(!parse_tasks(sa.response, &task)) {
@@ -108,11 +108,12 @@ int main(void)
             // After executing each task and posting results reset values
             // to execute  next task.
             reset_task_vals(&task);
+            free(sa.response);
 
 
         }
 
-        free(sa.response);
+        // free(sa.response);
         destroy(&task);
 
         task.results = NULL;

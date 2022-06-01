@@ -4,6 +4,7 @@ from .agent import Agent
 import cgi
 from uuid import uuid4
 from .agents_helpers import add_agent
+import os
 
 def register_agent(self):
     self.send_response(200)
@@ -76,7 +77,7 @@ def register_agent(self):
         self.end_headers()
 
 
-def collect_results(self):
+def collect_results(self, agent):
     self.send_response(200)
     self.send_header('content-type', 'text/html')
     # Always have to close the header.
@@ -123,6 +124,12 @@ def collect_results(self):
 
         # 301 is a redirect status response. This case, we want the user
         # to be redirected to the tasklist/new page after submitting a task.
+
+        # agent.has_tasks = False
+        # if not os.path.exists(agent.tasks_path):
+        #     os.remove(agent.tasks_path)
+        
+
         self.send_response(201)
         # listener.send_header('content-type', 'text/html')
         # listener.send_header('Location', '/new')

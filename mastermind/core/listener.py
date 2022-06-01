@@ -19,10 +19,6 @@ from multiprocessing import Process, Pool
 from subprocess import PIPE, DEVNULL, STDOUT
 
 
-# class Listener:
-#     def __init__(self, name, ip_addr, port):
-
-
 class Listener:
     def __init__(self, name, ip_addr, port):
         try:
@@ -100,8 +96,12 @@ class Handler(CGIHandler):
         if self.path.endswith('/reg'):
             register_agent(self)
         for key, value in agents.items():
-            if self.path.endswith(f'/results/{key}'):
-                collect_results(self)
+            if value.has_tasks:
+                if self.path.endswith(f'/results/{key}'):
+                    collect_results(self, value)
+                    # value.has_tasks = False
+                    # if not os.path.exists(value.tasks_path):
+                    #     os.remove(value.tasks_path)
 
     # This silences log messages from the server.
     def log_message(self, format, *args):

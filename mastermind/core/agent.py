@@ -52,6 +52,8 @@ class Agent:
         # Reads file into memory and prepends file with new task.
         # Each task is inserted as beginning of file, as initiate looks for end of file
         # indicator which is "$"
+
+
         if not os.path.exists(self.tasks_path):
             with open(self.tasks_path, "w") as f:
                 f.write("$\n")
