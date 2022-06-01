@@ -247,13 +247,13 @@ bool parse_tasks(char *response, struct tasks *task)
 			destroy(task);
 			return false;
 		}
-		
+		// Each task line in the task file begins with a #(35 in DEC).
 		if (line[0] == TASK_LINE) {
 			strncpy(task->tasks_array[task->sz], line + 1, len);
 			task->sz++;
 		}
 
-		// Each task file ends with a #(35 in DEC).
+		// Each task file ends with a $(36 in DEC).
 		if (line[0] == END_OF_TASK_FILE) {
 			puts("hit break statment\n");
 			break;

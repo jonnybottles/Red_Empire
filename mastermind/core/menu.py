@@ -229,7 +229,7 @@ Pmenu = Menu("payloads")
 Hmenu = Menu("c2")
 
 Amenu.registerCommand("list", "List active agents.", "")
-Amenu.registerCommand("interact", "Interact with an agent.", "<name>")
+Amenu.registerCommand("interact", "Interact with an agent.", "<uuid>")
 Amenu.registerCommand("rename", "Rename agent.", "<agent> <new name>")
 Amenu.registerCommand("remove", "Remove an agent.", "<name>")
 

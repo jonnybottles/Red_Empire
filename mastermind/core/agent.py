@@ -4,6 +4,10 @@ import time
 import red_alert.mastermind.core.menu as men
 from .common import *
 
+# choose a random element from a list
+from random import seed, choice
+from datetime import datetime
+
 from shutil import rmtree
 
 
@@ -16,14 +20,15 @@ class Agent:
         self.tgt_os = tgt_os
         self.tgt_version = tgt_version
         self.path = f"../data/listeners/{self.listener_name}/agents/{self.name}/"
-        self.tasksPath = "{}tasks".format(self.path, self.name)
+        self.tasks_path = "{}tasks.txt".format(self.path, self.name)
+        # self.task_ids = []
 
         if not os.path.exists(self.path):
             os.mkdir(self.path)
 
         self.menu = men.Menu(self.name)
         
-        self.menu.registerCommand("shell", "Execute a shell command.", "<command>")
+        self.menu.registerCommand("cmd", "Execute a shell command.", "<command>")
         self.menu.registerCommand("powershell", "Execute a powershell command.", "<command>")
         self.menu.registerCommand("sleep", "Change agent's sleep time.", "<time (s)>")
         self.menu.registerCommand("clear", "Clear tasks.", "")
@@ -34,21 +39,21 @@ class Agent:
         self.Commands = self.menu.Commands
 
     
-    def writeTask(self, task):
+    def write_task(self, task):
 
-        if self.Type == "p":
-            task = "VALID " + task
-            # task = ENCRYPT(task, self.key)
-        elif self.Type == "w":
-            task = task
+        # if self.Type == "p":
+        #     task = "VALID " + task
+        #     # task = ENCRYPT(task, self.key)
+        # elif self.Type == "w":
+        #     task = task
 
-        with open(self.tasksPath, "w") as f:
+        with open(self.tasks_path, "a") as f:
             f.write(task)
 
     def clearTasks(self):
 
-        if os.path.exists(self.tasksPath):
-            os.remove(self.tasksPath)
+        if os.path.exists(self.tasks_path):
+            os.remove(self.tasks_path)
         else:
             pass
 
@@ -56,7 +61,7 @@ class Agent:
         
     #     self.menu.name = self.name
     #     self.Path      = "data/listeners/{}/agents/{}/".format(self.listener, self.name)
-    #     self.tasksPath = "{}tasks".format(self.Path, self.name)
+    #     self.tasks_path = "{}tasks".format(self.Path, self.name)
         
     #     if os.path.exists(self.Path) == False:
     #         os.mkdir(self.Path)
@@ -67,19 +72,25 @@ class Agent:
         self.writeTask(task)
         
         progress("Waiting for agent.")
-        while os.path.exists(self.tasksPath):
+        while os.path.exists(self.tasks_path):
             pass
         
         return 0
 
-    def shell(self, args):
+    # def get_task_id():
+    #     seed(1)
+    #     sequence = [i for i in range(1000)]
+    #     print(sequence)
+
+    def cmd(self, args):
 
         if len(args) == 0:
             error("Missing command.")
         else:
+
             command = " ".join(args)
-            task    = "shell " + command
-            self.writeTask(task)
+            task = f"22 0 {command}\n"
+            self.write_task(task)
 
     def powershell(self, args):
         
@@ -104,7 +115,7 @@ class Agent:
                 return 0
             
             task = "sleep {}".format(time)
-            self.writeTask(task)
+            self.write_task(task)
             self.sleept = int(time)
             removeFromDatabase(agentsDB, self.name)
             writeToDatabase(agentsDB, self)
@@ -122,13 +133,13 @@ class Agent:
 
     def Quit(self):
         
-        self.writeTask("quit")
+        self.write_task("quit")
 
         progress("Waiting for agent.")
 
         for i in range(self.sleept):
             
-            if os.path.exists(self.tasksPath):
+            if os.path.exists(self.tasks_path):
                 time.sleep(1)
             else:
                 break
@@ -143,8 +154,8 @@ class Agent:
             men.Menu.home()
         elif command == "exit":
             men.Menu.Exit()
-        elif command == "shell":
-            self.shell(args)
+        elif command == "cmd":
+            self.cmd(args)
         elif command == "powershell":
             self.powershell(args)
         elif command == "sleep":
