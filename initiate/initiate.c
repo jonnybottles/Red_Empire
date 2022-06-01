@@ -191,8 +191,8 @@ bool check_tasks(struct agent_info *agent, struct strings_array *sa)
 
 	if (result != CURLE_OK)
 	{
-		fprintf(stderr, "download problem: %s\n",
-				curl_easy_strerror(result));
+		// fprintf(stderr, "download problem: %s\n",
+		// 		curl_easy_strerror(result));
 				return false;
 	}
 

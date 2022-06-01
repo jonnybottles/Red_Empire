@@ -8,7 +8,7 @@
 # listen on.
 # The BaseHTTPRequestHandler class enables management of your various
 # HTTP requests (e.g. GET, POST, etc)
-from http.server import HTTPServer, BaseHTTPRequestHandler, CGIHTTPRequestHandler as CGIHandler
+from http.server import HTTPServer, CGIHTTPRequestHandler as CGIHandler
 import socketserver
 from .handler_helper import register_agent, serve_tasks, collect_results
 from .agents_helpers import get_agent_uuid, agents
