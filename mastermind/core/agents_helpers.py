@@ -27,8 +27,8 @@ def delete_task(agent, task_id):
         file.close()
 
 def update_log(agent, task_id, task_cmd):
-    previousw = f" {task_id}          issued                 cmd                    {task_cmd}"
-    nextwwwww = f" {task_id}          complete               cmd                    {task_cmd}\n"
+    previousw = f" {task_id}         issued                 cmd                   {task_cmd}"
+    nextwwwww = f" {task_id}         complete               cmd                   {task_cmd}\n"
 
 
     for line in fileinput.input(agent.tasks_log_path, inplace=1):
