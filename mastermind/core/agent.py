@@ -22,12 +22,17 @@ class Agent:
         self.has_tasks = False
         self.path = f"../data/listeners/{self.listener_name}/agents/{self.name}/"
         self.tasks_path = "{}tasks.txt".format(self.path, self.name)
+        self.tasks_log_path = "{}tasks_log.txt".format(self.path, self.name)
+        self.results_path = f"{self.path}results"
 
         self.task_ids = []
         # self.task_ids = []
 
         if not os.path.exists(self.path):
             os.mkdir(self.path)
+
+        if not os.path.exists(self.results_path):
+            os.mkdir(self.results_path)
 
         # if not os.path.exists(self.tasks_path):
         #     with open(self.tasks_path, "w") as f:
@@ -39,10 +44,11 @@ class Agent:
         self.menu = men.Menu(self.name)
         
         self.menu.registerCommand("cmd", "Execute a shell command.", "<command>")
-        self.menu.registerCommand("powershell", "Execute a powershell command.", "<command>")
         self.menu.registerCommand("sleep", "Change agent's sleep time.", "<time (s)>")
         self.menu.registerCommand("clear", "Clear tasks.", "")
         self.menu.registerCommand("kill", "Task agent to kill / uninstall from target.", "")
+        self.menu.registerCommand("tasks", "View issued tasks and their status.", "")
+        self.menu.registerCommand("results", "View task results.", "<task ID")
 
         self.menu.uCommands()
 
@@ -98,11 +104,27 @@ class Agent:
             self.task_ids.append(i)
 
     def get_task_id(self):
-        seed(1)
+        seed(datetime.now())
         task_id = choice(self.task_ids)
-        print(f"Task id is ***************{task_id}")
         self.task_ids.remove(task_id)
         return task_id
+
+    def log_task(self, task):
+        with open(self.tasks_log_path, "a") as f:
+            f.write(task)
+            # f = open(self.tasks_path, "w")
+            # f.close()
+
+    def view_tasks(self):
+        if os.path.exists(self.tasks_log_path):
+            print(YELLOW)
+            print("  ID            Status                 Type                  Command")
+            print("------        ----------             ---------              ----------")
+            with open(self.tasks_log_path, 'r') as f:
+                print(f.read())
+        else:
+            error("No tasks to display.")
+
 
     def cmd(self, args):
 
@@ -112,9 +134,12 @@ class Agent:
             if not self.task_ids:
                 self.generate_task_ids()
             command = " ".join(args)
-            task = f"#{self.get_task_id()} 0 {command}\n"
-            # task = f"#17 0 {command}\n"
+            task_id = self.get_task_id()
+            task = f"#{task_id} 0 {command}\n"
             self.write_task(task)
+            task = f" {task_id}          issued                 cmd                    {command}\n"
+            self.log_task(task)
+
 
     def powershell(self, args):
         
@@ -170,6 +195,21 @@ class Agent:
 
         return 0
 
+    def view_results(self, args):
+        if len(args) == 0:
+            error("Missing command.")
+
+        print(YELLOW)
+        print(f"                                    TASK {args[0]} RESULTS                                 ")
+        print("  -----------------------------------------------------------------------------------\n")
+
+        if os.path.exists(f"{self.results_path}/{args[0]}.txt"):
+            with open(f"{self.results_path}/{args[0]}.txt", 'r') as f:
+                print(f.read())
+        else:
+            error("No results to display.")
+
+
     def ev(self, command, args):
 
         if command == "help":
@@ -180,14 +220,16 @@ class Agent:
             men.Exit()
         elif command == "cmd":
             self.cmd(args)
-        elif command == "powershell":
-            self.powershell(args)
         elif command == "sleep":
             self.sleep(args)
         elif command == "clear":
             self.clearTasks()
         elif command == "quit":
             self.QuitandRemove()
+        elif command == "tasks":
+            self.view_tasks()
+        elif command == "results":
+            self.view_results(args)
 
     def task_agent(self):
 

