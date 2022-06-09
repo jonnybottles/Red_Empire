@@ -1,6 +1,4 @@
 make all -C /home/jonathan/oopythonlabs/c2_server/initiate --print-data-base --no-builtin-variables --no-builtin-rules --question
-make: *** /home/jonathan/oopythonlabs/c2_server/initiate: No such file or directory.  Stop.
-
 # GNU Make 4.2.1
 # Built for x86_64-pc-linux-gnu
 # Copyright (C) 1988-2016 Free Software Foundation, Inc.
@@ -8,7 +6,7 @@ make: *** /home/jonathan/oopythonlabs/c2_server/initiate: No such file or direct
 # This is free software: you are free to change and redistribute it.
 # There is NO WARRANTY, to the extent permitted by law.
 
-# Make data base, printed on Wed Jun  1 07:32:41 2022
+# Make data base, printed on Thu Jun  9 12:28:01 2022
 
 # Variables
 
@@ -37,7 +35,7 @@ VSCODE_VERBOSE_LOGGING = true
 # environment
 VSCODE_CWD = /home/jonathan
 # environment
-SSH_CONNECTION = 192.168.37.1 50771 192.168.37.128 22
+SSH_CONNECTION = 192.168.37.1 56345 192.168.37.128 22
 # environment
 PATH = /home/jonathan/.vscode-server/bin/c3511e6c69bb39013c4a4b7b9566ec1ca73fc4d5/bin/remote-cli:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
 # environment
@@ -47,7 +45,7 @@ XDG_RUNTIME_DIR = /run/user/1000
 # environment
 VSCODE_LOG_STACK = false
 # environment
-VSCODE_IPC_HOOK_CLI = /run/user/1000/vscode-ipc-466b63b7-339a-440e-aab1-bf787b38819e.sock
+VSCODE_IPC_HOOK_CLI = /run/user/1000/vscode-ipc-7f760750-b169-466a-a52a-a729f1e07ad6.sock
 # default
 .FEATURES := target-specific order-only second-expansion else-if shortest-stem undefine oneshell archives jobserver output-sync check-symlink load
 # environment
@@ -65,7 +63,7 @@ HOME = /home/jonathan
 # environment
 LOGNAME = jonathan
 # environment
-APPLICATION_INSIGHTS_NO_DIAGNOSTIC_CHANNEL = 1
+APPLICATION_INSIGHTS_NO_DIAGNOSTIC_CHANNEL = true
 # environment
 ZSH = /home/jonathan/.oh-my-zsh
 # environment
@@ -77,7 +75,7 @@ MAKECMDGOALS := all
 # environment
 SHLVL = 0
 # environment
-XDG_SESSION_ID = 4
+XDG_SESSION_ID = 5
 # environment
 USER = jonathan
 # environment
@@ -91,7 +89,7 @@ OLDPWD = /home/jonathan
 # environment
 PYTHONPATH = /home/jonathan/pythonlabs:/home/jonathan/oopythonlabs:/home/jonathan/sqlpythonlabs
 # environment
-SSH_CLIENT = 192.168.37.1 50771 22
+SSH_CLIENT = 192.168.37.1 56345 22
 # environment
 BROWSER = /home/jonathan/.vscode-server/bin/c3511e6c69bb39013c4a4b7b9566ec1ca73fc4d5/bin/helpers/browser.sh
 # environment
@@ -147,6 +145,8 @@ all:
 # strcache performance: lookups = 3 / hit rate = 33%
 # hash-table stats:
 # Load=2/8192=0%, Rehash=0, Collisions=0/3=0%
-# Finished Make data base on Wed Jun  1 07:32:41 2022
+# Finished Make data base on Thu Jun  9 12:28:01 2022
 
  
+make: *** /home/jonathan/oopythonlabs/c2_server/initiate: No such file or directory.  Stop.
+
