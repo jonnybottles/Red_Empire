@@ -93,6 +93,7 @@ class Handler(CGIHandler):
     def do_GET(self):
         for key, value in agents.items():
             if value.has_tasks:
+                # Key is the agents UUID
                 if self.path.endswith(f'/tasks/{key}'):
                     serve_tasks(self, value)
 
@@ -100,8 +101,9 @@ class Handler(CGIHandler):
         if self.path.endswith('/reg'):
             register_agent(self)
         for key, value in agents.items():
+            # Key is the agents UUID
             if self.path.endswith(f'/results/{key}'):
-                collect_results(self)
+                collect_results(self, key)
 
     # This silences log messages from the server.
     def log_message(self, format, *args):

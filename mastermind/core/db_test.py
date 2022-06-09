@@ -4,7 +4,7 @@ from exception_utils import printerr, TracebackContext
 
 def main():
     listeners_schema = [
-        # "listener_name int AUTO_INCREMENT PRIMARY KEY NOT NULL ",
+        "listener_id int AUTO_INCREMENT PRIMARY KEY NOT NULL ",
         "listener_name VARCHAR(25) PRIMARY KEY NOT NULL",
         "listener_ip INT UNSIGNED NOT NULL",
         "listener_port SMALLINT UNSIGNED NOT NULL",
