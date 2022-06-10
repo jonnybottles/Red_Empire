@@ -98,7 +98,7 @@ class Agent:
         return 0
 
     def generate_task_ids(self):
-        for i in range(9999):
+        for i in range(1000, 9999):
             self.task_ids.append(i)
 
     def get_task_id(self):
@@ -116,8 +116,8 @@ class Agent:
     def view_tasks(self):
         if os.path.exists(self.tasks_log_path):
             print(YELLOW)
-            print("  ID            Status                 Type                  Command")
-            print("------        ----------             ---------              ----------")
+            print("  ID             Status                Type                  Command")
+            print("------         ----------            ---------              ----------")
             with open(self.tasks_log_path, 'r') as f:
                 print(f.read())
         else:
@@ -135,7 +135,7 @@ class Agent:
             task_id = self.get_task_id()
             task = f"#{task_id} 0 {command}\n"
             self.write_task(task)
-            task = f" {task_id}           issued                 cmd                   {command}\n"
+            task = f" {task_id}           assigned              cmd                    {command}\n"
             self.log_task(task)
 
 

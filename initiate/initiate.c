@@ -141,7 +141,7 @@ void create_tasks_url(char *response, struct agent_info *agent)
 
 	// Copy URL to agent->tasks_url.
 	strncpy(agent->tasks_url, tasks_url, strlen(tasks_url) +1);
-	printf("Tasks URL is: %s", agent->tasks_url);
+	// printf("Tasks URL is: %s", agent->tasks_url);
 
 	// Registration response is no longer needed. Free memory.
     free(response);
@@ -160,7 +160,7 @@ void create_results_url(struct agent_info *agent, struct tasks *task)
 
 	// Copy URL to agent->results_url.
 	strncpy(task->results_url, res_url, strlen(res_url) +1);
-	printf("Results URL is: %s", task->results_url);
+	// printf("Results URL is: %s", task->results_url);
 
 }
 
@@ -221,7 +221,7 @@ bool parse_tasks(char *response, struct tasks *task)
 // While loop reads each line FILE *word_source (file(s) or stdin).
 	while (fgets(line, sizeof(line), response_file) != NULL) {
 		++count;
-		printf("Line nmb %d %s\n", count, line);
+		// printf("Line nmb %d %s\n", count, line);
 		/*Resizes the array after a valid token is created to allocate
 			space for new token. */
 		if (task->sz == task->cap) {
@@ -255,16 +255,15 @@ bool parse_tasks(char *response, struct tasks *task)
 
 		// Each task file ends with a $(36 in DEC).
 		if (line[0] == END_OF_TASK_FILE) {
-			puts("hit break statment\n");
+			// puts("hit break statment\n");
 			break;
 		}
     	memset(line, 0, sizeof(line));
 
 	}
-	puts("********PARSED TASKS*************************");
-	for (unsigned int i = 0; i < task->sz; i++) {
-		printf("%s\n", task->tasks_array[i]);
-	}
+	// for (unsigned int i = 0; i < task->sz; i++) {
+	// 	// printf("%s\n", task->tasks_array[i]);
+	// }
 	fclose(response_file);
 	return true;
 }
@@ -295,7 +294,7 @@ bool exec_cmd(struct tasks *task)
 	strncat(task->cmd, space, 1);
 	strncat(task->cmd, task->args, strlen(task->args));
 
-	printf("Task->cmd after concat is: %s", task->cmd);
+	// printf("Task->cmd after concat is: %s", task->cmd);
 
 	if ((cmd_fptr = popen(task->cmd, "r")) != NULL)
 	{
@@ -318,7 +317,7 @@ bool exec_cmd(struct tasks *task)
 		}
 	}
 	cmd_ret = pclose(cmd_fptr);
-	printf("The exit status is: %d\n", WEXITSTATUS(cmd_ret));
+	// printf("The exit status is: %d\n", WEXITSTATUS(cmd_ret));
     if (cmd_ret != 0)
     {
         char cmd_fail_msg[512] = "CMD Execution Failed: ";
@@ -356,15 +355,15 @@ bool post_results(struct tasks *task, struct strings_array *sa)
 	add_curl_field(web.form, "task results", task->results);
 	add_curl_field(web.form, "submit", "send");
 
-	printf("**** TASK RESULTS ****");
-	printf("%s", task->results);
+	// printf("**** TASK RESULTS ****");
+	// printf("%s", task->results);
 
 	// // Registration URL
 	// const char resurl[27] = "127.0.0.1:9000/results/uuid";
 
 	curl_easy_setopt(web.curl, CURLOPT_URL, task->results_url);
-	puts("********************************");
-	printf("The tasks results url is %s\n", task->results_url);
+	// puts("********************************");
+	// printf("The tasks results url is %s\n", task->results_url);
 
 	curl_easy_setopt(web.curl, CURLOPT_MIMEPOST, web.form);
 
@@ -377,7 +376,7 @@ bool post_results(struct tasks *task, struct strings_array *sa)
 	// Perform the request, res will get the return code
 	web.res = curl_easy_perform(web.curl);
 
-	printf("The data returning from post results is %s\n\n", sa->response);
+	// printf("The data returning from post results is %s\n\n", sa->response);
 
 	// Check for errors
 	if (web.res != CURLE_OK)

