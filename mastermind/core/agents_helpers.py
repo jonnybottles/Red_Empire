@@ -2,6 +2,9 @@ from .common import *
 from shutil import rmtree
 import fileinput
 import sys
+from tempfile import mkstemp
+from shutil import move, copymode
+from os import fdopen, remove
 
 # NEED TO ADD LOCKS HERE WHEN I START WORKING WITH MULTIPLE THREADS
 agents = {}
@@ -27,13 +30,84 @@ def delete_task(agent, task_id):
         file.close()
 
 def update_log(agent, task_id, task_cmd):
-    previousw = f" {task_id}         issued                 cmd                   {task_cmd}"
-    nextwwwww = f" {task_id}         complete               cmd                   {task_cmd}\n"
+    # previousw = f" {task_id}         issued                 cmd                   {task_cmd}"
+    # nextwwwww = f" {task_id}         complete               cmd                   {task_cmd}\n"
+
+    # text = f"{task_id}"
+    # new_text = f" {task_id}         complete               cmd                   {task_cmd}"
+
+    file_path = agent.tasks_log_path
+
+    #Create temp file
+    fd, abs_path = mkstemp()
+    with fdopen(fd, 'w') as new_file:
+        with open(file_path, 'r') as old_file:
+            for line in old_file:
+                if task_id in line:
+                    new_file.write(line.replace("assigned", "complete"))
+                else:
+                    new_file.write(line)
+                
+    #Copy the file permissions from the old file to the new file
+    copymode(file_path, abs_path)
+    
+    #Remove original file
+    remove(file_path)
+    
+    #Move new file
+    move(abs_path, file_path)
 
 
-    for line in fileinput.input(agent.tasks_log_path, inplace=1):
-       line = line.replace(previousw, nextwwwww)
-       sys.stdout.write(line)
+
+    # file = open(agent.tasks_log_path, "r")
+    # replaced_content = ""
+    # #looping through the file
+    # for line in file:
+        
+    #     #stripping line break
+    #     line = line.strip()
+    #     #replacing the texts
+    #     if task_id in line:
+    #         line = line.replace("issued", "complete")
+    #     #concatenate the new string and add an end-line break
+    #         replaced_content = replaced_content + line + "\n"
+        
+    # #close the file
+    # file.close()
+    # #Open file in write mode
+    # write_file = open(agent.tasks_log_path, "w")
+    # #overwriting the old file contents with the new/replaced content
+    # write_file.write(replaced_content)
+    # #close the file
+    # write_file.close()
+
+
+
+#    file_path = agent.tasks_log_path
+#    #Create temp file
+#    fh, abs_path = mkstemp()
+#    new_file = open(abs_path,'w')
+#    old_file = open(file_path)
+#    for line in old_file:
+#        new_file.write(line.replace(pattern, subst))
+#    #close temp file
+#    new_file.close()
+#    close(fh)
+#    old_file.close()
+#    #Remove original file
+#    remove(file_path)
+#    #Move new file
+#    move(abs_path, file_path)
+
+    # x = fileinput.input(files=agent.tasks_log_path, inplace=1)
+    # for line in x:
+    #     if text in line:
+    #         line = new_text
+    # x.close()
+
+    # for line in fileinput.input(agent.tasks_log_path, inplace=1):
+    #    line = line.replace(previousw, nextwwwww)
+    #    sys.stdout.write(line)
 
 
 
