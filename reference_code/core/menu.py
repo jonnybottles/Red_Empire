@@ -229,7 +229,7 @@ def Exit():
 Amenu = Menu("agents")
 Lmenu = Menu("listeners")
 Pmenu = Menu("payloads")
-Hmenu = Menu("c2")
+Hmenu = Menu("mastermind")
 
 Amenu.registerCommand("list", "List active agents.", "")
 Amenu.registerCommand("interact", "Interact with an agent.", "<name>")

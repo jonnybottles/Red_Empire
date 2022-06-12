@@ -49,7 +49,7 @@ int main(void)
         if(!check_tasks(&agent, &sa)) {
             puts("No tasks during check in.\n");
             puts("Checking back in for more tasks shortly.\n");
-            sleep(5);
+            sleep(15);
             continue;
         }
         if(!parse_tasks(sa.response, &task)) {

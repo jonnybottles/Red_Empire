@@ -12,7 +12,9 @@ from shutil import rmtree
 
 
 class Agent:
-    def __init__(self, listener_name, uuid, tgt_ip, tgt_hostname, tgt_os, tgt_version):
+    def __init__(
+        self, listener_name, uuid, tgt_ip, tgt_hostname, tgt_os, tgt_version
+    ):
         self.listener_name = listener_name
         self.name = uuid
         self.tgt_ip = tgt_ip
@@ -20,13 +22,14 @@ class Agent:
         self.tgt_os = tgt_os
         self.tgt_version = tgt_version
         self.has_tasks = False
-        self.path = f"../data/listeners/{self.listener_name}/agents/{self.name}/"
+        self.path = (
+            f"../data/listeners/{self.listener_name}/agents/{self.name}/"
+        )
         self.tasks_path = "{}tasks.txt".format(self.path, self.name)
         self.tasks_log_path = "{}tasks_log.txt".format(self.path, self.name)
         self.results_path = f"{self.path}results"
 
         self.task_ids = []
-        # self.task_ids = []
 
         if not os.path.exists(self.path):
             os.mkdir(self.path)
@@ -34,40 +37,35 @@ class Agent:
         if not os.path.exists(self.results_path):
             os.mkdir(self.results_path)
 
-        # if not os.path.exists(self.tasks_path):
-        #     with open(self.tasks_path, "w") as f:
-        #         f.write("$\n")
-        #         f.close()
-        #         # f = open(self.tasks_path, "w")
-        #         # f.close()
-
         self.menu = men.Menu(self.name)
-        
-        self.menu.registerCommand("cmd", "Execute a shell command.", "<command>")
-        self.menu.registerCommand("tasks", "View issued tasks and their status.", "")
+
+        self.menu.registerCommand(
+            "cmd", "Execute a shell command.", "<command>"
+        )
+        self.menu.registerCommand(
+            "tasks", "View issued tasks and their status.", ""
+        )
         self.menu.registerCommand("clear", "Clear tasks.", "")
-        self.menu.registerCommand("results", "View task results.", "<task ID")
+        self.menu.registerCommand("results", "View task results.", "<task ID>")
 
         self.menu.uCommands()
 
         self.Commands = self.menu.Commands
 
-    
     def write_task(self, task):
 
         # Reads file into memory and prepends file with new task.
-        # Each task is inserted as beginning of file, as initiate looks for end of file
+        # Each task is inserted as beginning of file, as initiate looks for
+        # end of file
         # indicator which is "$"
         if not os.path.exists(self.tasks_path):
             with open(self.tasks_path, "w") as f:
                 f.write("$\n")
-                # f = open(self.tasks_path, "w")
-                # f.close()
 
-        with open(self.tasks_path, 'r+') as f:
+        with open(self.tasks_path, "r+") as f:
             content = f.read()
             f.seek(0, 0)
-            f.write(task.rstrip('\r\n') + '\n' + content)
+            f.write(task.rstrip("\r\n") + "\n" + content)
             self.has_tasks = True
 
     def clearTasks(self):
@@ -76,26 +74,6 @@ class Agent:
             os.remove(self.tasks_path)
         else:
             pass
-
-    # def update(self):
-        
-    #     self.menu.name = self.name
-    #     self.Path      = "data/listeners/{}/agents/{}/".format(self.listener, self.name)
-    #     self.tasks_path = "{}tasks".format(self.Path, self.name)
-        
-    #     if os.path.exists(self.Path) == False:
-    #         os.mkdir(self.Path)
-        
-    def rename(self, newname):
-        
-        task    = "rename " + newname
-        self.writeTask(task)
-        
-        progress("Waiting for agent.")
-        while os.path.exists(self.tasks_path):
-            pass
-        
-        return 0
 
     def generate_task_ids(self):
         for i in range(1000, 9999):
@@ -110,19 +88,20 @@ class Agent:
     def log_task(self, task):
         with open(self.tasks_log_path, "a") as f:
             f.write(task)
-            # f = open(self.tasks_path, "w")
-            # f.close()
 
     def view_tasks(self):
         if os.path.exists(self.tasks_log_path):
             print(YELLOW)
-            print("  ID             Status                Type                  Command")
-            print("------         ----------            ---------              ----------")
-            with open(self.tasks_log_path, 'r') as f:
+            print(
+                "  ID             Status                Type                  Command"
+            )
+            print(
+                "------         ----------            ---------              ----------"
+            )
+            with open(self.tasks_log_path, "r") as f:
                 print(f.read())
         else:
             error("No tasks to display.")
-
 
     def cmd(self, args):
 
@@ -139,74 +118,23 @@ class Agent:
             self.log_task(task)
 
 
-    def powershell(self, args):
-        
-        if len(args) == 0:
-            error("Missing command.")
-        else:
-            command = " ".join(args)
-            task    = "powershell " + command
-            self.writeTask(task)
-
-    def sleep(self, args):
-
-        if len(args) != 1:
-            error("Invalid arguments.")
-        else:
-            time = args[0]
-
-            try:
-                temp = int(time)
-            except:
-                error("Invalid time.")
-                return 0
-            
-            task = "sleep {}".format(time)
-            self.write_task(task)
-            self.sleept = int(time)
-            removeFromDatabase(agentsDB, self.name)
-            writeToDatabase(agentsDB, self)
-
-    def QuitandRemove(self):
-
-        self.Quit()
-
-        rmtree(self.Path)
-        # removeFromDatabase(agentsDB,self.name)
-
-        men.Menu.home()
-        
-        return 0
-
-    def Quit(self):
-        
-        self.write_task("quit")
-
-        progress("Waiting for agent.")
-
-        for i in range(self.sleept):
-            
-            if os.path.exists(self.tasks_path):
-                time.sleep(1)
-            else:
-                break
-
-        return 0
-
     def view_results(self, args):
         if len(args) == 0:
             error("Missing command.")
 
         print(YELLOW)
-        print(f"                                    TASK {args[0]} RESULTS                                 ")
-        print("  -----------------------------------------------------------------------------------\n")
+        print(
+            f"                                    TASK {args[0]} RESULTS                                 "
+        )
+        print(
+            "  -----------------------------------------------------------------------------------\n"
+        )
 
         if os.path.exists(f"{self.results_path}/{args[0]}.txt"):
-            with open(f"{self.results_path}/{args[0]}.txt", 'r') as f:
+            with open(f"{self.results_path}/{args[0]}.txt", "r") as f:
                 print(f.read())
         else:
             error("No results to display.")
-
 
     def ev(self, command, args):
 
@@ -222,8 +150,6 @@ class Agent:
             self.sleep(args)
         elif command == "clear":
             self.clearTasks()
-        elif command == "quit":
-            self.QuitandRemove()
         elif command == "tasks":
             self.view_tasks()
         elif command == "results":
@@ -234,12 +160,12 @@ class Agent:
         self.menu.clearScreen()
 
         while True:
-            
+
             try:
                 command, args = self.menu.parse()
             except:
                 continue
-            
+
             if command not in self.Commands:
                 error("Invalid command.")
             else:

