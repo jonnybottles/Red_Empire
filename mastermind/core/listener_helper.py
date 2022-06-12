@@ -11,17 +11,18 @@ listeners = {}
 
 
 def checkListenersEmpty(s):
-    
+
     if len(listeners) == 0:
-        
+
         if s == 1:
             error("There are no active listeners.")
             return True
         else:
             return True
-    
+
     else:
         return False
+
 
 def isValidListener(name, s):
 
@@ -36,35 +37,55 @@ def isValidListener(name, s):
         else:
             return False
 
+
 def view_listeners():
 
     if checkListenersEmpty(1) == False:
-        
+
         success("Active listeners:")
-        
+
         print(YELLOW)
-        print(" Name                         IP:Port                                  Status")
-        print("------                       ------------------                       --------")
-        
+        print(
+            " Name                         IP:Port                                  Status"
+        )
+        print(
+            "------                       ------------------                       --------"
+        )
+
         for i in listeners:
- 
+
             if listeners[i].is_running == True:
                 status = "Running"
             else:
                 status = "Stopped"
 
-            print(" {}".format(listeners[i].name) + " " * (29 - len(listeners[i].name)) + "{}:{}".format(listeners[i].ip_addr, str(listeners[i].port)) + " " * (41 - (len(str(listeners[i].port)) + len(":{}".format(listeners[i].ip_addr)))) + status)
-        
+            print(
+                " {}".format(listeners[i].name)
+                + " " * (29 - len(listeners[i].name))
+                + "{}:{}".format(listeners[i].ip_addr, str(listeners[i].port))
+                + " "
+                * (
+                    41
+                    - (
+                        len(str(listeners[i].port))
+                        + len(":{}".format(listeners[i].ip_addr))
+                    )
+                )
+                + status
+            )
+
         print(cRESET)
 
+
 def ulisteners():
-    
+
     l = []
-    
+
     for listener in listeners:
         l.append(listeners[listener].name)
-    
+
     return l
+
 
 def start_listener(args):
 
@@ -89,12 +110,14 @@ def start_listener(args):
             except:
                 error("Invalid port.")
                 return 0
-            
+
             iface = args[2]
 
             try:
                 netifaces.ifaddresses(iface)
-                ipaddress = netifaces.ifaddresses(iface)[netifaces.AF_INET][0]['addr']
+                ipaddress = netifaces.ifaddresses(iface)[netifaces.AF_INET][0][
+                    "addr"
+                ]
             except:
                 error("Invalid interface.")
                 return 0
@@ -102,7 +125,7 @@ def start_listener(args):
             if isValidListener(name, 0):
                 error(f"Listener {name} already exists.")
             else:
-            
+
                 listeners[name] = Listener(name, ipaddress, port)
                 progress(f"Starting listener {name} on {port}:{ipaddress}.")
 
@@ -114,16 +137,17 @@ def start_listener(args):
                     error("Failed. Check your options.")
                     del listeners[name]
 
+
 def stop_listener(args):
 
     if len(args) != 1:
         error("Invalid arguments.")
     else:
-        
+
         name = args[0]
-        
+
         if isValidListener(name, 1):
-            
+
             if listeners[name].is_running == True:
                 progress(f"Stopping listener {name}")
                 listeners[name].stop()
@@ -133,14 +157,15 @@ def stop_listener(args):
         else:
             pass
 
+
 def remove_listener(args):
-    
+
     if len(args) != 1:
         error("Invalid arguments.")
     else:
-        
+
         name = args[0]
-        
+
         if isValidListener(name, 1):
             # Pass in listener object, look for valid agents and return list
             # of listeners agents.
@@ -150,7 +175,7 @@ def remove_listener(args):
                 remove_agent([agent])
 
             rmtree(listeners[name].path)
-            
+
             if listeners[name].is_running == True:
                 stop_listener([name])
                 del listeners[name]
