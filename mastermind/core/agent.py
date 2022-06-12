@@ -75,17 +75,6 @@ class Agent:
         else:
             pass
 
-    def rename(self, newname):
-
-        task = "rename " + newname
-        self.writeTask(task)
-
-        progress("Waiting for agent.")
-        while os.path.exists(self.tasks_path):
-            pass
-
-        return 0
-
     def generate_task_ids(self):
         for i in range(1000, 9999):
             self.task_ids.append(i)

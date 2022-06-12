@@ -55,7 +55,6 @@ class Listener:
 
 class Handler(CGIHandler):
     listener = None
-
     def do_GET(self):
         for key, value in agents.items():
             if value.has_tasks:
